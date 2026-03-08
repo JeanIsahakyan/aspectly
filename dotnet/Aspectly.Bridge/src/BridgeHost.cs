@@ -338,12 +338,13 @@ public class BridgeHost : IDisposable
     /// </summary>
     public void RegisterHandler<TParams, TResult>(string methodName, Func<TParams, Task<TResult>> handler)
     {
-        RegisterHandler(methodName, async (JsonElement paramsJson) =>
+        Func<JsonElement, Task<object?>> wrapper = async (JsonElement paramsJson) =>
         {
             var parameters = JsonSerializer.Deserialize<TParams>(paramsJson.GetRawText(), _jsonOptions)
                 ?? throw new ArgumentException($"Failed to deserialize params for {methodName}");
-            return await handler(parameters);
-        });
+            return (object?)await handler(parameters);
+        };
+        RegisterHandler(methodName, wrapper);
     }
 
     /// <summary>
@@ -351,7 +352,8 @@ public class BridgeHost : IDisposable
     /// </summary>
     public void RegisterHandler<TResult>(string methodName, Func<Task<TResult>> handler)
     {
-        RegisterHandler(methodName, async (JsonElement _) => await handler());
+        Func<JsonElement, Task<object?>> wrapper = async (JsonElement _) => (object?)await handler();
+        RegisterHandler(methodName, wrapper);
     }
 
     /// <summary>
