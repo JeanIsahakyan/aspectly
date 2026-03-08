@@ -62,5 +62,7 @@ jobs:
           git pull --rebase origin main
           git push origin main
 
-      # Landing page redeploys automatically via deploy-landing.yml
-      # triggered by the version bump commit pushed to main
+      - name: Trigger landing page deploy
+        run: gh workflow run deploy-landing.yml --ref main
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
