@@ -46,8 +46,9 @@ export function LiveDemo() {
       addLog('greet({ name: "Landing" })', 'out')
       const result = await bridge.send<{ message: string }>('greet', { name: 'Landing' })
       addLog(`Response: ${result.message}`, 'in')
-    } catch (e: any) {
-      addLog(`Error: ${e.message || e.error_message}`, 'in')
+    } catch (e: unknown) {
+      const err = e as Record<string, string>
+      addLog(`Error: ${err.message || err.error_message}`, 'in')
     }
   }
 
@@ -58,8 +59,9 @@ export function LiveDemo() {
       addLog(`calculate({ a: ${a}, b: ${b} })`, 'out')
       const result = await bridge.send<{ sum: number; product: number }>('calculate', { a, b })
       addLog(`sum=${result.sum}, product=${result.product}`, 'in')
-    } catch (e: any) {
-      addLog(`Error: ${e.message || e.error_message}`, 'in')
+    } catch (e: unknown) {
+      const err = e as Record<string, string>
+      addLog(`Error: ${err.message || err.error_message}`, 'in')
     }
   }
 
@@ -70,8 +72,9 @@ export function LiveDemo() {
       addLog(`setTheme({ dark: ${newTheme} })`, 'out')
       await bridge.send('setTheme', { dark: newTheme })
       addLog('Theme applied', 'in')
-    } catch (e: any) {
-      addLog(`Error: ${e.message || e.error_message}`, 'in')
+    } catch (e: unknown) {
+      const err = e as Record<string, string>
+      addLog(`Error: ${err.message || err.error_message}`, 'in')
     }
   }
 

@@ -24,8 +24,11 @@ export function LiveDemoWindow() {
     setLogs(prev => [{ time, message, direction }, ...prev].slice(0, 20))
   }, [])
 
+  const isReady = ready && isOpen
+
   useEffect(() => {
-    if (loaded && isOpen) {
+    if (!isOpen || !loaded) return
+    if (loaded) {
       bridge.init({
         getTime: async () => {
           addLog('getTime()', 'in')
@@ -40,9 +43,6 @@ export function LiveDemoWindow() {
         addLog('Bridge connected!', 'in')
       })
     }
-    if (!isOpen) {
-      setReady(false)
-    }
   }, [loaded, isOpen, bridge, addLog])
 
   const handleGreet = async () => {
@@ -50,8 +50,9 @@ export function LiveDemoWindow() {
       addLog('greet({ name: "Parent" })', 'out')
       const result = await bridge.send<{ message: string }>('greet', { name: 'Parent' })
       addLog(`Response: ${result.message}`, 'in')
-    } catch (e: any) {
-      addLog(`Error: ${e.message || e.error_message}`, 'in')
+    } catch (e: unknown) {
+      const err = e as Record<string, string>
+      addLog(`Error: ${err.message || err.error_message}`, 'in')
     }
   }
 
@@ -62,8 +63,9 @@ export function LiveDemoWindow() {
       addLog(`calculate({ a: ${a}, b: ${b} })`, 'out')
       const result = await bridge.send<{ sum: number; product: number }>('calculate', { a, b })
       addLog(`sum=${result.sum}, product=${result.product}`, 'in')
-    } catch (e: any) {
-      addLog(`Error: ${e.message || e.error_message}`, 'in')
+    } catch (e: unknown) {
+      const err = e as Record<string, string>
+      addLog(`Error: ${err.message || err.error_message}`, 'in')
     }
   }
 
@@ -74,8 +76,9 @@ export function LiveDemoWindow() {
       addLog(`setTheme({ dark: ${newTheme} })`, 'out')
       await bridge.send('setTheme', { dark: newTheme })
       addLog('Theme applied', 'in')
-    } catch (e: any) {
-      addLog(`Error: ${e.message || e.error_message}`, 'in')
+    } catch (e: unknown) {
+      const err = e as Record<string, string>
+      addLog(`Error: ${err.message || err.error_message}`, 'in')
     }
   }
 
@@ -113,8 +116,8 @@ export function LiveDemoWindow() {
               <div className="p-4 space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-sm">
-                    <div className={`w-2 h-2 rounded-full ${ready ? 'bg-green-500' : 'bg-red-500'}`} />
-                    <span>{ready ? 'Connected' : isOpen ? 'Connecting...' : 'Window closed'}</span>
+                    <div className={`w-2 h-2 rounded-full ${isReady ? 'bg-green-500' : 'bg-red-500'}`} />
+                    <span>{isReady ? 'Connected' : isOpen ? 'Connecting...' : 'Window closed'}</span>
                   </div>
                   {!isOpen ? (
                     <button
@@ -143,21 +146,21 @@ export function LiveDemoWindow() {
                   <div className="flex flex-wrap gap-2">
                     <button
                       onClick={handleGreet}
-                      disabled={!ready}
+                      disabled={!isReady}
                       className="px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50"
                     >
                       greet()
                     </button>
                     <button
                       onClick={handleCalculate}
-                      disabled={!ready}
+                      disabled={!isReady}
                       className="px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50"
                     >
                       calculate()
                     </button>
                     <button
                       onClick={handleToggleTheme}
-                      disabled={!ready}
+                      disabled={!isReady}
                       className="px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50"
                     >
                       setTheme()

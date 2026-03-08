@@ -10,7 +10,7 @@ vi.mock('@aspectly/core', () => ({
       try {
         const parsed = JSON.parse(data);
         if (parsed?.type === 'BridgeEvent') listener(parsed.event);
-      } catch {}
+      } catch { /* ignore parse errors */ }
     }),
     subscribe: vi.fn().mockReturnValue(vi.fn()),
   },

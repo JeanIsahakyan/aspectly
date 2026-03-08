@@ -1,10 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { TransportRegistry, detectTransport, registerTransport } from './TransportRegistry';
-import type { TransportDetector, Transport } from './types';
+import type { TransportDetector } from './types';
 import { NullTransport } from './transports/NullTransport';
-import { CefSharpTransport } from './transports/CefSharpTransport';
-import { ReactNativeTransport } from './transports/ReactNativeTransport';
-import { IframeTransport } from './transports/IframeTransport';
 
 describe('TransportRegistry', () => {
   let consoleWarnSpy: ReturnType<typeof vi.spyOn>;

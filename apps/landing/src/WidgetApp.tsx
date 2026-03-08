@@ -45,8 +45,9 @@ export function WidgetApp() {
       addLog('getTime()', 'out')
       const result = await bridge.send<{ time: string }>('getTime')
       addLog(`→ ${result.time}`, 'in')
-    } catch (e: any) {
-      addLog(`Error: ${e.message || e.error_message}`, 'info')
+    } catch (e: unknown) {
+      const err = e as Record<string, string>
+      addLog(`Error: ${err.message || err.error_message}`, 'info')
     }
   }
 
@@ -55,8 +56,9 @@ export function WidgetApp() {
       addLog('getUserInfo()', 'out')
       const result = await bridge.send<{ name: string; role: string }>('getUserInfo')
       addLog(`→ ${result.name} (${result.role})`, 'in')
-    } catch (e: any) {
-      addLog(`Error: ${e.message || e.error_message}`, 'info')
+    } catch (e: unknown) {
+      const err = e as Record<string, string>
+      addLog(`Error: ${err.message || err.error_message}`, 'info')
     }
   }
 

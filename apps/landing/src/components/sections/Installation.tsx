@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Check, Copy, Package } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
+import { Tabs, TabsList, TabsTrigger } from '../ui/tabs'
 import { BlurFade } from '../reactbits'
 
 const jsPackages = [
