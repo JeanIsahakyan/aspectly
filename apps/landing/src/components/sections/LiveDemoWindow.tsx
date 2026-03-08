@@ -15,7 +15,7 @@ export function LiveDemoWindow() {
   const [ready, setReady] = useState(false)
 
   const [bridge, loaded, openWindow, closeWindow, isOpen] = useAspectlyWindow({
-    url: '/popup',
+    url: import.meta.env.BASE_URL + 'popup.html',
     features: 'width=420,height=500,left=200,top=200',
   })
 

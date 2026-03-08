@@ -15,7 +15,7 @@ export function LiveDemo() {
   const [ready, setReady] = useState(false)
 
   const [bridge, loaded, Iframe] = useAspectlyIframe({
-    url: '/widget'
+    url: import.meta.env.BASE_URL + 'widget.html'
   })
 
   const addLog = useCallback((message: string, direction: 'in' | 'out') => {

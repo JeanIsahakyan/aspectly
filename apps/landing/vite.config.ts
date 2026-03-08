@@ -12,6 +12,15 @@ const corePkg = JSON.parse(readFileSync(resolve(__dirname, '../../packages/core/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   base: '/aspectly/',
+  build: {
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html'),
+        widget: resolve(__dirname, 'widget.html'),
+        popup: resolve(__dirname, 'popup.html'),
+      },
+    },
+  },
   define: {
     __ASPECTLY_VERSION__: JSON.stringify(corePkg.version),
   },

@@ -5,11 +5,12 @@ import App from './App.tsx'
 import { WidgetApp } from './WidgetApp.tsx'
 import { PopupApp } from './PopupApp.tsx'
 
+const base = import.meta.env.BASE_URL.replace(/\/$/, '')
 const pathname = window.location.pathname
 
 const getApp = () => {
-  if (pathname === '/widget' || pathname === '/widget.html') return <WidgetApp />
-  if (pathname === '/popup' || pathname === '/popup.html') return <PopupApp />
+  if (pathname === `${base}/widget` || pathname === `${base}/widget.html`) return <WidgetApp />
+  if (pathname === `${base}/popup` || pathname === `${base}/popup.html`) return <PopupApp />
   return <App />
 }
 
