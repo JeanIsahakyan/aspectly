@@ -412,14 +412,16 @@ public class BridgeHostTests
 
     private static string ExtractRequestIdFromScript(string script)
     {
-        // Script format: window.postMessage("{\"type\":\"BridgeEvent\",\"event\":{\"type\":\"Request\",\"data\":{...\"request_id\":\"123\"...}}}", '*');
-        // Parse JSON to extract request_id
-        var startIndex = script.IndexOf("window.postMessage(\"") + "window.postMessage(\"".Length;
-        var endIndex = script.IndexOf("\", '*');");
-        var jsonString = script.Substring(startIndex, endIndex - startIndex);
-        jsonString = jsonString.Replace("\\\"", "\"");
+        // Script format: window.postMessage(<json-encoded-string>, '*');
+        // The inner value is a JSON string token produced by JsonSerializer.Serialize(json)
+        var startIndex = script.IndexOf("window.postMessage(") + "window.postMessage(".Length;
+        var endIndex = script.LastIndexOf(", '*');");
+        var jsonStringToken = script.Substring(startIndex, endIndex - startIndex);
 
-        var doc = JsonDocument.Parse(jsonString);
+        // Deserialize the JSON string token to get the actual JSON
+        var json = JsonSerializer.Deserialize<string>(jsonStringToken)!;
+
+        var doc = JsonDocument.Parse(json);
         var eventData = doc.RootElement.GetProperty("event").GetProperty("data");
         return eventData.GetProperty("request_id").GetString() ?? string.Empty;
     }
