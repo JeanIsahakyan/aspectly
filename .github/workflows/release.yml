@@ -6,8 +6,6 @@ on:
 
 permissions:
   contents: write
-  pages: write
-  id-token: write
 
 jobs:
   publish:
@@ -64,24 +62,5 @@ jobs:
           git pull --rebase origin main
           git push origin main
 
-      - name: Build landing page
-        run: pnpm --filter @aspectly/transports build && pnpm --filter @aspectly/core build && pnpm --filter @aspectly/web build && pnpm build:landing
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: './apps/landing/dist'
-
-  deploy-landing:
-    needs: publish
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      # Landing page redeploys automatically via deploy-landing.yml
+      # triggered by the version bump commit pushed to main
