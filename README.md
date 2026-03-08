@@ -19,6 +19,11 @@ Aspectly enables seamless bidirectional communication between:
 | [`@aspectly/web`](./packages/web) | Web/iframe integration with React hooks |
 | [`@aspectly/react-native`](./packages/react-native) | React Native WebView integration |
 | [`@aspectly/react-native-web`](./packages/react-native-web) | Universal React Native Web support |
+| [`@aspectly/transports`](./packages/transports) | Transport layer for platform detection |
+| | |
+| [`Aspectly.Bridge`](./dotnet/Aspectly.Bridge) | Core .NET bridge library |
+| [`Aspectly.Bridge.CefSharp`](./dotnet/Aspectly.Bridge.CefSharp) | CefSharp (Chromium) integration |
+| [`Aspectly.Bridge.WebView2`](./dotnet/Aspectly.Bridge.WebView2) | WebView2 (Edge) integration |
 
 ## Quick Start
 
@@ -113,6 +118,24 @@ function App() {
 }
 ```
 
+### Scenario 4: .NET desktop app with CefSharp
+
+**C# host app:**
+
+```csharp
+using Aspectly.Bridge;
+using Aspectly.Bridge.CefSharp;
+
+var browserBridge = new CefSharpBrowserBridge(chromiumBrowser);
+var bridge = new BridgeHost(browserBridge);
+
+bridge.RegisterHandler<object, object>("getUserData", async _ =>
+    new { name = "John", id = 123 });
+
+await bridge.InitializeAsync();
+var result = await bridge.SendAsync<string>("jsMethod");
+```
+
 ## Features
 
 - **Type-safe** - Full TypeScript support with generics
@@ -122,6 +145,7 @@ function App() {
 - **Event-driven** - Subscribe to all bridge events
 - **Error handling** - Typed errors with detailed messages
 - **Timeout protection** - Configurable request timeouts
+- **Cross-platform** - JavaScript, TypeScript, and .NET support
 
 ## Architecture
 
@@ -129,7 +153,7 @@ function App() {
 ┌─────────────────────────────────────────────────────────────────┐
 │                         Host Context                             │
 │  ┌─────────────────────────────────────────────────────────────┐ │
-│  │ @aspectly/web | @aspectly/react-native | @aspectly/react-native-web│ │
+│  │ @aspectly/web | @aspectly/react-native | @aspectly/react-native-web | .NET (Aspectly.Bridge)│ │
 │  │                                                              │ │
 │  │  • useAspectlyIframe() / useAspectlyWebView()               │ │
 │  │  • Register handlers                                         │ │
@@ -167,6 +191,12 @@ npm install @aspectly/react-native react-native-webview
 
 # Universal app (Expo / React Native Web)
 npm install @aspectly/react-native-web react-native-webview
+
+# .NET desktop app with CefSharp
+dotnet add package Aspectly.Bridge.CefSharp
+
+# .NET desktop app with WebView2
+dotnet add package Aspectly.Bridge.WebView2
 ```
 
 ## Error Handling
@@ -201,6 +231,7 @@ See the [examples](./examples) directory:
 - [`examples/core`](./examples/core) - Widget running inside iframe/WebView
 - [`examples/web`](./examples/web) - React app embedding an iframe
 - [`examples/react-native`](./examples/react-native) - Universal Expo app
+- [`examples/dotnet`](./examples/dotnet) - .NET desktop app with CefSharp
 
 ## Documentation
 

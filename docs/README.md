@@ -12,6 +12,7 @@ Welcome to the Aspectly framework documentation! This guide will help you unders
 - **[API Reference](API.md)** - Complete API documentation for all classes and methods
 - **[Examples](EXAMPLES.md)** - Comprehensive examples and use cases
 - **[Architecture](ARCHITECTURE.md)** - Internal architecture and design decisions
+- **[Migration Guide](MIGRATION.md)** - Migration from legacy packages
 
 ### Additional Resources
 - **[Contributing Guide](../CONTRIBUTING.md)** - How to contribute to the project
@@ -32,7 +33,7 @@ Welcome to the Aspectly framework documentation! This guide will help you unders
 ### For Contributors
 1. Review [Architecture](ARCHITECTURE.md) to understand the codebase
 2. Check [Contributing Guide](../CONTRIBUTING.md) for development guidelines
-3. Examine the example app in the `/example` directory
+3. Examine the example app in the `/examples` directory
 
 ## 📖 Documentation Structure
 
@@ -41,7 +42,8 @@ docs/
 ├── README.md          # This file - documentation index
 ├── API.md            # Complete API reference
 ├── EXAMPLES.md       # Usage examples and patterns
-└── ARCHITECTURE.md   # Internal architecture guide
+├── ARCHITECTURE.md   # Internal architecture guide
+└── MIGRATION.md      # Migration guide from legacy packages
 ```
 
 ## 🎯 Framework Goals
@@ -71,6 +73,7 @@ Aspectly is designed to solve the complex problem of communication between diffe
 | React Native Android | ✅ | ❌ | ❌ |
 | React Native Web | ❌ | ✅ | ✅ |
 | Web Browsers | ❌ | ✅ | ✅ |
+| .NET (CefSharp/WebView2) | ✅ | ❌ | ❌ |
 
 ## 🛠️ Common Use Cases
 
@@ -115,7 +118,7 @@ If you can't find what you're looking for in the documentation:
 
 1. **Check the examples** - The [Examples](EXAMPLES.md) document covers most common scenarios
 2. **Review the API** - The [API Reference](API.md) has detailed method documentation
-3. **Examine the code** - The example app in `/example` shows real-world usage
+3. **Examine the code** - The example app in `/examples` shows real-world usage
 4. **Open an issue** - Create a GitHub issue for bugs or feature requests
 5. **Start a discussion** - Use GitHub Discussions for questions and ideas
 

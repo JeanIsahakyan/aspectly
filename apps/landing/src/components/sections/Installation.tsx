@@ -33,6 +33,12 @@ const jsPackages = [
 
 const dotnetPackages = [
   {
+    name: 'Aspectly.Bridge',
+    description: 'Core bridge library for .NET applications',
+    install: 'dotnet add package Aspectly.Bridge',
+    useCase: 'Base package - required by CefSharp and WebView2 integrations',
+  },
+  {
     name: 'Aspectly.Bridge.CefSharp',
     description: 'CefSharp (Chromium) integration for WPF/WinForms',
     install: 'dotnet add package Aspectly.Bridge.CefSharp',

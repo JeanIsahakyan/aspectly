@@ -76,11 +76,15 @@ Unsubscribe from result events.
 
 Cleanup bridge subscriptions.
 
+##### `reset(): void`
+
+Reset bridge state (clears pending requests, supported methods, and availability).
+
 ---
 
 ## @aspectly/web
 
-React hooks for embedding iframes in web applications.
+React hooks for iframe and popup window communication in web applications.
 
 ### useAspectlyIframe
 
@@ -107,6 +111,38 @@ const [bridge, loaded, IframeComponent] = useAspectlyIframe({
 | 0 | `BridgeBase` | Bridge instance |
 | 1 | `boolean` | Loading state |
 | 2 | `FunctionComponent` | iframe component |
+
+### useAspectlyWindow
+
+```typescript
+import { useAspectlyWindow } from '@aspectly/web';
+
+const [bridge, loaded, open, close, isOpen] = useAspectlyWindow({
+  url: 'https://popup.example.com',
+  features: 'width=800,height=600', // optional
+  target: '_blank', // optional, default: '_blank'
+  timeout: 100000 // optional
+});
+```
+
+#### Options
+
+| Option | Type | Required | Description |
+|--------|------|----------|-------------|
+| `url` | `string` | Yes | URL to open in the popup window |
+| `features` | `string` | No | Window features string (e.g., 'width=800,height=600') |
+| `target` | `string` | No | Window target name (default: '_blank') |
+| `timeout` | `number` | No | Handler execution timeout |
+
+#### Returns
+
+| Index | Type | Description |
+|-------|------|-------------|
+| 0 | `BridgeBase` | Bridge instance |
+| 1 | `boolean` | Whether the window has loaded |
+| 2 | `() => void` | Function to open the popup window |
+| 3 | `() => void` | Function to close the popup window |
+| 4 | `boolean` | Whether the window is currently open |
 
 ---
 
@@ -171,7 +207,7 @@ Automatically detect and return the appropriate transport for the current enviro
 import { detectTransport } from '@aspectly/transports';
 
 const transport = detectTransport();
-console.log(transport.name); // 'cefsharp', 'react-native', 'iframe', or 'null'
+console.log(transport.name); // 'cefsharp', 'react-native', 'iframe', 'window', 'postmessage', or 'null'
 
 // Send a message
 transport.send(JSON.stringify({ type: 'hello' }));
@@ -192,6 +228,8 @@ unsubscribe();
 | CefSharpTransport | `window.CefSharp.PostMessage` | 100 | Desktop apps with CefSharp (.NET) |
 | ReactNativeTransport | `window.ReactNativeWebView.postMessage` | 90 | React Native WebView |
 | IframeTransport | `window.parent !== window` | 80 | Web content in iframes |
+| WindowTransport | `window.addEventListener('message')` | 70 | Popup window communication |
+| PostMessageTransport | `window.postMessage` | 10 | Generic postMessage fallback |
 | NullTransport | Always available | - | Fallback for SSR/testing |
 
 ### TransportRegistry

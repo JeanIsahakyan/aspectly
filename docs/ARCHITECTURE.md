@@ -6,6 +6,11 @@ This document explains the internal architecture of the Aspectly framework, incl
 
 - [Overview](#overview)
 - [Component Architecture](#component-architecture)
+  - [Layer 0: Transport Layer](#layer-0-transport-layer-aspectlytransports)
+  - [Layer 1: BridgeCore](#layer-1-bridgecore)
+  - [Layer 2: BridgeInternal](#layer-2-bridgeinternal)
+  - [Layer 3: BridgeBase](#layer-3-bridgebase)
+  - [Layer 4: AspectlyBridge](#layer-4-aspectlybridge)
 - [Message Flow](#message-flow)
 - [Platform Detection](#platform-detection)
 - [Error Handling Architecture](#error-handling-architecture)
@@ -24,21 +29,45 @@ Aspectly uses a layered architecture that separates concerns and provides a clea
 
 ## Component Architecture
 
+### Layer 0: Transport Layer (@aspectly/transports)
+
+The transport layer provides platform detection and cross-environment messaging. It is a separate package (`@aspectly/transports`) that BridgeCore delegates to.
+
+```tsx
+interface Transport {
+  readonly name: string;
+  isAvailable(): boolean;
+  send(message: string): void;
+  subscribe(listener: TransportListener): TransportUnsubscribe;
+}
+```
+
+Built-in transports (detection priority order):
+1. CefSharpTransport (100) -- .NET desktop apps with CefSharp
+2. ReactNativeTransport (90) -- React Native WebView
+3. IframeTransport (80) -- Web iframe (window.parent.postMessage)
+4. WindowTransport (70) -- Popup window communication
+5. PostMessageTransport (10) -- Generic postMessage fallback
+6. NullTransport -- SSR-safe fallback (no-op)
+
+Custom transports can be registered via `registerTransport()`.
+
 ### Layer 1: BridgeCore
 
 The lowest level component that handles platform-specific communication.
 
 ```tsx
 export class BridgeCore {
-  // Message serialization and deserialization
+  // Transport management
+  static setTransport(transport: Transport): void
+  static resetTransport(): void
+  static getTransportName(): string
+
+  // Message serialization
   static wrapBridgeEvent(event: Event): string
-  static wrapListener(listener: BridgeCoreListener)
-  
-  // Platform-specific listeners
-  static browserListener(listener: BridgeCoreListener)
-  static webViewListener(listener: BridgeCoreListener)
-  
-  // Message sending
+  static wrapListener(listener: BridgeCoreListener): (data?: string) => void
+
+  // Communication (delegates to transport)
   static sendEvent(event: Event): void
   static subscribe(listener: BridgeCoreListener): VoidFunction
 }
@@ -46,15 +75,15 @@ export class BridgeCore {
 
 **Responsibilities:**
 - Message serialization/deserialization
-- Platform detection and appropriate method selection
+- Transport management and delegation
 - Event listener setup and cleanup
 - Cross-platform message sending
 
 **Key Features:**
-- Automatic platform detection (WebView vs iframe vs browser)
+- Delegates to `@aspectly/transports` for platform-specific communication
 - JSON message wrapping with type safety
 - Quote handling for iOS WebView compatibility
-- Event listener management
+- Event listener management via transport layer
 
 ### Layer 2: BridgeInternal
 
@@ -127,11 +156,13 @@ The main entry point that combines all components.
 
 ```tsx
 export class AspectlyBridge extends BridgeBase {
-  constructor() {
-    const bridge = new BridgeInternal(BridgeCore.sendEvent);
+  constructor(options?: BridgeOptions) {
+    const bridge = new BridgeInternal(BridgeCore.sendEvent, options);
     super(bridge);
     BridgeCore.subscribe(bridge.handleCoreEvent);
   }
+
+  public destroy(): void
 }
 ```
 
@@ -219,32 +250,15 @@ sequenceDiagram
 
 ## Platform Detection
 
-The framework automatically detects the environment and uses the appropriate communication method:
+Platform detection is now handled by `@aspectly/transports`. The `TransportRegistry` detects the environment by checking each registered transport detector in priority order. The first one whose `detect()` returns true is used.
 
 ### Detection Logic
 
 ```tsx
 static sendEvent = (event: Event): void => {
   const bridgeEvent = BridgeCore.wrapBridgeEvent(event);
-  
-  if (typeof window === 'undefined') {
-    console.warn('Window is undefined');
-    return;
-  }
-  
-  const RNW = window?.ReactNativeWebView;
-  if (typeof RNW?.postMessage === 'function') {
-    // React Native WebView environment
-    return RNW.postMessage(`'${bridgeEvent}'`);
-  }
-  
-  if (window.parent === window) {
-    // Top-level window (no parent)
-    return;
-  }
-  
-  // Iframe environment
-  return window.parent.postMessage(bridgeEvent, '*');
+  const transport = BridgeCore.getTransport();
+  transport.send(bridgeEvent);
 };
 ```
 
@@ -299,8 +313,6 @@ const retryableErrors = [
 interface BridgeResultError {
   error_type: BridgeErrorType;
   error_message?: string;
-  method?: string;
-  request_id?: string;
 }
 ```
 
@@ -363,12 +375,14 @@ if (eventData.type !== BridgeCore.BRIDGE_EVENT_TYPE) {
 ### Custom Communication Methods
 
 ```tsx
-// Extend BridgeCore for custom platforms
-class CustomBridgeCore extends BridgeCore {
-  static sendEvent = (event: Event): void => {
-    // Custom implementation
-  };
-}
+import { registerTransport } from '@aspectly/transports';
+
+registerTransport({
+  name: 'electron',
+  priority: 150,
+  detect: () => !!window.electron,
+  createTransport: () => new ElectronTransport(),
+});
 ```
 
 ### Custom Error Types

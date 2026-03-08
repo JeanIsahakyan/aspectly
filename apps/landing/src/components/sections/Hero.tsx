@@ -45,9 +45,9 @@ export function Hero() {
 
           <BlurFade delay={0.3} inView>
             <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-              A powerful, type-safe communication framework for React Native WebViews
-              and iframes. Build hybrid apps with confidence using a modern,
-              promise-based API.
+              A powerful, type-safe communication framework for WebViews, iframes,
+              popup windows, and .NET desktop apps. Build hybrid apps with confidence
+              using a modern, promise-based API.
             </p>
           </BlurFade>
 
@@ -74,11 +74,11 @@ export function Hero() {
             <div className="mt-12 flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-green-500" />
-                <span>TypeScript First</span>
+                <span>TypeScript & C#</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-blue-500" />
-                <span>Zero Dependencies</span>
+                <span>React Native, Web & .NET</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-purple-500" />

@@ -13,6 +13,7 @@ const links = {
     { name: '@aspectly/web', href: 'https://www.npmjs.com/package/@aspectly/web' },
     { name: '@aspectly/react-native', href: 'https://www.npmjs.com/package/@aspectly/react-native' },
     { name: '@aspectly/react-native-web', href: 'https://www.npmjs.com/package/@aspectly/react-native-web' },
+    { name: '@aspectly/transports', href: 'https://www.npmjs.com/package/@aspectly/transports' },
   ],
   community: [
     { name: 'GitHub', href: 'https://github.com/JeanIsahakyan/aspectly' },
@@ -37,8 +38,8 @@ export function Footer() {
                 <span className="text-xl font-bold">Aspectly</span>
               </div>
               <p className="text-sm text-muted-foreground mb-4">
-                A powerful, type-safe communication bridge framework for React
-                Native and web applications.
+                A powerful, type-safe communication bridge framework for
+                WebViews, iframes, popup windows, and .NET desktop apps.
               </p>
               <div className="flex items-center gap-4">
                 <a
