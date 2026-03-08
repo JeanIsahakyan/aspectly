@@ -9,7 +9,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  base: '/',
+  base: '/aspectly/',
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
