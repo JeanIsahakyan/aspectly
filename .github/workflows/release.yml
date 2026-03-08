@@ -46,4 +46,7 @@ jobs:
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" >> .npmrc
 
       - name: Publish to npm
-        run: pnpm -r publish --access public --no-git-checks
+        run: |
+          for pkg in packages/*/; do
+            (cd "$pkg" && npm publish --access public) || true
+          done
