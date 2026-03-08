@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Aspectly.Bridge;
 using Aspectly.Bridge.Protocol;
 using FluentAssertions;
