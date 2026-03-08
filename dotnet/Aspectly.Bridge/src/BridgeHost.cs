@@ -260,7 +260,8 @@ public class BridgeHost : IDisposable
 
         var wrapper = new { type = "BridgeEvent", @event = innerEvent };
         var json = JsonSerializer.Serialize(wrapper, _jsonOptions);
-        var script = $"window.postMessage({json}, '*');";
+        var jsonString = JsonSerializer.Serialize(json);
+        var script = $"window.postMessage({jsonString}, '*');";
 
         await _browserBridge.ExecuteScriptAsync(script);
         _logger.Debug($"[BridgeHost] Sent: {json}");
