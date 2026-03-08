@@ -3,7 +3,7 @@ using System.Windows;
 using CefSharp;
 using CefSharp.Wpf;
 
-namespace Aspectly.Bridge.Example;
+namespace Aspectly.Example;
 
 public partial class App : Application
 {

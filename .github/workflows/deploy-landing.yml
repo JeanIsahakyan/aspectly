@@ -47,7 +47,7 @@ jobs:
         run: pnpm install
 
       - name: Build workspace packages
-        run: pnpm --filter @aspectly/transports build && pnpm --filter @aspectly/core build
+        run: pnpm --filter @aspectly/transports build && pnpm --filter @aspectly/core build && pnpm --filter @aspectly/web build
 
       - name: Build landing page
         run: pnpm build:landing

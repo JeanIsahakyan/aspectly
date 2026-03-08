@@ -4,7 +4,7 @@ using System.Windows.Media;
 using Aspectly.Bridge;
 using Aspectly.Bridge.CefSharp;
 
-namespace Aspectly.Bridge.Example;
+namespace Aspectly.Example;
 
 public partial class MainWindow : Window
 {
