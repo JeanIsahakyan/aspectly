@@ -72,9 +72,13 @@ export const windowDetector: TransportDetector = {
   name: 'window',
   priority: 70, // Below iframe (80), above postmessage (10)
   detect: () => {
-    return typeof window !== 'undefined' &&
-      window.opener !== null &&
-      !window.opener.closed;
+    try {
+      return typeof window !== 'undefined' &&
+        window.opener != null &&
+        !window.opener.closed;
+    } catch {
+      return false;
+    }
   },
   createTransport: () => new WindowTransport(),
 };
