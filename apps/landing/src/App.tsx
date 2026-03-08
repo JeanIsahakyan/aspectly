@@ -4,6 +4,8 @@ import {
   Features,
   Installation,
   Examples,
+  LiveDemo,
+  LiveDemoWindow,
   ApiDocs,
   Architecture,
   Footer,
@@ -16,6 +18,8 @@ function App() {
       <main>
         <Hero />
         <Features />
+        <LiveDemo />
+        <LiveDemoWindow />
         <Installation />
         <Examples />
         <ApiDocs />

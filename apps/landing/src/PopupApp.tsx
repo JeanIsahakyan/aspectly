@@ -1,0 +1,119 @@
+import { useState, useEffect, useCallback } from 'react'
+import { AspectlyBridge } from '@aspectly/core'
+
+interface LogEntry {
+  message: string
+  direction: 'in' | 'out' | 'info'
+}
+
+export function PopupApp() {
+  const [connected, setConnected] = useState(false)
+  const [dark, setDark] = useState(false)
+  const [logs, setLogs] = useState<LogEntry[]>([])
+  const [bridge] = useState(() => new AspectlyBridge())
+
+  const addLog = useCallback((message: string, direction: LogEntry['direction'] = 'info') => {
+    setLogs(prev => [{ message, direction }, ...prev].slice(0, 15))
+  }, [])
+
+  useEffect(() => {
+    bridge.init({
+      greet: async (params: { name: string }) => {
+        addLog(`greet({ name: "${params.name}" })`, 'in')
+        return { message: `Hello, ${params.name}! Greetings from popup.` }
+      },
+      calculate: async (params: { a: number; b: number }) => {
+        addLog(`calculate({ a: ${params.a}, b: ${params.b} })`, 'in')
+        return { sum: params.a + params.b, product: params.a * params.b }
+      },
+      setTheme: async (params: { dark: boolean }) => {
+        setDark(params.dark)
+        addLog(`setTheme({ dark: ${params.dark} })`, 'in')
+        return { applied: true }
+      }
+    }).then(() => {
+      setConnected(true)
+      addLog('Bridge initialized!')
+    })
+  }, [bridge, addLog])
+
+  const callGetTime = async () => {
+    try {
+      addLog('getTime()', 'out')
+      const result = await bridge.send<{ time: string }>('getTime')
+      addLog(`${result.time}`, 'in')
+    } catch (e: any) {
+      addLog(`Error: ${e.message || e.error_message}`, 'info')
+    }
+  }
+
+  const callGetUserInfo = async () => {
+    try {
+      addLog('getUserInfo()', 'out')
+      const result = await bridge.send<{ name: string; role: string }>('getUserInfo')
+      addLog(`${result.name} (${result.role})`, 'in')
+    } catch (e: any) {
+      addLog(`Error: ${e.message || e.error_message}`, 'info')
+    }
+  }
+
+  return (
+    <div className={`min-h-screen p-6 transition-colors ${dark ? 'bg-slate-900' : 'bg-gradient-to-br from-emerald-500 to-teal-600'}`}>
+      <div className="max-w-md mx-auto space-y-3">
+        {/* Status Card */}
+        <div className="bg-white/15 backdrop-blur-sm rounded-xl p-4">
+          <div className="flex items-center gap-2 text-white text-sm">
+            <div className={`w-2 h-2 rounded-full transition-colors ${connected ? 'bg-green-400' : 'bg-red-400'}`} />
+            <span className="font-medium">{connected ? 'Connected to parent' : 'Connecting...'}</span>
+          </div>
+          <p className="text-white/60 text-xs mt-1">Transport: window.opener</p>
+        </div>
+
+        {/* Actions Card */}
+        <div className="bg-white/15 backdrop-blur-sm rounded-xl p-4">
+          <h3 className="text-white text-sm font-medium mb-2 opacity-90">Call Parent Methods</h3>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={callGetTime}
+              disabled={!connected}
+              className="bg-white text-emerald-600 px-3 py-1.5 rounded-md text-xs font-medium hover:scale-105 transition-transform disabled:opacity-50 disabled:hover:scale-100"
+            >
+              getTime()
+            </button>
+            <button
+              onClick={callGetUserInfo}
+              disabled={!connected}
+              className="bg-white text-emerald-600 px-3 py-1.5 rounded-md text-xs font-medium hover:scale-105 transition-transform disabled:opacity-50 disabled:hover:scale-100"
+            >
+              getUserInfo()
+            </button>
+          </div>
+        </div>
+
+        {/* Log Card */}
+        <div className="bg-white/15 backdrop-blur-sm rounded-xl p-4">
+          <h3 className="text-white text-sm font-medium mb-2 opacity-90">Log</h3>
+          <div className="bg-black/20 rounded-lg p-2 max-h-48 overflow-y-auto font-mono text-xs space-y-1">
+            {logs.map((log, i) => (
+              <div
+                key={i}
+                className={`${
+                  log.direction === 'in' ? 'text-green-300' :
+                  log.direction === 'out' ? 'text-blue-300' :
+                  'text-white/70'
+                }`}
+              >
+                {log.direction === 'in' && '← '}
+                {log.direction === 'out' && '→ '}
+                {log.message}
+              </div>
+            ))}
+            {logs.length === 0 && (
+              <div className="text-white/50">Waiting...</div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
