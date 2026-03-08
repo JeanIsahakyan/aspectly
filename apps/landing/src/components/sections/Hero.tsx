@@ -31,6 +31,7 @@ export function Hero() {
             <Badge variant="secondary" className="mb-6 gap-2">
               <Sparkles className="h-3.5 w-3.5" />
               <span>Type-safe Communication Bridge</span>
+              <span className="opacity-50">v{__ASPECTLY_VERSION__}</span>
             </Badge>
           </BlurFade>
 
