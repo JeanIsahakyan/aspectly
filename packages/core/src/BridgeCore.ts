@@ -1,6 +1,9 @@
 /**
  * Low-level bridge core handling platform-specific message passing
+ * Now delegates to @aspectly/transports for platform detection
  */
+
+import { detectTransport, type Transport } from '@aspectly/transports';
 
 export type Event = unknown;
 
@@ -9,32 +12,56 @@ interface BridgeCoreEvent {
   event: Event;
 }
 
-interface WebViewMessage {
-  nativeEvent?: {
-    data?: string;
-  };
-}
-
 export type BridgeCoreListener = (event: Event) => void;
-
-declare global {
-  interface Window {
-    ReactNativeWebView?: {
-      postMessage: (message: string) => void;
-    };
-  }
-}
 
 /**
  * BridgeCore handles the low-level platform detection and message serialization.
  * It provides static methods for wrapping events, creating listeners, and sending messages.
+ *
+ * Platform detection is now handled by @aspectly/transports which supports:
+ * - CefSharp (Chromium Embedded Framework for .NET)
+ * - React Native WebView
+ * - Iframe (window.parent.postMessage)
+ * - Custom transports via TransportRegistry
  */
 export class BridgeCore {
   private static BRIDGE_EVENT_TYPE = 'BridgeEvent';
+  private static transport: Transport | null = null;
 
   private static isJSONObject = (str: string): boolean => {
     return str.startsWith('{') && str.endsWith('}');
   };
+
+  /**
+   * Get the current transport (lazy initialization)
+   */
+  private static getTransport(): Transport {
+    if (!BridgeCore.transport) {
+      BridgeCore.transport = detectTransport();
+    }
+    return BridgeCore.transport;
+  }
+
+  /**
+   * Set a custom transport (useful for testing or manual configuration)
+   */
+  public static setTransport(transport: Transport): void {
+    BridgeCore.transport = transport;
+  }
+
+  /**
+   * Reset transport to auto-detect on next use
+   */
+  public static resetTransport(): void {
+    BridgeCore.transport = null;
+  }
+
+  /**
+   * Get the name of the current transport
+   */
+  public static getTransportName(): string {
+    return BridgeCore.getTransport().name;
+  }
 
   /**
    * Wraps an event in the bridge protocol format
@@ -78,61 +105,21 @@ export class BridgeCore {
     };
 
   /**
-   * Creates a browser-specific message event listener
-   */
-  static browserListener = (listener: BridgeCoreListener) => {
-    const triggerEvent = BridgeCore.wrapListener(listener);
-    return (originalEvent: MessageEvent): void => {
-      if (!originalEvent?.data) {
-        return;
-      }
-      triggerEvent(originalEvent.data);
-    };
-  };
-
-  /**
-   * Creates a React Native WebView message listener
-   */
-  static webViewListener = (listener: BridgeCoreListener) => {
-    const triggerEvent = BridgeCore.wrapListener(listener);
-    return (originalEvent: WebViewMessage): void => {
-      if (!originalEvent?.nativeEvent?.data) {
-        return;
-      }
-      triggerEvent(originalEvent.nativeEvent.data);
-    };
-  };
-
-  /**
-   * Sends an event to the parent context (WebView or iframe parent)
+   * Sends an event to the parent context using the detected transport
    */
   static sendEvent = (event: Event): void => {
     const bridgeEvent = BridgeCore.wrapBridgeEvent(event);
-    if (typeof window === 'undefined') {
-      console.warn('Window is undefined');
-      return;
-    }
-    const RNW = window.ReactNativeWebView;
-    if (typeof RNW?.postMessage === 'function') {
-      RNW.postMessage(`'${bridgeEvent}'`);
-      return;
-    }
-    if (window.parent === window) {
-      return;
-    }
-    window.parent.postMessage(bridgeEvent, '*');
+    const transport = BridgeCore.getTransport();
+    transport.send(bridgeEvent);
   };
 
   /**
-   * Subscribes to window message events
+   * Subscribes to incoming messages via the detected transport
    * @returns Cleanup function to unsubscribe
    */
   static subscribe = (listener: BridgeCoreListener): VoidFunction => {
-    const browserListener = BridgeCore.browserListener(listener);
-    if (typeof window === 'undefined' || !window.addEventListener) {
-      return () => {};
-    }
-    window.addEventListener('message', browserListener);
-    return () => window.removeEventListener('message', browserListener);
+    const transport = BridgeCore.getTransport();
+    const wrappedListener = BridgeCore.wrapListener(listener);
+    return transport.subscribe(wrappedListener);
   };
 }

@@ -4,8 +4,9 @@ import {
   Features,
   Installation,
   Examples,
-  ApiDocs,
-  Architecture,
+  LiveDemo,
+  LiveDemoWindow,
+  Docs,
   Footer,
 } from './components/sections'
 
@@ -16,10 +17,11 @@ function App() {
       <main>
         <Hero />
         <Features />
+        <LiveDemo />
+        <LiveDemoWindow />
         <Installation />
         <Examples />
-        <ApiDocs />
-        <Architecture />
+        <Docs />
       </main>
       <Footer />
     </div>

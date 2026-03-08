@@ -1,5 +1,6 @@
 // Main exports
 export { useAspectlyIframe } from './useAspectlyIframe';
+export { useAspectlyWindow } from './useAspectlyWindow';
 
 // Type exports
 export type {
@@ -7,6 +8,11 @@ export type {
   UseAspectlyIframeReturn,
   AspectlyIframeProps,
 } from './useAspectlyIframe';
+
+export type {
+  UseAspectlyWindowOptions,
+  UseAspectlyWindowReturn,
+} from './useAspectlyWindow';
 
 // Re-export core types for convenience
 export {

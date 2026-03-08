@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0-windows;net48</TargetFrameworks>
+    <LangVersion>12.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <PlatformTarget>x64</PlatformTarget>
+
+    <!-- NuGet Package Metadata -->
+    <PackageId>Aspectly.Bridge.CefSharp</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>Zhan Isaakian</Authors>
+    <Company>Aspectly</Company>
+    <Description>CefSharp browser bridge for Aspectly - enables communication with JavaScript via CefSharp (Chromium Embedded Framework)</Description>
+    <PackageTags>aspectly;bridge;cefsharp;chromium;wpf</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/JeanIsahakyan/aspectly</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/JeanIsahakyan/aspectly</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+
+    <RootNamespace>Aspectly.Bridge.CefSharp</RootNamespace>
+    <AssemblyName>Aspectly.Bridge.CefSharp</AssemblyName>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <!-- Project reference to base package -->
+  <ItemGroup>
+    <ProjectReference Include="..\Aspectly.Bridge\Aspectly.Bridge.csproj" />
+  </ItemGroup>
+
+  <!-- CefSharp dependencies -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0-windows'">
+    <PackageReference Include="CefSharp.Wpf.NETCore" Version="143.*" />
+  </ItemGroup>
+
+  <!-- For net48: use CefSharp.Wpf (matches Revit 2024's bundled version) -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+    <PackageReference Include="CefSharp.Wpf" Version="119.4.30" IncludeAssets="compile" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>

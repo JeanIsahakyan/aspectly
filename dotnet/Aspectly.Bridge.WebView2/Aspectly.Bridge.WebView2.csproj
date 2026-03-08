@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0-windows;net48</TargetFrameworks>
+    <LangVersion>12.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+
+    <PackageId>Aspectly.Bridge.WebView2</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>Zhan Isaakian</Authors>
+    <Description>WebView2 browser bridge for Aspectly - enables communication with JavaScript via Microsoft Edge WebView2</Description>
+    <PackageTags>aspectly;bridge;webview2;edge;chromium</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+
+    <RootNamespace>Aspectly.Bridge.WebView2</RootNamespace>
+    <AssemblyName>Aspectly.Bridge.WebView2</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Aspectly.Bridge\Aspectly.Bridge.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2903.40" />
+  </ItemGroup>
+
+</Project>

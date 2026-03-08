@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <LangVersion>12.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <PlatformTarget>x64</PlatformTarget>
+    <RootNamespace>Aspectly.Example</RootNamespace>
+    <AssemblyName>Aspectly.Bridge.Example.CefSharp</AssemblyName>
+  </PropertyGroup>
+
+  <!-- Aspectly Bridge libraries -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\dotnet\Aspectly.Bridge\Aspectly.Bridge.csproj" />
+    <ProjectReference Include="..\..\dotnet\Aspectly.Bridge.CefSharp\Aspectly.Bridge.CefSharp.csproj" />
+  </ItemGroup>
+
+  <!-- CefSharp -->
+  <ItemGroup>
+    <PackageReference Include="CefSharp.Wpf.NETCore" Version="143.*" />
+  </ItemGroup>
+
+  <!-- Copy wwwroot to output -->
+  <ItemGroup>
+    <None Include="wwwroot\**" CopyToOutputDirectory="PreserveNewest" LinkBase="wwwroot" />
+  </ItemGroup>
+
+</Project>

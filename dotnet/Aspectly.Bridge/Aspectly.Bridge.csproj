@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net10.0;net8.0;net48;netstandard2.0</TargetFrameworks>
+    <LangVersion>12.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <PlatformTarget>x64</PlatformTarget>
+
+    <!-- NuGet Package Metadata -->
+    <PackageId>Aspectly.Bridge</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>Zhan Isaakian</Authors>
+    <Company>Aspectly</Company>
+    <Description>Core bridge library for Aspectly - bidirectional communication between .NET and JavaScript via the Aspectly protocol</Description>
+    <PackageTags>aspectly;bridge;communication;javascript;interop</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/JeanIsahakyan/aspectly</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/JeanIsahakyan/aspectly</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+
+    <!-- Assembly info -->
+    <RootNamespace>Aspectly.Bridge</RootNamespace>
+    <AssemblyName>Aspectly.Bridge</AssemblyName>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <!-- README for NuGet -->
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <!-- .NET Standard 2.0 and .NET Framework 4.8 need explicit System.Text.Json -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' Or '$(TargetFramework)' == 'net48'">
+    <PackageReference Include="System.Text.Json" Version="8.0.0" />
+  </ItemGroup>
+
+</Project>

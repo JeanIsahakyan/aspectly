@@ -7,6 +7,42 @@ on:
     branches: [main]
 
 jobs:
+  # .NET packages build and test
+  dotnet:
+    name: .NET Build & Test
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore Aspectly.Bridge
+        run: dotnet restore dotnet/Aspectly.Bridge/Aspectly.Bridge.csproj
+
+      - name: Build Aspectly.Bridge
+        run: dotnet build dotnet/Aspectly.Bridge/Aspectly.Bridge.csproj -c Release --no-restore
+
+      - name: Restore Aspectly.Bridge.CefSharp
+        run: dotnet restore dotnet/Aspectly.Bridge.CefSharp/Aspectly.Bridge.CefSharp.csproj
+
+      - name: Build Aspectly.Bridge.CefSharp
+        run: dotnet build dotnet/Aspectly.Bridge.CefSharp/Aspectly.Bridge.CefSharp.csproj -c Release --no-restore
+
+      - name: Restore & Run Tests
+        run: |
+          dotnet restore dotnet/Aspectly.Bridge.Tests/Aspectly.Bridge.Tests.csproj
+          dotnet test dotnet/Aspectly.Bridge.Tests/Aspectly.Bridge.Tests.csproj -c Release --verbosity normal
+
+      - name: Build Example (CefSharp)
+        run: |
+          dotnet restore examples/dotnet/Aspectly.Bridge.Example.CefSharp.csproj
+          dotnet build examples/dotnet/Aspectly.Bridge.Example.CefSharp.csproj -c Release --no-restore
+
+  # Node.js packages build and test
   build:
     runs-on: ubuntu-latest
 

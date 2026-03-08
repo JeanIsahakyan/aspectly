@@ -6,6 +6,12 @@ import { useAspectlyIframe } from './useAspectlyIframe';
 vi.mock('@aspectly/core', () => ({
   BridgeCore: {
     wrapBridgeEvent: vi.fn((event) => JSON.stringify({ type: 'BridgeEvent', event })),
+    wrapListener: vi.fn((listener) => (data: string) => {
+      try {
+        const parsed = JSON.parse(data);
+        if (parsed?.type === 'BridgeEvent') listener(parsed.event);
+      } catch { /* ignore parse errors */ }
+    }),
     subscribe: vi.fn().mockReturnValue(vi.fn()),
   },
   BridgeInternal: vi.fn().mockImplementation(() => ({

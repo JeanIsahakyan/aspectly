@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { Check, Copy, Package } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
-import { BlurFade } from '../magicui'
+import { Tabs, TabsList, TabsTrigger } from '../ui/tabs'
+import { BlurFade } from '../reactbits'
 
-const packages = [
+const jsPackages = [
   {
     name: '@aspectly/core',
     description: 'Core bridge for embedded web content',
@@ -31,6 +31,27 @@ const packages = [
   },
 ]
 
+const dotnetPackages = [
+  {
+    name: 'Aspectly.Bridge',
+    description: 'Core bridge library for .NET applications',
+    install: 'dotnet add package Aspectly.Bridge',
+    useCase: 'Base package - required by CefSharp and WebView2 integrations',
+  },
+  {
+    name: 'Aspectly.Bridge.CefSharp',
+    description: 'CefSharp (Chromium) integration for WPF/WinForms',
+    install: 'dotnet add package Aspectly.Bridge.CefSharp',
+    useCase: 'For desktop apps using CefSharp browser control',
+  },
+  {
+    name: 'Aspectly.Bridge.WebView2',
+    description: 'Microsoft Edge WebView2 integration',
+    install: 'dotnet add package Aspectly.Bridge.WebView2',
+    useCase: 'For desktop apps using WebView2 (Edge)',
+  },
+]
+
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false)
 
@@ -52,9 +73,10 @@ function CopyButton({ text }: { text: string }) {
 }
 
 export function Installation() {
+  const [platform, setPlatform] = useState('javascript')
   const [packageManager, setPackageManager] = useState('npm')
 
-  const getCommand = (pkg: string) => {
+  const getJsCommand = (pkg: string) => {
     switch (packageManager) {
       case 'yarn':
         return `yarn add ${pkg.replace('npm install ', '')}`
@@ -66,6 +88,9 @@ export function Installation() {
         return pkg
     }
   }
+
+  const packages = platform === 'javascript' ? jsPackages : dotnetPackages
+  const getCommand = platform === 'javascript' ? getJsCommand : (pkg: string) => pkg
 
   return (
     <section id="installation" className="py-24 bg-muted/30">
@@ -83,57 +108,80 @@ export function Installation() {
         </BlurFade>
 
         <BlurFade delay={0.2} inView>
-          <Tabs
-            value={packageManager}
-            onValueChange={setPackageManager}
-            className="max-w-4xl mx-auto"
-          >
-            <div className="flex justify-center mb-8">
-              <TabsList>
-                <TabsTrigger value="npm">npm</TabsTrigger>
-                <TabsTrigger value="yarn">yarn</TabsTrigger>
-                <TabsTrigger value="pnpm">pnpm</TabsTrigger>
-                <TabsTrigger value="bun">bun</TabsTrigger>
-              </TabsList>
+          <div className="max-w-4xl mx-auto">
+            {/* Platform Selector */}
+            <div className="flex justify-center mb-6">
+              <Tabs value={platform} onValueChange={setPlatform}>
+                <TabsList>
+                  <TabsTrigger value="javascript" className="gap-2">
+                    <span className="text-yellow-500">JS</span> JavaScript / TypeScript
+                  </TabsTrigger>
+                  <TabsTrigger value="dotnet" className="gap-2">
+                    <span className="text-purple-500">C#</span> .NET
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
             </div>
 
-            <TabsContent value={packageManager}>
-              <div className="grid gap-4">
-                {packages.map((pkg, index) => (
-                  <BlurFade key={pkg.name} delay={0.1 + index * 0.05} inView>
-                    <Card className="border-border/50 bg-background/80 backdrop-blur-sm">
-                      <CardHeader className="pb-3">
-                        <div className="flex items-start justify-between">
-                          <div className="flex items-center gap-3">
-                            <div className="p-2 rounded-lg bg-primary/10">
-                              <Package className="h-5 w-5 text-primary" />
-                            </div>
-                            <div>
-                              <CardTitle className="text-lg font-mono">
-                                {pkg.name}
-                              </CardTitle>
-                              <CardDescription>{pkg.description}</CardDescription>
-                            </div>
-                          </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="flex items-center gap-4">
-                          <div className="flex-1 bg-zinc-900 rounded-lg px-4 py-3 font-mono text-sm text-zinc-300 overflow-x-auto">
-                            {getCommand(pkg.install)}
-                          </div>
-                          <CopyButton text={getCommand(pkg.install)} />
-                        </div>
-                        <p className="mt-3 text-sm text-muted-foreground">
-                          {pkg.useCase}
-                        </p>
-                      </CardContent>
-                    </Card>
-                  </BlurFade>
-                ))}
+            {/* Package Manager Selector (JS only) */}
+            {platform === 'javascript' && (
+              <div className="flex justify-center mb-8">
+                <Tabs value={packageManager} onValueChange={setPackageManager}>
+                  <TabsList>
+                    <TabsTrigger value="npm">npm</TabsTrigger>
+                    <TabsTrigger value="yarn">yarn</TabsTrigger>
+                    <TabsTrigger value="pnpm">pnpm</TabsTrigger>
+                    <TabsTrigger value="bun">bun</TabsTrigger>
+                  </TabsList>
+                </Tabs>
               </div>
-            </TabsContent>
-          </Tabs>
+            )}
+
+            {/* .NET info */}
+            {platform === 'dotnet' && (
+              <div className="flex justify-center mb-8">
+                <div className="text-sm text-muted-foreground">
+                  Using .NET CLI or NuGet Package Manager
+                </div>
+              </div>
+            )}
+
+            {/* Packages List */}
+            <div className="grid gap-4">
+              {packages.map((pkg, index) => (
+                <BlurFade key={pkg.name} delay={0.1 + index * 0.05} inView>
+                  <Card className="border-border/50 bg-background/80 backdrop-blur-sm">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className={`p-2 rounded-lg ${platform === 'dotnet' ? 'bg-purple-500/10' : 'bg-primary/10'}`}>
+                            <Package className={`h-5 w-5 ${platform === 'dotnet' ? 'text-purple-500' : 'text-primary'}`} />
+                          </div>
+                          <div>
+                            <CardTitle className="text-lg font-mono">
+                              {pkg.name}
+                            </CardTitle>
+                            <CardDescription>{pkg.description}</CardDescription>
+                          </div>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center gap-4">
+                        <div className="flex-1 bg-zinc-900 rounded-lg px-4 py-3 font-mono text-sm text-zinc-300 overflow-x-auto">
+                          {getCommand(pkg.install)}
+                        </div>
+                        <CopyButton text={getCommand(pkg.install)} />
+                      </div>
+                      <p className="mt-3 text-sm text-muted-foreground">
+                        {pkg.useCase}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </BlurFade>
+              ))}
+            </div>
+          </div>
         </BlurFade>
       </div>
     </section>

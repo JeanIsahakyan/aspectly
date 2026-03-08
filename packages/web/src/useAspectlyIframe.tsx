@@ -97,10 +97,22 @@ export const useAspectlyIframe = ({
   const publicBridge = useMemo(() => new BridgeBase(bridge), [bridge]);
 
   useEffect(() => {
-    const unsubscribe = BridgeCore.subscribe(
+    const wrappedListener = BridgeCore.wrapListener(
       bridge.handleCoreEvent as (event: unknown) => void
     );
-    return () => unsubscribe();
+
+    const handler = (event: MessageEvent): void => {
+      if (
+        iframeRef.current?.contentWindow &&
+        event.source === iframeRef.current.contentWindow &&
+        typeof event.data === 'string'
+      ) {
+        wrappedListener(event.data);
+      }
+    };
+
+    window.addEventListener('message', handler);
+    return () => window.removeEventListener('message', handler);
   }, [bridge]);
 
   const onLoad = useCallback(() => setLoaded(true), []);

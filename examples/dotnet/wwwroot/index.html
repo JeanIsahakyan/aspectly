@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aspectly Bridge - JS Side</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 24px;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: white;
+            margin-bottom: 24px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        h2 {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 16px;
+        }
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ef4444;
+            transition: background 0.3s;
+        }
+        .status-dot.connected {
+            background: #22c55e;
+        }
+        .methods {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .method-badge {
+            background: #e0e7ff;
+            color: #4338ca;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 13px;
+            font-family: monospace;
+        }
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        button {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #4338ca;
+        }
+        button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        .log {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 12px;
+            padding: 16px;
+            border-radius: 8px;
+            height: 250px;
+            overflow-y: auto;
+        }
+        .log-entry {
+            margin-bottom: 4px;
+            line-height: 1.5;
+        }
+        .log-time {
+            color: #6b7280;
+        }
+        .log-in {
+            color: #22c55e;
+        }
+        .log-out {
+            color: #3b82f6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Aspectly Bridge - JavaScript Side</h1>
+
+        <div class="card">
+            <h2>Bridge Status</h2>
+            <div class="status">
+                <div id="statusDot" class="status-dot"></div>
+                <span id="statusText">Waiting for C# connection...</span>
+            </div>
+            <div id="csharpMethods" class="methods"></div>
+        </div>
+
+        <div class="card">
+            <h2>Call C# Methods</h2>
+            <div class="actions">
+                <button id="btnPing" disabled>Call ping()</button>
+                <button id="btnEcho" disabled>Call echo("Hello from JS")</button>
+                <button id="btnAdd" disabled>Call add(10, 20)</button>
+                <button id="btnGetSystemInfo" disabled>Call getSystemInfo()</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Event Log</h2>
+            <div id="log" class="log"></div>
+        </div>
+    </div>
+
+    <script src="aspectly.js"></script>
+    <script>
+        const statusDot = document.getElementById('statusDot');
+        const statusText = document.getElementById('statusText');
+        const csharpMethods = document.getElementById('csharpMethods');
+        const logEl = document.getElementById('log');
+        const btnPing = document.getElementById('btnPing');
+        const btnEcho = document.getElementById('btnEcho');
+        const btnAdd = document.getElementById('btnAdd');
+        const btnGetSystemInfo = document.getElementById('btnGetSystemInfo');
+
+        function log(message, direction = 'info') {
+            const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+            const dirClass = direction === 'in' ? 'log-in' : direction === 'out' ? 'log-out' : '';
+            const dirLabel = direction === 'in' ? '← IN ' : direction === 'out' ? '→ OUT' : '    ';
+            logEl.innerHTML += `<div class="log-entry"><span class="log-time">[${time}]</span> <span class="${dirClass}">${dirLabel}</span> ${message}</div>`;
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        function enableButtons() {
+            btnPing.disabled = false;
+            btnEcho.disabled = false;
+            btnAdd.disabled = false;
+            btnGetSystemInfo.disabled = false;
+        }
+
+        // Initialize bridge with handlers that C# can call
+        window.aspectlyBridge.init({
+            greet: async (params) => {
+                log(`greet({ name: '${params.name}' })`, 'in');
+                return { message: `Hello, ${params.name}! Greetings from JavaScript.` };
+            },
+            getTime: async () => {
+                log('getTime()', 'in');
+                return { time: new Date().toISOString() };
+            },
+            calculate: async (params) => {
+                log(`calculate({ a: ${params.a}, b: ${params.b} })`, 'in');
+                return {
+                    sum: params.a + params.b,
+                    product: params.a * params.b
+                };
+            }
+        }).then(() => {
+            log('Bridge initialized successfully!');
+            statusDot.classList.add('connected');
+            statusText.textContent = 'Connected to C#';
+            enableButtons();
+
+            // Show C# methods
+            const methods = window.aspectlyBridge.getSupportedMethods();
+            log(`C# supports methods: ${methods.join(', ')}`);
+            csharpMethods.innerHTML = methods.map(m => `<span class="method-badge">${m}</span>`).join('');
+        });
+
+        // Button handlers
+        btnPing.addEventListener('click', async () => {
+            try {
+                log('ping()', 'out');
+                const result = await window.aspectlyBridge.send('ping');
+                log(`Result: ${result}`, 'in');
+            } catch (e) {
+                log(`Error: ${e.error_message || e.message}`, 'in');
+            }
+        });
+
+        btnEcho.addEventListener('click', async () => {
+            try {
+                log('echo({ message: "Hello from JS" })', 'out');
+                const result = await window.aspectlyBridge.send('echo', { message: 'Hello from JS' });
+                log(`Result: ${result}`, 'in');
+            } catch (e) {
+                log(`Error: ${e.error_message || e.message}`, 'in');
+            }
+        });
+
+        btnAdd.addEventListener('click', async () => {
+            try {
+                log('add({ a: 10, b: 20 })', 'out');
+                const result = await window.aspectlyBridge.send('add', { a: 10, b: 20 });
+                log(`Result: ${result}`, 'in');
+            } catch (e) {
+                log(`Error: ${e.error_message || e.message}`, 'in');
+            }
+        });
+
+        btnGetSystemInfo.addEventListener('click', async () => {
+            try {
+                log('getSystemInfo()', 'out');
+                const result = await window.aspectlyBridge.send('getSystemInfo');
+                log(`Result: ${JSON.stringify(result)}`, 'in');
+            } catch (e) {
+                log(`Error: ${e.error_message || e.message}`, 'in');
+            }
+        });
+
+        log('Waiting for bridge initialization...');
+    </script>
+</body>
+</html>

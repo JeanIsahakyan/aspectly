@@ -1,18 +1,19 @@
 import { Github, Heart } from 'lucide-react'
-import { BlurFade } from '../magicui'
+import { BlurFade } from '../reactbits'
 
 const links = {
   docs: [
     { name: 'Getting Started', href: '#installation' },
     { name: 'Examples', href: '#examples' },
-    { name: 'API Reference', href: '#api' },
-    { name: 'Architecture', href: '#architecture' },
+    { name: 'API Reference', href: 'https://github.com/JeanIsahakyan/aspectly/blob/main/docs/API.md' },
+    { name: 'Architecture', href: 'https://github.com/JeanIsahakyan/aspectly/blob/main/docs/ARCHITECTURE.md' },
   ],
   packages: [
     { name: '@aspectly/core', href: 'https://www.npmjs.com/package/@aspectly/core' },
     { name: '@aspectly/web', href: 'https://www.npmjs.com/package/@aspectly/web' },
     { name: '@aspectly/react-native', href: 'https://www.npmjs.com/package/@aspectly/react-native' },
     { name: '@aspectly/react-native-web', href: 'https://www.npmjs.com/package/@aspectly/react-native-web' },
+    { name: '@aspectly/transports', href: 'https://www.npmjs.com/package/@aspectly/transports' },
   ],
   community: [
     { name: 'GitHub', href: 'https://github.com/JeanIsahakyan/aspectly' },
@@ -37,8 +38,8 @@ export function Footer() {
                 <span className="text-xl font-bold">Aspectly</span>
               </div>
               <p className="text-sm text-muted-foreground mb-4">
-                A powerful, type-safe communication bridge framework for React
-                Native and web applications.
+                A powerful, type-safe communication bridge framework for
+                WebViews, iframes, popup windows, and .NET desktop apps.
               </p>
               <div className="flex items-center gap-4">
                 <a
@@ -61,6 +62,7 @@ export function Footer() {
                   <li key={link.name}>
                     <a
                       href={link.href}
+                      {...(link.href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
                       className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                     >
                       {link.name}

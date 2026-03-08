@@ -63,6 +63,9 @@
   "publishConfig": {
     "access": "public"
   },
+  "dependencies": {
+    "@aspectly/transports": "workspace:*"
+  },
   "devDependencies": {
     "tsup": "^8.0.1",
     "typescript": "^5.3.2",
