@@ -70,7 +70,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A
+          git add packages/*/package.json apps/landing/package.json examples/*/package.json
           git commit -m "chore: bump version to v${VERSION}" || echo "No changes to commit"
           git pull --rebase origin main
           git push origin main
