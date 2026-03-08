@@ -260,8 +260,7 @@ public class BridgeHost : IDisposable
 
         var wrapper = new { type = "BridgeEvent", @event = innerEvent };
         var json = JsonSerializer.Serialize(wrapper, _jsonOptions);
-        var jsonString = JsonSerializer.Serialize(json);
-        var script = $"window.postMessage({jsonString}, '*');";
+        var script = $"window.postMessage({json}, '*');";
 
         await _browserBridge.ExecuteScriptAsync(script);
         _logger.Debug($"[BridgeHost] Sent: {json}");
@@ -272,7 +271,7 @@ public class BridgeHost : IDisposable
     /// <summary>
     /// Sends a request to the JavaScript side and awaits the response.
     /// </summary>
-    public async Task<T?> SendAsync<T>(string method, object? parameters = null, int timeoutMs = 30000)
+    public async Task<T?> SendAsync<T>(string method, object? parameters = null, int timeoutMs = 100000)
     {
         if (!_initialized)
             throw new InvalidOperationException("Bridge not initialized");
