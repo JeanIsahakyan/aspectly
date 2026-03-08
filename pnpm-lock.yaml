@@ -62,6 +62,12 @@ importers:
 
   apps/landing:
     dependencies:
+      '@aspectly/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@aspectly/web':
+        specifier: workspace:*
+        version: link:../../packages/web
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -208,6 +214,10 @@ importers:
         version: 5.4.21(@types/node@20.19.25)
 
   packages/core:
+    dependencies:
+      '@aspectly/transports':
+        specifier: workspace:*
+        version: link:../transports
     devDependencies:
       rimraf:
         specifier: ^5.0.5
@@ -277,6 +287,18 @@ importers:
       react-native-webview:
         specifier: ^13.0.0
         version: 13.6.2(react-native@0.72.6)(react@18.2.0)
+      rimraf:
+        specifier: ^5.0.5
+        version: 5.0.10
+      tsup:
+        specifier: ^8.0.1
+        version: 8.5.1(typescript@5.9.3)
+      typescript:
+        specifier: ^5.3.2
+        version: 5.9.3
+
+  packages/transports:
+    devDependencies:
       rimraf:
         specifier: ^5.0.5
         version: 5.0.10
@@ -7166,7 +7188,7 @@ packages:
 
   /glob@6.0.4:
     resolution: {integrity: sha512-MKZeRNyYZAVVVG1oZeLaWie1uweH40m9AZwIwxyPbTSX4hHrVYSzLg0Ro5Z5R7XKkIX+Cc6oD1rqeDJnwsB8/A==}
-    deprecated: Glob versions prior to v9 are no longer supported
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
     requiresBuild: true
     dependencies:
       inflight: 1.0.6
@@ -7179,7 +7201,7 @@ packages:
 
   /glob@7.1.6:
     resolution: {integrity: sha512-LwaxwyZ72Lk7vZINtNNrywX0ZuLyStrdDtabefZKAY5ZGJhVtgdznluResxNmPitE0SAO+O26sWTHeKSI2wMBA==}
-    deprecated: Glob versions prior to v9 are no longer supported
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
     dependencies:
       fs.realpath: 1.0.0
       inflight: 1.0.6
@@ -7203,6 +7225,7 @@ packages:
   /glob@9.3.5:
     resolution: {integrity: sha512-e1LleDykUz2Iu+MTYdkSsuWX8lvAjAcs0Xef0lNIu0S2wOAzuTxCJtcd9S3cijlwYF18EsU3rzb8jPVobxDh9Q==}
     engines: {node: '>=16 || 14 >=14.17'}
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
     dependencies:
       fs.realpath: 1.0.0
       minimatch: 8.0.4

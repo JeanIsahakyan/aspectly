@@ -3,7 +3,7 @@ import { ChevronDown, ChevronRight, Code2, FileCode } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
 import { Badge } from '../ui/badge'
 import { CodeBlock } from '../ui/code-block'
-import { BlurFade } from '../magicui'
+import { BlurFade } from '../reactbits'
 import { cn } from '../../utils/utils'
 
 interface ApiMethod {

@@ -2,7 +2,7 @@ import { useRef } from 'react'
 import { motion } from 'framer-motion'
 import { Layers, Network, Smartphone, Globe, Monitor } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
-import { AnimatedBeam, BlurFade } from '../magicui'
+import { AnimatedBeam, BlurFade } from '../reactbits'
 import { cn } from '../../utils/utils'
 
 const layers = [

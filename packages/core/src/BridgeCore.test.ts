@@ -1,15 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { BridgeCore } from './BridgeCore';
-
-interface TestWindow extends Window {
-  ReactNativeWebView?: { postMessage: (message: string) => void };
-}
-
-const testWindow = window as TestWindow;
+import type { Transport } from '@aspectly/transports';
 
 describe('BridgeCore', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    BridgeCore.resetTransport();
   });
 
   describe('wrapBridgeEvent', () => {
@@ -109,152 +105,89 @@ describe('BridgeCore', () => {
     });
   });
 
-  describe('browserListener', () => {
-    it('should extract data from MessageEvent', () => {
-      const listener = vi.fn();
-      const browserListener = BridgeCore.browserListener(listener);
-      const event = { method: 'test' };
-      const messageEvent = {
-        data: JSON.stringify({ type: 'BridgeEvent', event }),
-      } as MessageEvent;
-
-      browserListener(messageEvent);
-
-      expect(listener).toHaveBeenCalledWith(event);
-    });
-
-    it('should ignore events without data', () => {
-      const listener = vi.fn();
-      const browserListener = BridgeCore.browserListener(listener);
-
-      browserListener({ data: undefined } as MessageEvent);
-      browserListener({} as MessageEvent);
-
-      expect(listener).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('webViewListener', () => {
-    it('should extract data from WebView nativeEvent', () => {
-      const listener = vi.fn();
-      const webViewListener = BridgeCore.webViewListener(listener);
-      const event = { method: 'test' };
-      const webViewMessage = {
-        nativeEvent: {
-          data: JSON.stringify({ type: 'BridgeEvent', event }),
-        },
-      };
-
-      webViewListener(webViewMessage);
-
-      expect(listener).toHaveBeenCalledWith(event);
-    });
-
-    it('should ignore messages without nativeEvent', () => {
-      const listener = vi.fn();
-      const webViewListener = BridgeCore.webViewListener(listener);
-
-      webViewListener({});
-      webViewListener({ nativeEvent: {} });
-      webViewListener({ nativeEvent: { data: undefined } });
-
-      expect(listener).not.toHaveBeenCalled();
-    });
-  });
-
   describe('sendEvent', () => {
-    let originalParent: Window;
-    let originalRNW: typeof window.ReactNativeWebView;
-
-    beforeEach(() => {
-      originalParent = window.parent;
-      originalRNW = window.ReactNativeWebView;
-    });
-
-    afterEach(() => {
-      Object.defineProperty(window, 'parent', {
-        value: originalParent,
-        writable: true,
-        configurable: true,
-      });
-      testWindow.ReactNativeWebView = originalRNW;
-    });
-
-    it('should send to iframe parent when available', () => {
-      testWindow.ReactNativeWebView = undefined;
-      const mockParent = {
-        postMessage: vi.fn(),
+    it('should send via the configured transport', () => {
+      const mockTransport: Transport = {
+        name: 'mock',
+        isAvailable: () => true,
+        send: vi.fn(),
+        subscribe: vi.fn(),
       };
-      Object.defineProperty(window, 'parent', {
-        value: mockParent,
-        writable: true,
-        configurable: true,
-      });
+      BridgeCore.setTransport(mockTransport);
 
       const event = { method: 'test' };
       BridgeCore.sendEvent(event);
 
-      expect(mockParent.postMessage).toHaveBeenCalledWith(
-        expect.any(String),
-        '*'
-      );
+      expect(mockTransport.send).toHaveBeenCalledWith(expect.any(String));
     });
 
-    it('should send to ReactNativeWebView when available', () => {
-      const mockRNW = {
-        postMessage: vi.fn(),
-      };
-      testWindow.ReactNativeWebView = mockRNW;
-
+    it('should not throw with null transport (fallback)', () => {
       const event = { method: 'test' };
-      BridgeCore.sendEvent(event);
-
-      expect(mockRNW.postMessage).toHaveBeenCalledWith(expect.any(String));
-    });
-
-    it('should not send when window.parent === window (top level)', () => {
-      testWindow.ReactNativeWebView = undefined;
-      Object.defineProperty(window, 'parent', {
-        value: window,
-        writable: true,
-        configurable: true,
-      });
-
-      const event = { method: 'test' };
-      // This should not throw
       expect(() => BridgeCore.sendEvent(event)).not.toThrow();
     });
   });
 
   describe('subscribe', () => {
-    it('should subscribe to message events', () => {
-      const listener = vi.fn();
-      const addEventListenerSpy = vi.spyOn(window, 'addEventListener');
+    it('should subscribe via the configured transport', () => {
+      const mockUnsubscribe = vi.fn();
+      const mockTransport: Transport = {
+        name: 'mock',
+        isAvailable: () => true,
+        send: vi.fn(),
+        subscribe: vi.fn().mockReturnValue(mockUnsubscribe),
+      };
+      BridgeCore.setTransport(mockTransport);
 
+      const listener = vi.fn();
       const unsubscribe = BridgeCore.subscribe(listener);
 
-      expect(addEventListenerSpy).toHaveBeenCalledWith(
-        'message',
-        expect.any(Function)
-      );
+      expect(mockTransport.subscribe).toHaveBeenCalledWith(expect.any(Function));
       expect(typeof unsubscribe).toBe('function');
-
-      addEventListenerSpy.mockRestore();
     });
 
-    it('should return cleanup function that removes listener', () => {
-      const listener = vi.fn();
-      const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
+    it('should return cleanup function from transport', () => {
+      const mockUnsubscribe = vi.fn();
+      const mockTransport: Transport = {
+        name: 'mock',
+        isAvailable: () => true,
+        send: vi.fn(),
+        subscribe: vi.fn().mockReturnValue(mockUnsubscribe),
+      };
+      BridgeCore.setTransport(mockTransport);
 
+      const listener = vi.fn();
       const unsubscribe = BridgeCore.subscribe(listener);
       unsubscribe();
 
-      expect(removeEventListenerSpy).toHaveBeenCalledWith(
-        'message',
-        expect.any(Function)
-      );
+      expect(mockUnsubscribe).toHaveBeenCalled();
+    });
+  });
 
-      removeEventListenerSpy.mockRestore();
+  describe('transport management', () => {
+    it('should allow setting a custom transport', () => {
+      const mockTransport: Transport = {
+        name: 'custom',
+        isAvailable: () => true,
+        send: vi.fn(),
+        subscribe: vi.fn(),
+      };
+      BridgeCore.setTransport(mockTransport);
+
+      expect(BridgeCore.getTransportName()).toBe('custom');
+    });
+
+    it('should reset transport to auto-detect', () => {
+      const mockTransport: Transport = {
+        name: 'custom',
+        isAvailable: () => true,
+        send: vi.fn(),
+        subscribe: vi.fn(),
+      };
+      BridgeCore.setTransport(mockTransport);
+      BridgeCore.resetTransport();
+
+      // After reset, auto-detection will pick a default transport
+      expect(BridgeCore.getTransportName()).not.toBe('custom');
     });
   });
 });

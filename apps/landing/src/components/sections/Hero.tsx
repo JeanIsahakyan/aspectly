@@ -2,7 +2,7 @@ import { motion } from 'framer-motion'
 import { ArrowRight, Github, Sparkles } from 'lucide-react'
 import { ButtonLink } from '../ui/button'
 import { Badge } from '../ui/badge'
-import { AnimatedGridPattern, BlurFade, Particles } from '../magicui'
+import { AnimatedGridPattern, BlurFade, Particles } from '../reactbits'
 
 export function Hero() {
   return (

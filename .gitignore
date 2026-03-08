@@ -69,3 +69,7 @@ lib/
 # Build outputs
 dist/
 *.tsbuildinfo
+
+# .NET
+bin/
+obj/

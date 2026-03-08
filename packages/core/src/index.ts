@@ -4,6 +4,24 @@ export { BridgeBase } from './BridgeBase';
 export { BridgeInternal } from './BridgeInternal';
 export { BridgeCore } from './BridgeCore';
 
+// Re-export transports for convenience
+export {
+  detectTransport,
+  registerTransport,
+  TransportRegistry,
+  CefSharpTransport,
+  ReactNativeTransport,
+  IframeTransport,
+  NullTransport,
+} from '@aspectly/transports';
+
+export type {
+  Transport,
+  TransportDetector,
+  TransportListener,
+  TransportUnsubscribe,
+} from '@aspectly/transports';
+
 // Type exports
 export type {
   BridgeEvent,

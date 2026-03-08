@@ -8,6 +8,7 @@ Complete API documentation for all Aspectly packages.
 - [@aspectly/web](#aspectweb)
 - [@aspectly/react-native](#aspectreact-native)
 - [@aspectly/react-native-web](#aspectreact-native-web)
+- [@aspectly/transports](#aspectlytransports)
 - [Types](#types)
 
 ---
@@ -139,6 +140,118 @@ import { useAspectlyWebView } from '@aspectly/react-native-web';
 ```
 
 Same API, works on Web (iframe), iOS and Android (WebView).
+
+---
+
+## @aspectly/transports
+
+Transport layer for platform detection and cross-environment messaging.
+
+### Transport Interface
+
+Core interface implemented by all transports:
+
+```typescript
+interface Transport {
+  readonly name: string;
+  isAvailable(): boolean;
+  send(message: string): void;
+  subscribe(listener: TransportListener): TransportUnsubscribe;
+}
+
+type TransportListener = (message: string) => void;
+type TransportUnsubscribe = () => void;
+```
+
+### detectTransport
+
+Automatically detect and return the appropriate transport for the current environment:
+
+```typescript
+import { detectTransport } from '@aspectly/transports';
+
+const transport = detectTransport();
+console.log(transport.name); // 'cefsharp', 'react-native', 'iframe', or 'null'
+
+// Send a message
+transport.send(JSON.stringify({ type: 'hello' }));
+
+// Subscribe to messages
+const unsubscribe = transport.subscribe((message) => {
+  console.log('Received:', message);
+});
+
+// Cleanup
+unsubscribe();
+```
+
+### Built-in Transports
+
+| Transport | Detection | Priority | Use Case |
+|-----------|-----------|----------|----------|
+| CefSharpTransport | `window.CefSharp.PostMessage` | 100 | Desktop apps with CefSharp (.NET) |
+| ReactNativeTransport | `window.ReactNativeWebView.postMessage` | 90 | React Native WebView |
+| IframeTransport | `window.parent !== window` | 80 | Web content in iframes |
+| NullTransport | Always available | - | Fallback for SSR/testing |
+
+### TransportRegistry
+
+Global registry for managing custom transports:
+
+```typescript
+import { TransportRegistry, registerTransport } from '@aspectly/transports';
+
+// Register custom transport
+registerTransport({
+  name: 'electron',
+  priority: 150, // Higher = checked first
+  detect: () => !!window.electron,
+  createTransport: () => new ElectronTransport(),
+});
+
+// Force re-detection (ignores cache)
+const transport = TransportRegistry.detect(true);
+
+// Clear cached transport
+TransportRegistry.clearCache();
+
+// Reset to default state
+TransportRegistry.reset();
+```
+
+### TransportDetector Interface
+
+Used for registering custom transports:
+
+```typescript
+interface TransportDetector {
+  readonly name: string;
+  readonly priority: number;
+  detect(): boolean;
+  createTransport(): Transport;
+}
+```
+
+### BaseTransport
+
+Abstract base class with SSR-safe helpers:
+
+```typescript
+import { BaseTransport } from '@aspectly/transports';
+
+class CustomTransport extends BaseTransport {
+  readonly name = 'custom';
+
+  isAvailable(): boolean {
+    // Use helper methods for SSR safety
+    if (!this.hasWindow()) return false;
+    const win = this.getWindow();
+    return win?.customAPI !== undefined;
+  }
+
+  // ... implement send() and subscribe()
+}
+```
 
 ---
 

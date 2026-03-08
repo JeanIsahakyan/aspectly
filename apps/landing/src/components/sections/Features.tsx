@@ -11,7 +11,7 @@ import {
   Layers,
 } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
-import { BlurFade } from '../magicui'
+import { BlurFade } from '../reactbits'
 
 const features = [
   {

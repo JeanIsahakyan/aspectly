@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { Smartphone, Globe, Layers } from 'lucide-react'
+import { Smartphone, Globe, Layers, Monitor } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 import { CodeBlock } from '../ui/code-block'
-import { BlurFade } from '../magicui'
+import { BlurFade } from '../reactbits'
 
 const examples = {
   'react-native': {
@@ -168,6 +168,73 @@ if (platform.isWeb) {
 
 // The API is the same regardless of platform!`,
   },
+  'dotnet': {
+    title: '.NET Desktop (WPF)',
+    icon: Monitor,
+    description: 'Desktop apps with CefSharp or WebView2',
+    native: `using Aspectly.Bridge;
+using Aspectly.Bridge.CefSharp;
+
+public partial class MainWindow : Window
+{
+    private BridgeHost _bridge;
+
+    public MainWindow()
+    {
+        InitializeComponent();
+
+        // Create bridge with CefSharp browser
+        var browserBridge = new CefSharpBrowserBridge(browser);
+        _bridge = new BridgeHost(browserBridge);
+
+        // Register handlers for JavaScript calls
+        _bridge.RegisterHandler<GetUserParams, UserData>(
+            "getUserData",
+            async (p) => new UserData {
+                Name = "John Doe",
+                Id = 123,
+                Role = "Admin"
+            });
+
+        _bridge.RegisterHandler<AlertParams, bool>(
+            "showAlert",
+            async (p) => {
+                MessageBox.Show(p.Message, "Alert");
+                return true;
+            });
+    }
+
+    private async void OnSendClick(object sender, EventArgs e)
+    {
+        // Call JavaScript method
+        var result = await _bridge.SendAsync<ProcessResult>(
+            "processData",
+            new { Items = new[] { 1, 2, 3 } }
+        );
+        Console.WriteLine($"Sum: {result.Sum}");
+    }
+}`,
+    web: `import { AspectlyBridge } from '@aspectly/core';
+
+const bridge = new AspectlyBridge();
+
+// Initialize with handlers for C# app
+await bridge.init({
+  processData: async ({ items }) => {
+    const sum = items.reduce((a, b) => a + b, 0);
+    return { sum, count: items.length };
+  }
+});
+
+// Call C# methods
+const user = await bridge.send('getUserData');
+console.log('User:', user.name, user.role);
+
+// Show native Windows alert
+await bridge.send('showAlert', {
+  message: 'Hello from Web UI!'
+});`,
+  },
 }
 
 type ExampleKey = keyof typeof examples
@@ -199,7 +266,7 @@ export function Examples() {
             className="max-w-6xl mx-auto"
           >
             <div className="flex justify-center mb-8">
-              <TabsList className="grid grid-cols-3 w-full max-w-lg">
+              <TabsList className="grid grid-cols-4 w-full max-w-2xl">
                 {(Object.entries(examples) as [ExampleKey, typeof example][]).map(
                   ([key, ex]) => {
                     const ExIcon = ex.icon
@@ -226,19 +293,19 @@ export function Examples() {
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-blue-500" />
-                    Host App (Parent)
+                    <div className={`w-3 h-3 rounded-full ${activeExample === 'dotnet' ? 'bg-purple-500' : 'bg-blue-500'}`} />
+                    Host App {activeExample === 'dotnet' ? '(C#)' : '(Parent)'}
                   </h3>
                   <CodeBlock
                     code={example.native}
-                    language="typescript"
-                    filename="App.tsx"
+                    language={activeExample === 'dotnet' ? 'csharp' : 'typescript'}
+                    filename={activeExample === 'dotnet' ? 'MainWindow.xaml.cs' : 'App.tsx'}
                   />
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-green-500" />
-                    Embedded Content (Child)
+                    Embedded Content (JavaScript)
                   </h3>
                   <CodeBlock
                     code={example.web}

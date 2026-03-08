@@ -111,15 +111,13 @@ export const useAspectlyWebView = ({
 
   const onMessage = useMemo(
     () => {
-      const listener = BridgeCore.webViewListener(
+      const triggerEvent = BridgeCore.wrapListener(
         bridge.handleCoreEvent as (event: unknown) => void
       );
       return (event: WebViewMessageEvent) => {
-        listener({
-          nativeEvent: {
-            data: event.nativeEvent.data,
-          },
-        });
+        if (event.nativeEvent?.data) {
+          triggerEvent(event.nativeEvent.data);
+        }
       };
     },
     [bridge]
