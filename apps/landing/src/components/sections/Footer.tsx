@@ -5,8 +5,8 @@ const links = {
   docs: [
     { name: 'Getting Started', href: '#installation' },
     { name: 'Examples', href: '#examples' },
-    { name: 'API Reference', href: '#api' },
-    { name: 'Architecture', href: '#architecture' },
+    { name: 'API Reference', href: 'https://github.com/JeanIsahakyan/aspectly/blob/main/docs/API.md' },
+    { name: 'Architecture', href: 'https://github.com/JeanIsahakyan/aspectly/blob/main/docs/ARCHITECTURE.md' },
   ],
   packages: [
     { name: '@aspectly/core', href: 'https://www.npmjs.com/package/@aspectly/core' },
@@ -61,6 +61,7 @@ export function Footer() {
                   <li key={link.name}>
                     <a
                       href={link.href}
+                      {...(link.href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
                       className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                     >
                       {link.name}

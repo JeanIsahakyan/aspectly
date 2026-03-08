@@ -18,6 +18,7 @@ export function WidgetApp() {
   }, [])
 
   useEffect(() => {
+    let stale = false
     bridge.init({
       greet: async (params: { name: string }) => {
         addLog(`greet({ name: "${params.name}" })`, 'in')
@@ -33,11 +34,12 @@ export function WidgetApp() {
         return { applied: true }
       }
     }).then(() => {
+      if (stale) return
       setConnected(true)
       setParentMethods(['getTime', 'getUserInfo'].filter(m => bridge.supports(m)))
       addLog('Bridge initialized!')
     })
-
+    return () => { stale = true }
   }, [bridge, addLog])
 
   const callGetTime = async () => {

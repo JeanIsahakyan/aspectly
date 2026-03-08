@@ -60,4 +60,9 @@ export class BridgeBase {
    */
   public init = (handlers?: BridgeHandlers): Promise<boolean> =>
     this.bridge.init(handlers);
+
+  /**
+   * Reset bridge state for a new connection context
+   */
+  public reset = (): void => this.bridge.reset();
 }

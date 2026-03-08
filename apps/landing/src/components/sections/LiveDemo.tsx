@@ -24,21 +24,23 @@ export function LiveDemo() {
   }, [])
 
   useEffect(() => {
-    if (loaded) {
-      bridge.init({
-        getTime: async () => {
-          addLog('getTime()', 'in')
-          return { time: new Date().toISOString() }
-        },
-        getUserInfo: async () => {
-          addLog('getUserInfo()', 'in')
-          return { name: 'Demo User', role: 'Developer', id: 42 }
-        }
-      }).then(() => {
-        setReady(true)
-        addLog('Bridge connected!', 'in')
-      })
-    }
+    if (!loaded) return
+    let stale = false
+    bridge.init({
+      getTime: async () => {
+        addLog('getTime()', 'in')
+        return { time: new Date().toISOString() }
+      },
+      getUserInfo: async () => {
+        addLog('getUserInfo()', 'in')
+        return { name: 'Demo User', role: 'Developer', id: 42 }
+      }
+    }).then(() => {
+      if (stale) return
+      setReady(true)
+      addLog('Bridge connected!', 'in')
+    })
+    return () => { stale = true }
   }, [loaded, bridge, addLog])
 
   const handleGreet = async () => {

@@ -68,6 +68,17 @@ export class BridgeInternal {
   }
 
   /**
+   * Reset bridge state for a new connection context.
+   * Call this when the remote side has changed (e.g., new popup window).
+   */
+  public reset = (): void => {
+    this.handlers = {};
+    this.available = false;
+    this.supportedMethods = [];
+    this.initPromise = undefined;
+  };
+
+  /**
    * Subscribe to all result events
    */
   public subscribe = (listener: BridgeListener): number => {

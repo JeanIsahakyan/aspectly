@@ -17,6 +17,7 @@ export function PopupApp() {
   }, [])
 
   useEffect(() => {
+    let stale = false
     bridge.init({
       greet: async (params: { name: string }) => {
         addLog(`greet({ name: "${params.name}" })`, 'in')
@@ -32,9 +33,11 @@ export function PopupApp() {
         return { applied: true }
       }
     }).then(() => {
+      if (stale) return
       setConnected(true)
       addLog('Bridge initialized!')
     })
+    return () => { stale = true }
   }, [bridge, addLog])
 
   const callGetTime = async () => {

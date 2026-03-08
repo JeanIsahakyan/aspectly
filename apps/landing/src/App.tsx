@@ -6,8 +6,7 @@ import {
   Examples,
   LiveDemo,
   LiveDemoWindow,
-  ApiDocs,
-  Architecture,
+  Docs,
   Footer,
 } from './components/sections'
 
@@ -22,8 +21,7 @@ function App() {
         <LiveDemoWindow />
         <Installation />
         <Examples />
-        <ApiDocs />
-        <Architecture />
+        <Docs />
       </main>
       <Footer />
     </div>

@@ -109,19 +109,12 @@ export const useAspectlyWindow = ({
     return () => window.removeEventListener('message', handler);
   }, [bridge]);
 
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const interval = setInterval(() => {
-      if (windowRef.current?.closed) {
-        windowRef.current = null;
-        setIsOpen(false);
-        setLoaded(false);
-      }
-    }, 500);
-
-    return () => clearInterval(interval);
-  }, [isOpen]);
+  const handleWindowClosed = useCallback(() => {
+    windowRef.current = null;
+    bridge.reset();
+    setIsOpen(false);
+    setLoaded(false);
+  }, [bridge]);
 
   const open = useCallback(() => {
     if (windowRef.current && !windowRef.current.closed) {
@@ -135,30 +128,25 @@ export const useAspectlyWindow = ({
       setIsOpen(true);
       setLoaded(false);
 
-      const onLoad = () => {
-        setLoaded(true);
-      };
-
-      // For same-origin windows, use the load event
-      // For cross-origin, we rely on the child sending an init message
       try {
-        newWindow.addEventListener('load', onLoad);
+        newWindow.addEventListener('load', () => setLoaded(true));
+        newWindow.addEventListener('beforeunload', handleWindowClosed);
       } catch {
-        // Cross-origin: can't add load listener, loaded will be set
-        // when the child bridge sends its first init event
+        // Cross-origin: can't add listeners
         setLoaded(true);
       }
     }
-  }, [url, target, features]);
+  }, [url, target, features, handleWindowClosed]);
 
   const close = useCallback(() => {
     if (windowRef.current && !windowRef.current.closed) {
       windowRef.current.close();
     }
     windowRef.current = null;
+    bridge.reset();
     setIsOpen(false);
     setLoaded(false);
-  }, []);
+  }, [bridge]);
 
   return [publicBridge, loaded, open, close, isOpen];
 };

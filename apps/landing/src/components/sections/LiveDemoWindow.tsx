@@ -28,21 +28,22 @@ export function LiveDemoWindow() {
 
   useEffect(() => {
     if (!isOpen || !loaded) return
-    if (loaded) {
-      bridge.init({
-        getTime: async () => {
-          addLog('getTime()', 'in')
-          return { time: new Date().toISOString() }
-        },
-        getUserInfo: async () => {
-          addLog('getUserInfo()', 'in')
-          return { name: 'Demo User', role: 'Developer', id: 42 }
-        }
-      }).then(() => {
-        setReady(true)
-        addLog('Bridge connected!', 'in')
-      })
-    }
+    let stale = false
+    bridge.init({
+      getTime: async () => {
+        addLog('getTime()', 'in')
+        return { time: new Date().toISOString() }
+      },
+      getUserInfo: async () => {
+        addLog('getUserInfo()', 'in')
+        return { name: 'Demo User', role: 'Developer', id: 42 }
+      }
+    }).then(() => {
+      if (stale) return
+      setReady(true)
+      addLog('Bridge connected!', 'in')
+    })
+    return () => { stale = true }
   }, [loaded, isOpen, bridge, addLog])
 
   const handleGreet = async () => {

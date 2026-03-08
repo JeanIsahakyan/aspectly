@@ -6,10 +6,10 @@ import { cn } from '../../utils/utils'
 
 const navLinks = [
   { name: 'Features', href: '#features' },
+  { name: 'Demo', href: '#demo' },
   { name: 'Installation', href: '#installation' },
   { name: 'Examples', href: '#examples' },
-  { name: 'API', href: '#api' },
-  { name: 'Architecture', href: '#architecture' },
+  { name: 'Docs', href: '#docs' },
 ]
 
 export function Navbar() {
