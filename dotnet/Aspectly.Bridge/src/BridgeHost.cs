@@ -379,7 +379,8 @@ public class BridgeHost : IDisposable
     #endregion
 
     /// <summary>
-    /// Sends the Init event to JavaScript with the list of registered methods.
+    /// Sends the Init event to JavaScript with the list of registered methods,
+    /// followed by InitResult to confirm the bridge is ready.
     /// </summary>
     public async Task InitializeAsync()
     {
@@ -390,6 +391,9 @@ public class BridgeHost : IDisposable
         }
         await SendEventAsync(BridgeEventType.Init, new BridgeInitData { Methods = methods });
         _logger.Info($"[BridgeHost] Sent Init with methods: {string.Join(", ", methods)}");
+
+        await SendEventAsync(BridgeEventType.InitResult, new BridgeInitData { Methods = methods });
+        _logger.Info("[BridgeHost] Sent InitResult");
     }
 
     /// <inheritdoc />
