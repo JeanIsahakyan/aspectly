@@ -11,9 +11,12 @@ namespace Aspectly.Bridge;
 /// </summary>
 public class BridgeHost : IDisposable
 {
+    private const int DEFAULT_TIMEOUT_MS = 100000;
+
     private readonly IBrowserBridge _browserBridge;
     private readonly IBridgeLogger _logger;
     private readonly JsonSerializerOptions _jsonOptions;
+    private readonly int _timeoutMs;
 
     private bool _initialized;
     private bool _disposed;
@@ -56,10 +59,12 @@ public class BridgeHost : IDisposable
     /// </summary>
     /// <param name="browserBridge">The browser bridge implementation.</param>
     /// <param name="logger">Optional logger. If null, logging is disabled.</param>
-    public BridgeHost(IBrowserBridge browserBridge, IBridgeLogger? logger = null)
+    /// <param name="timeoutMs">Timeout for handler execution in milliseconds (default: 100000).</param>
+    public BridgeHost(IBrowserBridge browserBridge, IBridgeLogger? logger = null, int timeoutMs = DEFAULT_TIMEOUT_MS)
     {
         _browserBridge = browserBridge ?? throw new ArgumentNullException(nameof(browserBridge));
         _logger = logger ?? NullLogger.Instance;
+        _timeoutMs = timeoutMs;
 
         _jsonOptions = new JsonSerializerOptions
         {
@@ -175,15 +180,36 @@ public class BridgeHost : IDisposable
         {
             try
             {
-                var handlerResult = await handler(request.Params);
-                result = new BridgeResultData
+                var handlerTask = handler(request.Params);
+                var completedTask = await Task.WhenAny(handlerTask, Task.Delay(_timeoutMs));
+
+                if (completedTask != handlerTask)
                 {
-                    Type = BridgeResultType.Success,
-                    Method = request.Method,
-                    RequestId = request.RequestId,
-                    Data = JsonSerializer.SerializeToElement(handlerResult, _jsonOptions)
-                };
-                _logger.Debug($"[BridgeHost] Handler '{request.Method}' completed successfully");
+                    _logger.Error($"[BridgeHost] Handler '{request.Method}' timed out after {_timeoutMs}ms");
+                    result = new BridgeResultData
+                    {
+                        Type = BridgeResultType.Error,
+                        Method = request.Method,
+                        RequestId = request.RequestId,
+                        Error = new BridgeResultError
+                        {
+                            ErrorType = BridgeErrorType.METHOD_EXECUTION_TIMEOUT,
+                            ErrorMessage = "Execution timeout exceeded"
+                        }
+                    };
+                }
+                else
+                {
+                    var handlerResult = await handlerTask;
+                    result = new BridgeResultData
+                    {
+                        Type = BridgeResultType.Success,
+                        Method = request.Method,
+                        RequestId = request.RequestId,
+                        Data = JsonSerializer.SerializeToElement(handlerResult, _jsonOptions)
+                    };
+                    _logger.Debug($"[BridgeHost] Handler '{request.Method}' completed successfully");
+                }
             }
             catch (Exception ex)
             {
@@ -373,6 +399,19 @@ public class BridgeHost : IDisposable
     }
 
     #endregion
+
+    /// <summary>
+    /// Registers handlers and sends Init to JavaScript, then waits for InitResult.
+    /// Mirrors the JS bridge.init(handlers) pattern.
+    /// </summary>
+    /// <param name="handlers">Map of method names to handler functions.</param>
+    public async Task InitializeAsync(Dictionary<string, Func<JsonElement, Task<object?>>> handlers)
+    {
+        foreach (var kvp in handlers)
+            RegisterHandler(kvp.Key, kvp.Value);
+
+        await InitializeAsync();
+    }
 
     /// <summary>
     /// Sends the Init event to JavaScript with the list of registered methods
