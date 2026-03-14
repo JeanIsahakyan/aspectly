@@ -11,13 +11,17 @@ namespace Aspectly.Bridge;
 /// </summary>
 public class BridgeHost : IDisposable
 {
+    private const int DEFAULT_TIMEOUT_MS = 100000;
+
     private readonly IBrowserBridge _browserBridge;
     private readonly IBridgeLogger _logger;
     private readonly JsonSerializerOptions _jsonOptions;
+    private readonly int _timeoutMs;
 
     private bool _initialized;
     private bool _disposed;
     private int _requestIdCounter;
+    private TaskCompletionSource<bool>? _initTcs;
 
     private readonly List<string> _supportedMethods = new();
     private readonly Dictionary<string, Func<JsonElement, Task<object?>>> _handlers = new();
@@ -55,10 +59,12 @@ public class BridgeHost : IDisposable
     /// </summary>
     /// <param name="browserBridge">The browser bridge implementation.</param>
     /// <param name="logger">Optional logger. If null, logging is disabled.</param>
-    public BridgeHost(IBrowserBridge browserBridge, IBridgeLogger? logger = null)
+    /// <param name="timeoutMs">Timeout for handler execution in milliseconds (default: 100000).</param>
+    public BridgeHost(IBrowserBridge browserBridge, IBridgeLogger? logger = null, int timeoutMs = DEFAULT_TIMEOUT_MS)
     {
         _browserBridge = browserBridge ?? throw new ArgumentNullException(nameof(browserBridge));
         _logger = logger ?? NullLogger.Instance;
+        _timeoutMs = timeoutMs;
 
         _jsonOptions = new JsonSerializerOptions
         {
@@ -131,6 +137,7 @@ public class BridgeHost : IDisposable
                 break;
             case BridgeEventType.InitResult:
                 _initialized = true;
+                _initTcs?.TrySetResult(true);
                 _logger.Info("[BridgeHost] Bridge initialized (confirmed by JS)");
                 Initialized?.Invoke(this, EventArgs.Empty);
                 break;
@@ -150,16 +157,10 @@ public class BridgeHost : IDisposable
             _logger.Info($"[BridgeHost] JS supports methods: {string.Join(", ", initData.Methods)}");
         }
 
-        string[] ourMethods;
-        lock (_lock)
-        {
-            ourMethods = _handlers.Keys.ToArray();
-        }
-
-        await SendEventAsync(BridgeEventType.Init, new BridgeInitData { Methods = ourMethods });
-        _logger.Info($"[BridgeHost] Sent Init with methods: {string.Join(", ", ourMethods)}");
-
-        await SendEventAsync(BridgeEventType.InitResult, new BridgeInitData { Methods = ourMethods });
+        // Match JS protocol: only send InitResult, not our Init.
+        // Our Init is sent explicitly via InitializeAsync().
+        await SendEventAsync(BridgeEventType.InitResult, true);
+        _logger.Info("[BridgeHost] Sent InitResult");
     }
 
     private async Task HandleRequestAsync(JsonElement data)
@@ -179,15 +180,36 @@ public class BridgeHost : IDisposable
         {
             try
             {
-                var handlerResult = await handler(request.Params);
-                result = new BridgeResultData
+                var handlerTask = handler(request.Params);
+                var completedTask = await Task.WhenAny(handlerTask, Task.Delay(_timeoutMs));
+
+                if (completedTask != handlerTask)
                 {
-                    Type = BridgeResultType.Success,
-                    Method = request.Method,
-                    RequestId = request.RequestId,
-                    Data = JsonSerializer.SerializeToElement(handlerResult, _jsonOptions)
-                };
-                _logger.Debug($"[BridgeHost] Handler '{request.Method}' completed successfully");
+                    _logger.Error($"[BridgeHost] Handler '{request.Method}' timed out after {_timeoutMs}ms");
+                    result = new BridgeResultData
+                    {
+                        Type = BridgeResultType.Error,
+                        Method = request.Method,
+                        RequestId = request.RequestId,
+                        Error = new BridgeResultError
+                        {
+                            ErrorType = BridgeErrorType.METHOD_EXECUTION_TIMEOUT,
+                            ErrorMessage = "Execution timeout exceeded"
+                        }
+                    };
+                }
+                else
+                {
+                    var handlerResult = await handlerTask;
+                    result = new BridgeResultData
+                    {
+                        Type = BridgeResultType.Success,
+                        Method = request.Method,
+                        RequestId = request.RequestId,
+                        Data = JsonSerializer.SerializeToElement(handlerResult, _jsonOptions)
+                    };
+                    _logger.Debug($"[BridgeHost] Handler '{request.Method}' completed successfully");
+                }
             }
             catch (Exception ex)
             {
@@ -379,8 +401,22 @@ public class BridgeHost : IDisposable
     #endregion
 
     /// <summary>
-    /// Sends the Init event to JavaScript with the list of registered methods,
-    /// followed by InitResult to confirm the bridge is ready.
+    /// Registers handlers and sends Init to JavaScript, then waits for InitResult.
+    /// Mirrors the JS bridge.init(handlers) pattern.
+    /// </summary>
+    /// <param name="handlers">Map of method names to handler functions.</param>
+    public async Task InitializeAsync(Dictionary<string, Func<JsonElement, Task<object?>>> handlers)
+    {
+        foreach (var kvp in handlers)
+            RegisterHandler(kvp.Key, kvp.Value);
+
+        await InitializeAsync();
+    }
+
+    /// <summary>
+    /// Sends the Init event to JavaScript with the list of registered methods
+    /// and waits for InitResult from the JS side.
+    /// Mirrors the JS bridge.init() protocol: send Init, await InitResult.
     /// </summary>
     public async Task InitializeAsync()
     {
@@ -389,11 +425,14 @@ public class BridgeHost : IDisposable
         {
             methods = _handlers.Keys.ToArray();
         }
+
+        _initTcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+
         await SendEventAsync(BridgeEventType.Init, new BridgeInitData { Methods = methods });
         _logger.Info($"[BridgeHost] Sent Init with methods: {string.Join(", ", methods)}");
 
-        await SendEventAsync(BridgeEventType.InitResult, new BridgeInitData { Methods = methods });
-        _logger.Info("[BridgeHost] Sent InitResult");
+        await _initTcs.Task;
+        _logger.Info("[BridgeHost] InitResult received, initialization complete");
     }
 
     /// <inheritdoc />
@@ -404,6 +443,8 @@ public class BridgeHost : IDisposable
 
         _browserBridge.MessageReceived -= OnMessageReceived;
         _browserBridge.Dispose();
+
+        _initTcs?.TrySetCanceled();
 
         lock (_lock)
         {

@@ -318,6 +318,69 @@ describe('BridgeInternal', () => {
     });
   });
 
+  describe('registerHandler/unregisterHandler', () => {
+    it('should register a handler that can be called via Request', async () => {
+      const handler = vi.fn().mockResolvedValue({ ok: true });
+      bridge.registerHandler('myMethod', handler);
+
+      bridge.handleCoreEvent({
+        type: BridgeEventType.Request,
+        data: { method: 'myMethod', params: { x: 1 }, request_id: '1' },
+      });
+
+      await new Promise((resolve) => setTimeout(resolve, 50));
+
+      expect(handler).toHaveBeenCalledWith({ x: 1 });
+      expect(sendEvent).toHaveBeenCalledWith({
+        type: BridgeEventType.Result,
+        data: {
+          type: BridgeResultType.Success,
+          data: { ok: true },
+          method: 'myMethod',
+          request_id: '1',
+        },
+      });
+    });
+
+    it('should unregister a handler', async () => {
+      bridge.registerHandler('myMethod', vi.fn().mockResolvedValue({}));
+      bridge.unregisterHandler('myMethod');
+
+      bridge.handleCoreEvent({
+        type: BridgeEventType.Request,
+        data: { method: 'myMethod', params: {}, request_id: '1' },
+      });
+
+      await new Promise((resolve) => setTimeout(resolve, 50));
+
+      expect(sendEvent).toHaveBeenCalledWith({
+        type: BridgeEventType.Result,
+        data: expect.objectContaining({
+          type: BridgeResultType.Error,
+          data: expect.objectContaining({
+            error_type: BridgeErrorType.UNSUPPORTED_METHOD,
+          }),
+        }),
+      });
+    });
+
+    it('should include registerHandler methods in init', () => {
+      bridge.registerHandler('pre1', vi.fn().mockResolvedValue({}));
+      bridge.registerHandler('pre2', vi.fn().mockResolvedValue({}));
+
+      bridge.init({
+        pre1: vi.fn().mockResolvedValue({}),
+        pre2: vi.fn().mockResolvedValue({}),
+        extra: vi.fn().mockResolvedValue({}),
+      });
+
+      expect(sendEvent).toHaveBeenCalledWith({
+        type: BridgeEventType.Init,
+        data: { methods: ['pre1', 'pre2', 'extra'] },
+      });
+    });
+  });
+
   describe('supports', () => {
     it('should return false before initialization', () => {
       expect(bridge.supports('test')).toBe(false);

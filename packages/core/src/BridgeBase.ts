@@ -1,4 +1,4 @@
-import type { BridgeHandlers, BridgeListener } from './types';
+import type { BridgeHandler, BridgeHandlers, BridgeListener } from './types';
 import type { BridgeInternal } from './BridgeInternal';
 
 /**
@@ -51,6 +51,24 @@ export class BridgeBase {
    */
   public unsubscribe = (listener: BridgeListener): void => {
     return this.bridge.unsubscribe(listener);
+  };
+
+  /**
+   * Register a single handler for a method.
+   * Can be called before or after init().
+   * @param method Method name to handle
+   * @param handler Async function to handle the method
+   */
+  public registerHandler = (method: string, handler: BridgeHandler): void => {
+    this.bridge.registerHandler(method, handler);
+  };
+
+  /**
+   * Remove a previously registered handler.
+   * @param method Method name to remove
+   */
+  public unregisterHandler = (method: string): void => {
+    this.bridge.unregisterHandler(method);
   };
 
   /**

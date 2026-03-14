@@ -79,6 +79,21 @@ export class BridgeInternal {
   };
 
   /**
+   * Register a single handler for a method.
+   * Can be called before or after init().
+   */
+  public registerHandler = (method: string, handler: BridgeHandler): void => {
+    this.handlers[method] = handler;
+  };
+
+  /**
+   * Remove a previously registered handler.
+   */
+  public unregisterHandler = (method: string): void => {
+    delete this.handlers[method];
+  };
+
+  /**
    * Subscribe to all result events
    */
   public subscribe = (listener: BridgeListener): number => {
