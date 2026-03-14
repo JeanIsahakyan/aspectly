@@ -402,12 +402,70 @@ public class BridgeHostTests
         _bridge.Initialized += (sender, args) => eventFired = true;
 
         // Process InitResult message
-        var initResultMessage = CreateBridgeMessage(BridgeEventType.InitResult, new { methods = new string[] { } });
+        var initResultMessage = CreateBridgeMessage(BridgeEventType.InitResult, true);
         await _bridge.ProcessMessageAsync(initResultMessage);
 
         // Assert IsInitialized == true and event was raised
         _bridge.IsInitialized.Should().BeTrue();
         eventFired.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task InitializeAsync_ShouldWaitForInitResult()
+    {
+        _mockBrowser.Setup(b => b.ExecuteScriptAsync(It.IsAny<string>()))
+            .Returns(Task.CompletedTask);
+
+        // Start InitializeAsync (will send Init and wait for InitResult)
+        var initTask = _bridge.InitializeAsync();
+
+        // Should not be completed yet (waiting for InitResult)
+        initTask.IsCompleted.Should().BeFalse();
+
+        // Simulate JS responding with InitResult
+        var initResultMessage = CreateBridgeMessage(BridgeEventType.InitResult, true);
+        await _bridge.ProcessMessageAsync(initResultMessage);
+
+        // Now InitializeAsync should complete
+        await initTask;
+        _bridge.IsInitialized.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task InitializeAsync_ShouldBeCancelledOnDispose()
+    {
+        _mockBrowser.Setup(b => b.ExecuteScriptAsync(It.IsAny<string>()))
+            .Returns(Task.CompletedTask);
+
+        // Start InitializeAsync (will wait for InitResult)
+        var initTask = _bridge.InitializeAsync();
+
+        // Dispose before InitResult arrives
+        _bridge.Dispose();
+
+        // Should throw TaskCanceledException
+        await Assert.ThrowsAsync<TaskCanceledException>(async () => await initTask);
+    }
+
+    [Fact]
+    public async Task HandleInit_ShouldOnlySendInitResult_NotOurInit()
+    {
+        var sentScripts = new List<string>();
+        _mockBrowser.Setup(b => b.ExecuteScriptAsync(It.IsAny<string>()))
+            .Callback<string>(s => sentScripts.Add(s))
+            .Returns(Task.CompletedTask);
+
+        // Register a handler so we have methods
+        _bridge.RegisterHandler("myMethod", async (_) => "result");
+
+        // Process JS Init
+        var initMessage = CreateBridgeMessage(BridgeEventType.Init, new { methods = new[] { "jsMethod" } });
+        await _bridge.ProcessMessageAsync(initMessage);
+
+        // Should have sent exactly one message (InitResult), not two (Init + InitResult)
+        sentScripts.Should().HaveCount(1);
+        sentScripts[0].Should().Contain("InitResult");
+        sentScripts[0].Should().NotContain("\"type\":\"Init\"");
     }
 
     private static string ExtractRequestIdFromScript(string script)
