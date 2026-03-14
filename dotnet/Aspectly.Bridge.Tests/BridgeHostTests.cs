@@ -468,6 +468,71 @@ public class BridgeHostTests
         sentScripts[0].Should().NotContain("\"type\":\"Init\"");
     }
 
+    [Fact]
+    public async Task HandleRequestAsync_ShouldTimeoutSlowHandler()
+    {
+        string? sentScript = null;
+        _mockBrowser.Setup(b => b.ExecuteScriptAsync(It.IsAny<string>()))
+            .Callback<string>(s => sentScript = s)
+            .Returns(Task.CompletedTask);
+
+        // Create bridge with short timeout
+        var shortTimeoutBridge = new BridgeHost(_mockBrowser.Object, timeoutMs: 100);
+
+        // Register a slow handler
+        shortTimeoutBridge.RegisterHandler("slowMethod", async (JsonElement _) =>
+        {
+            await Task.Delay(5000);
+            return new { value = "late" };
+        });
+
+        // Process Request event
+        var requestMessage = CreateBridgeMessage(BridgeEventType.Request, new
+        {
+            method = "slowMethod",
+            request_id = "1",
+            @params = new { }
+        });
+
+        await shortTimeoutBridge.ProcessMessageAsync(requestMessage);
+
+        // Wait for timeout to fire
+        await Task.Delay(200);
+
+        // Verify timeout error was sent
+        sentScript.Should().NotBeNull();
+        sentScript.Should().Contain("METHOD_EXECUTION_TIMEOUT");
+
+        shortTimeoutBridge.Dispose();
+    }
+
+    [Fact]
+    public async Task InitializeAsync_WithHandlers_ShouldRegisterAndInit()
+    {
+        _mockBrowser.Setup(b => b.ExecuteScriptAsync(It.IsAny<string>()))
+            .Returns(Task.CompletedTask);
+
+        var handlers = new Dictionary<string, Func<JsonElement, Task<object?>>>
+        {
+            ["method1"] = async (_) => (object?)"result1",
+            ["method2"] = async (_) => (object?)"result2",
+        };
+
+        // Start InitializeAsync with handlers
+        var initTask = _bridge.InitializeAsync(handlers);
+
+        // Verify handlers are registered
+        _bridge.RegisteredMethods.Should().Contain("method1");
+        _bridge.RegisteredMethods.Should().Contain("method2");
+
+        // Simulate JS InitResult to complete init
+        var initResultMessage = CreateBridgeMessage(BridgeEventType.InitResult, true);
+        await _bridge.ProcessMessageAsync(initResultMessage);
+
+        await initTask;
+        _bridge.IsInitialized.Should().BeTrue();
+    }
+
     private static string ExtractRequestIdFromScript(string script)
     {
         // Script format: window.postMessage(<json-encoded-string>, '*');
