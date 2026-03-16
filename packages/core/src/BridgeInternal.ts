@@ -264,7 +264,7 @@ export class BridgeInternal {
       return;
     }
     if (type === BridgeResultType.Error) {
-      request.reject(data as BridgeResultError);
+      request.reject((data || result.error) as BridgeResultError);
     }
   };
 

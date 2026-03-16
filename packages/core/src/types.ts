@@ -65,6 +65,7 @@ export interface BridgeResultEvent {
   method?: string;
   request_id?: string;
   data?: BridgeResultData;
+  error?: BridgeResultError;
 }
 
 /**
