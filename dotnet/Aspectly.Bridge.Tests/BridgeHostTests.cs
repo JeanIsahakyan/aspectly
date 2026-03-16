@@ -402,12 +402,135 @@ public class BridgeHostTests
         _bridge.Initialized += (sender, args) => eventFired = true;
 
         // Process InitResult message
-        var initResultMessage = CreateBridgeMessage(BridgeEventType.InitResult, new { methods = new string[] { } });
+        var initResultMessage = CreateBridgeMessage(BridgeEventType.InitResult, true);
         await _bridge.ProcessMessageAsync(initResultMessage);
 
         // Assert IsInitialized == true and event was raised
         _bridge.IsInitialized.Should().BeTrue();
         eventFired.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task InitializeAsync_ShouldWaitForInitResult()
+    {
+        _mockBrowser.Setup(b => b.ExecuteScriptAsync(It.IsAny<string>()))
+            .Returns(Task.CompletedTask);
+
+        // Start InitializeAsync (will send Init and wait for InitResult)
+        var initTask = _bridge.InitializeAsync();
+
+        // Should not be completed yet (waiting for InitResult)
+        initTask.IsCompleted.Should().BeFalse();
+
+        // Simulate JS responding with InitResult
+        var initResultMessage = CreateBridgeMessage(BridgeEventType.InitResult, true);
+        await _bridge.ProcessMessageAsync(initResultMessage);
+
+        // Now InitializeAsync should complete
+        await initTask;
+        _bridge.IsInitialized.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task InitializeAsync_ShouldBeCancelledOnDispose()
+    {
+        _mockBrowser.Setup(b => b.ExecuteScriptAsync(It.IsAny<string>()))
+            .Returns(Task.CompletedTask);
+
+        // Start InitializeAsync (will wait for InitResult)
+        var initTask = _bridge.InitializeAsync();
+
+        // Dispose before InitResult arrives
+        _bridge.Dispose();
+
+        // Should throw TaskCanceledException
+        await Assert.ThrowsAsync<TaskCanceledException>(async () => await initTask);
+    }
+
+    [Fact]
+    public async Task HandleInit_ShouldOnlySendInitResult_NotOurInit()
+    {
+        var sentScripts = new List<string>();
+        _mockBrowser.Setup(b => b.ExecuteScriptAsync(It.IsAny<string>()))
+            .Callback<string>(s => sentScripts.Add(s))
+            .Returns(Task.CompletedTask);
+
+        // Register a handler so we have methods
+        _bridge.RegisterHandler("myMethod", async (_) => "result");
+
+        // Process JS Init
+        var initMessage = CreateBridgeMessage(BridgeEventType.Init, new { methods = new[] { "jsMethod" } });
+        await _bridge.ProcessMessageAsync(initMessage);
+
+        // Should have sent exactly one message (InitResult), not two (Init + InitResult)
+        sentScripts.Should().HaveCount(1);
+        sentScripts[0].Should().Contain("InitResult");
+        sentScripts[0].Should().NotContain("\"type\":\"Init\"");
+    }
+
+    [Fact]
+    public async Task HandleRequestAsync_ShouldTimeoutSlowHandler()
+    {
+        string? sentScript = null;
+        _mockBrowser.Setup(b => b.ExecuteScriptAsync(It.IsAny<string>()))
+            .Callback<string>(s => sentScript = s)
+            .Returns(Task.CompletedTask);
+
+        // Create bridge with short timeout
+        var shortTimeoutBridge = new BridgeHost(_mockBrowser.Object, timeoutMs: 100);
+
+        // Register a slow handler
+        shortTimeoutBridge.RegisterHandler("slowMethod", async (JsonElement _) =>
+        {
+            await Task.Delay(5000);
+            return new { value = "late" };
+        });
+
+        // Process Request event
+        var requestMessage = CreateBridgeMessage(BridgeEventType.Request, new
+        {
+            method = "slowMethod",
+            request_id = "1",
+            @params = new { }
+        });
+
+        await shortTimeoutBridge.ProcessMessageAsync(requestMessage);
+
+        // Wait for timeout to fire
+        await Task.Delay(200);
+
+        // Verify timeout error was sent
+        sentScript.Should().NotBeNull();
+        sentScript.Should().Contain("METHOD_EXECUTION_TIMEOUT");
+
+        shortTimeoutBridge.Dispose();
+    }
+
+    [Fact]
+    public async Task InitializeAsync_WithHandlers_ShouldRegisterAndInit()
+    {
+        _mockBrowser.Setup(b => b.ExecuteScriptAsync(It.IsAny<string>()))
+            .Returns(Task.CompletedTask);
+
+        var handlers = new Dictionary<string, Func<JsonElement, Task<object?>>>
+        {
+            ["method1"] = async (_) => (object?)"result1",
+            ["method2"] = async (_) => (object?)"result2",
+        };
+
+        // Start InitializeAsync with handlers
+        var initTask = _bridge.InitializeAsync(handlers);
+
+        // Verify handlers are registered
+        _bridge.RegisteredMethods.Should().Contain("method1");
+        _bridge.RegisteredMethods.Should().Contain("method2");
+
+        // Simulate JS InitResult to complete init
+        var initResultMessage = CreateBridgeMessage(BridgeEventType.InitResult, true);
+        await _bridge.ProcessMessageAsync(initResultMessage);
+
+        await initTask;
+        _bridge.IsInitialized.Should().BeTrue();
     }
 
     private static string ExtractRequestIdFromScript(string script)

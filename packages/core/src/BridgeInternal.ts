@@ -1,6 +1,7 @@
 import type {
   BridgeData,
   BridgeEvent,
+  BridgeHandler,
   BridgeHandlers,
   BridgeInitEvent,
   BridgeInitResultEvent,
@@ -76,6 +77,21 @@ export class BridgeInternal {
     this.available = false;
     this.supportedMethods = [];
     this.initPromise = undefined;
+  };
+
+  /**
+   * Register a single handler for a method.
+   * Can be called before or after init().
+   */
+  public registerHandler = (method: string, handler: BridgeHandler): void => {
+    this.handlers[method] = handler;
+  };
+
+  /**
+   * Remove a previously registered handler.
+   */
+  public unregisterHandler = (method: string): void => {
+    delete this.handlers[method];
   };
 
   /**
