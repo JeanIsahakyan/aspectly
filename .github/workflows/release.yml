@@ -7,6 +7,7 @@ on:
 permissions:
   contents: write
   actions: write
+  id-token: write
 
 jobs:
   publish:
@@ -26,9 +27,17 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'pnpm'
           registry-url: 'https://registry.npmjs.org'
+
+      - name: Install npm with OIDC support
+        run: npm install -g npm@latest
+
+      - name: Verify npm version
+        run: |
+          echo "npm version: $(npm --version)"
+          echo "node version: $(node --version)"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -45,13 +54,10 @@ jobs:
       - name: Run tests
         run: pnpm test
 
-      - name: Setup npm auth
-        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" >> .npmrc
-
       - name: Publish to npm
         run: |
           for pkg in packages/*/; do
-            (cd "$pkg" && npm publish --access public)
+            (cd "$pkg" && npm publish --provenance --access public)
           done
 
       - name: Setup .NET
