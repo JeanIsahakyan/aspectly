@@ -396,39 +396,52 @@ public class BridgeHostTests
     }
 
     [Fact]
-    public async Task ProcessMessageAsync_WithInitResult_ShouldSetInitializedAndFireEvent()
+    public async Task ProcessMessageAsync_ShouldInitializeOnlyWhenBothInitAndInitResultReceived()
     {
+        _mockBrowser.Setup(b => b.ExecuteScriptAsync(It.IsAny<string>()))
+            .Returns(Task.CompletedTask);
+
         var eventFired = false;
         _bridge.Initialized += (sender, args) => eventFired = true;
 
-        // Process InitResult message
+        // Only InitResult — should NOT be initialized yet
         var initResultMessage = CreateBridgeMessage(BridgeEventType.InitResult, true);
         await _bridge.ProcessMessageAsync(initResultMessage);
+        _bridge.IsInitialized.Should().BeFalse();
+        eventFired.Should().BeFalse();
 
-        // Assert IsInitialized == true and event was raised
+        // Now Init arrives — should be initialized
+        var initMessage = CreateBridgeMessage(BridgeEventType.Init, new { methods = new[] { "jsMethod" } });
+        await _bridge.ProcessMessageAsync(initMessage);
         _bridge.IsInitialized.Should().BeTrue();
         eventFired.Should().BeTrue();
     }
 
     [Fact]
-    public async Task InitializeAsync_ShouldWaitForInitResult()
+    public async Task InitializeAsync_ShouldWaitForBothInitAndInitResult()
     {
         _mockBrowser.Setup(b => b.ExecuteScriptAsync(It.IsAny<string>()))
             .Returns(Task.CompletedTask);
 
-        // Start InitializeAsync (will send Init and wait for InitResult)
+        // Start InitializeAsync (will send Init and wait)
         var initTask = _bridge.InitializeAsync();
-
-        // Should not be completed yet (waiting for InitResult)
         initTask.IsCompleted.Should().BeFalse();
 
-        // Simulate JS responding with InitResult
+        // Simulate JS Init (remote methods)
+        var initMessage = CreateBridgeMessage(BridgeEventType.Init, new { methods = new[] { "jsMethod" } });
+        await _bridge.ProcessMessageAsync(initMessage);
+
+        // Still not complete — waiting for InitResult
+        initTask.IsCompleted.Should().BeFalse();
+
+        // Simulate JS InitResult
         var initResultMessage = CreateBridgeMessage(BridgeEventType.InitResult, true);
         await _bridge.ProcessMessageAsync(initResultMessage);
 
-        // Now InitializeAsync should complete
+        // Now should complete
         await initTask;
         _bridge.IsInitialized.Should().BeTrue();
+        _bridge.SupportedMethods.Should().Contain("jsMethod");
     }
 
     [Fact]
@@ -525,7 +538,10 @@ public class BridgeHostTests
         _bridge.RegisteredMethods.Should().Contain("method1");
         _bridge.RegisteredMethods.Should().Contain("method2");
 
-        // Simulate JS InitResult to complete init
+        // Simulate JS Init + InitResult to complete init
+        var initMessage = CreateBridgeMessage(BridgeEventType.Init, new { methods = new[] { "jsMethod" } });
+        await _bridge.ProcessMessageAsync(initMessage);
+
         var initResultMessage = CreateBridgeMessage(BridgeEventType.InitResult, true);
         await _bridge.ProcessMessageAsync(initResultMessage);
 

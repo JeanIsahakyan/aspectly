@@ -60,6 +60,7 @@ export class BridgeInternal {
   private supportedMethods: string[] = [];
   private listeners: BridgeListener[] = [];
   private initPromise?: InitPromise;
+  private initResultReceived = false;
   private readonly sendEvent: InternalEventSender;
   private readonly timeout: number;
 
@@ -77,6 +78,7 @@ export class BridgeInternal {
     this.available = false;
     this.supportedMethods = [];
     this.initPromise = undefined;
+    this.initResultReceived = false;
   };
 
   /**
@@ -272,13 +274,21 @@ export class BridgeInternal {
     this.available = true;
     this.supportedMethods = data.methods;
     this.sendEvent(internalEvent(BridgeEventType.InitResult, true));
+    this.tryResolveInit();
   };
 
   private handleInitResult = (success: BridgeInitResultEvent): void => {
     if (success) {
-      this.initPromise?.resolve(true);
+      this.initResultReceived = true;
+      this.tryResolveInit();
     } else {
       this.initPromise?.reject();
+    }
+  };
+
+  private tryResolveInit = (): void => {
+    if (this.initResultReceived && this.available) {
+      this.initPromise?.resolve(true);
     }
   };
 

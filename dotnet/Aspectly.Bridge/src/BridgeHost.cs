@@ -19,6 +19,8 @@ public class BridgeHost : IDisposable
     private readonly int _timeoutMs;
 
     private bool _initialized;
+    private bool _remoteInitReceived;
+    private bool _initResultReceived;
     private bool _disposed;
     private int _requestIdCounter;
     private TaskCompletionSource<bool>? _initTcs;
@@ -136,10 +138,9 @@ public class BridgeHost : IDisposable
                 HandleResult(payload.Data);
                 break;
             case BridgeEventType.InitResult:
-                _initialized = true;
-                _initTcs?.TrySetResult(true);
-                _logger.Info("[BridgeHost] Bridge initialized (confirmed by JS)");
-                Initialized?.Invoke(this, EventArgs.Empty);
+                _initResultReceived = true;
+                _logger.Info("[BridgeHost] InitResult received from JS");
+                TryResolveInit();
                 break;
         }
     }
@@ -157,10 +158,24 @@ public class BridgeHost : IDisposable
             _logger.Info($"[BridgeHost] JS supports methods: {string.Join(", ", initData.Methods)}");
         }
 
+        _remoteInitReceived = true;
+
         // Match JS protocol: only send InitResult, not our Init.
         // Our Init is sent explicitly via InitializeAsync().
         await SendEventAsync(BridgeEventType.InitResult, true);
         _logger.Info("[BridgeHost] Sent InitResult");
+        TryResolveInit();
+    }
+
+    private void TryResolveInit()
+    {
+        if (_initResultReceived && _remoteInitReceived)
+        {
+            _initialized = true;
+            _initTcs?.TrySetResult(true);
+            _logger.Info("[BridgeHost] Bridge fully initialized (both Init and InitResult received)");
+            Initialized?.Invoke(this, EventArgs.Empty);
+        }
     }
 
     private async Task HandleRequestAsync(JsonElement data)

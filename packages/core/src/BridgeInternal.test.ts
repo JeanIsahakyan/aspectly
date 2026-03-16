@@ -34,17 +34,47 @@ describe('BridgeInternal', () => {
       expect(sendEvent).not.toHaveBeenCalled();
     });
 
-    it('should return promise that resolves on InitResult', async () => {
+    it('should return promise that resolves when both Init and InitResult received', async () => {
       const handlers = {
         greet: async () => ({ message: 'hello' }),
       };
 
       const initPromise = bridge.init(handlers);
 
-      // Simulate receiving InitResult
+      // Simulate receiving Init from other side (sets available + supportedMethods)
+      bridge.handleCoreEvent({
+        type: BridgeEventType.Init,
+        data: { methods: ['remoteMethod'] },
+      });
+
+      // Simulate receiving InitResult (confirms our Init was acknowledged)
       bridge.handleCoreEvent({
         type: BridgeEventType.InitResult,
         data: true,
+      });
+
+      await expect(initPromise).resolves.toBe(true);
+      expect(bridge.isAvailable()).toBe(true);
+      expect(bridge.supports('remoteMethod')).toBe(true);
+    });
+
+    it('should resolve init when InitResult arrives before Init', async () => {
+      const handlers = {
+        greet: async () => ({ message: 'hello' }),
+      };
+
+      const initPromise = bridge.init(handlers);
+
+      // InitResult first
+      bridge.handleCoreEvent({
+        type: BridgeEventType.InitResult,
+        data: true,
+      });
+
+      // Init second
+      bridge.handleCoreEvent({
+        type: BridgeEventType.Init,
+        data: { methods: ['remoteMethod'] },
       });
 
       await expect(initPromise).resolves.toBe(true);
