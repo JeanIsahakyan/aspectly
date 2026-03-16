@@ -51,7 +51,7 @@ jobs:
       - name: Publish to npm
         run: |
           for pkg in packages/*/; do
-            (cd "$pkg" && npm publish --access public) || true
+            (cd "$pkg" && npm publish --access public)
           done
 
       - name: Setup .NET
@@ -62,7 +62,7 @@ jobs:
       - name: Publish to NuGet
         run: |
           for proj in dotnet/Aspectly.Bridge/Aspectly.Bridge.csproj dotnet/Aspectly.Bridge.CefSharp/Aspectly.Bridge.CefSharp.csproj dotnet/Aspectly.Bridge.WebView2/Aspectly.Bridge.WebView2.csproj; do
-            dotnet pack "$proj" -c Release /p:Version="${VERSION}" /p:EnableWindowsTargeting=true -o ./nupkgs || true
+            dotnet pack "$proj" -c Release /p:Version="${VERSION}" /p:EnableWindowsTargeting=true -o ./nupkgs
           done
           dotnet nuget push ./nupkgs/*.nupkg --api-key "${{ secrets.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
 
