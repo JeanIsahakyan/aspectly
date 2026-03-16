@@ -1,6 +1,7 @@
 import type {
   BridgeData,
   BridgeEvent,
+  BridgeHandler,
   BridgeHandlers,
   BridgeInitEvent,
   BridgeInitResultEvent,
