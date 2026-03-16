@@ -274,6 +274,11 @@ export class BridgeInternal {
     this.available = true;
     this.supportedMethods = data.methods;
     this.sendEvent(internalEvent(BridgeEventType.InitResult, true));
+    // Receiving Init from the other side means it's alive and ready.
+    // If our Init was lost (sent before the other side was listening),
+    // we'll never get an explicit InitResult — so treat receiving
+    // their Init as implicit confirmation.
+    this.initResultReceived = true;
     this.tryResolveInit();
   };
 

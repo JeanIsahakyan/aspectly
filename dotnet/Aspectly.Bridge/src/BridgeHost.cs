@@ -159,6 +159,9 @@ public class BridgeHost : IDisposable
         }
 
         _remoteInitReceived = true;
+        // Receiving Init from JS means JS is alive. If our Init was lost
+        // (sent before JS was listening), treat this as implicit confirmation.
+        _initResultReceived = true;
 
         // Match JS protocol: only send InitResult, not our Init.
         // Our Init is sent explicitly via InitializeAsync().
