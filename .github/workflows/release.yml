@@ -55,10 +55,7 @@ jobs:
         run: pnpm test
 
       - name: Publish to npm
-        run: |
-          for pkg in packages/*/; do
-            (cd "$pkg" && npm publish --provenance --access public)
-          done
+        run: pnpm -r publish --provenance --access public --no-git-checks
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
