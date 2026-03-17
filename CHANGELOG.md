@@ -120,10 +120,12 @@ All notable changes to Aspectly Bridge are documented here.
 
 ## [1.0.0] - 2025-12-05
 
+Renamed from **Aspect** to **Aspectly**.
+
 ### Changed
-- Rename from Aspect to Aspectly across all packages
+- Rename Aspect to Aspectly across all packages and repository
 - Update author name to Zhan Isaakian
-- Update repository URLs
+- Update all repository URLs
 
 ### Added
 - Monorepo structure with pnpm workspaces
@@ -131,7 +133,13 @@ All notable changes to Aspectly Bridge are documented here.
 - CI/CD with GitHub Actions
 - ESLint configuration
 
-## [0.1.11] - 2023-03-11
+---
+
+*Previously published as `@aspect/chirp-core` (v0.1.x) and later as Aspect. The project was renamed twice: Chirp → Aspect → Aspectly.*
+
+---
+
+## [0.1.11] - 2023-03-11 (as Chirp / Aspect)
 
 ### Fixed
 - Prevent unnecessary window init events
@@ -150,6 +158,7 @@ All notable changes to Aspectly Bridge are documented here.
 
 ### Fixed
 - Version fix
+- Codestyle fixes
 
 ## [0.1.7]
 
@@ -174,9 +183,11 @@ All notable changes to Aspectly Bridge are documented here.
 ## [0.1.3]
 
 ### Added
-- Initial release as `@aspect/chirp-core` (later renamed)
+- Initial public release as `@aspect/chirp-core`
 
-## [0.1.1]
+## [0.1.1] - 2022
 
 ### Added
 - Initial commit — Chirp bridge core with React Native WebView support
+- Platform detection: CefSharp, React Native WebView, browser
+- Bidirectional message passing with JSON serialization
