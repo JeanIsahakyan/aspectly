@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Media;
 using Aspectly.Bridge;
 using Aspectly.Bridge.CefSharp;
+using CefSharp;
 
 namespace Aspectly.Example;
 
@@ -15,30 +16,21 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-        // Load local HTML file
         var htmlPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "wwwroot", "index.html");
         Browser.Address = htmlPath;
 
-        Browser.IsBrowserInitializedChanged += Browser_IsBrowserInitializedChanged;
-        Closed += MainWindow_Closed;
+        Browser.IsBrowserInitializedChanged += OnBrowserInitialized;
+        Browser.FrameLoadEnd += OnFrameLoadEnd;
+        Closed += OnClosed;
     }
 
-    private async void Browser_IsBrowserInitializedChanged(object? sender, System.Windows.DependencyPropertyChangedEventArgs e)
+    private void OnBrowserInitialized(object? sender, DependencyPropertyChangedEventArgs e)
     {
-        if (Browser.IsBrowserInitialized)
-        {
-            await Dispatcher.InvokeAsync(InitializeBridge);
-        }
-    }
+        if (!Browser.IsBrowserInitialized) return;
 
-    private async void InitializeBridge()
-    {
         Log("Browser initialized, setting up bridge...");
 
-        // Create browser bridge
-        _browserBridge = new CefSharpBrowserBridge(Browser);
-
-        // Create bridge host
+        _browserBridge = new CefSharpBrowserBridge(Browser, Dispatcher);
         _bridgeHost = new BridgeHost(_browserBridge);
 
         // Register handlers that JS can call
@@ -74,31 +66,36 @@ public partial class MainWindow : Window
             return info;
         });
 
-        // Handle bridge initialization
-        _bridgeHost.Initialized += (s, e) =>
+        Log("Handlers registered: ping, echo, add, getSystemInfo");
+    }
+
+    private async void OnFrameLoadEnd(object? sender, FrameLoadEndEventArgs e)
+    {
+        if (!e.Frame.IsMain || _bridgeHost == null) return;
+
+        Log("Frame loaded, initializing bridge...");
+        try
         {
+            await _bridgeHost.InitializeAsync();
+
             Dispatcher.Invoke(() =>
             {
                 Log("Bridge initialized!");
                 StatusIndicator.Fill = new SolidColorBrush(Colors.Green);
                 StatusText.Text = "Connected";
-
                 Log($"JS methods: {string.Join(", ", _bridgeHost.SupportedMethods)}");
                 Log($"C# methods: {string.Join(", ", _bridgeHost.RegisteredMethods)}");
             });
-        };
-
-        // Initialize the bridge
-        await _bridgeHost.InitializeAsync();
+        }
+        catch (Exception ex)
+        {
+            Log($"Bridge init error: {ex.Message}");
+        }
     }
 
     private async void BtnGreet_Click(object sender, RoutedEventArgs e)
     {
-        if (_bridgeHost == null || !_bridgeHost.IsInitialized)
-        {
-            Log("Bridge not initialized");
-            return;
-        }
+        if (_bridgeHost == null || !_bridgeHost.IsInitialized) { Log("Bridge not initialized"); return; }
 
         try
         {
@@ -106,19 +103,12 @@ public partial class MainWindow : Window
             var result = await _bridgeHost.SendAsync<GreetResult>("greet", new { name = "C#" });
             Log($"[Result] {result?.Message}");
         }
-        catch (Exception ex)
-        {
-            Log($"[Error] {ex.Message}");
-        }
+        catch (Exception ex) { Log($"[Error] {ex.Message}"); }
     }
 
     private async void BtnGetTime_Click(object sender, RoutedEventArgs e)
     {
-        if (_bridgeHost == null || !_bridgeHost.IsInitialized)
-        {
-            Log("Bridge not initialized");
-            return;
-        }
+        if (_bridgeHost == null || !_bridgeHost.IsInitialized) { Log("Bridge not initialized"); return; }
 
         try
         {
@@ -126,19 +116,12 @@ public partial class MainWindow : Window
             var result = await _bridgeHost.SendAsync<TimeResult>("getTime");
             Log($"[Result] {result?.Time}");
         }
-        catch (Exception ex)
-        {
-            Log($"[Error] {ex.Message}");
-        }
+        catch (Exception ex) { Log($"[Error] {ex.Message}"); }
     }
 
     private async void BtnCalculate_Click(object sender, RoutedEventArgs e)
     {
-        if (_bridgeHost == null || !_bridgeHost.IsInitialized)
-        {
-            Log("Bridge not initialized");
-            return;
-        }
+        if (_bridgeHost == null || !_bridgeHost.IsInitialized) { Log("Bridge not initialized"); return; }
 
         try
         {
@@ -146,39 +129,21 @@ public partial class MainWindow : Window
             var result = await _bridgeHost.SendAsync<CalcResult>("calculate", new { a = 5, b = 3 });
             Log($"[Result] sum={result?.Sum}, product={result?.Product}");
         }
-        catch (Exception ex)
-        {
-            Log($"[Error] {ex.Message}");
-        }
+        catch (Exception ex) { Log($"[Error] {ex.Message}"); }
     }
 
-    private void BtnClearLog_Click(object sender, RoutedEventArgs e)
-    {
-        LogBox.Text = "";
-    }
+    private void BtnClearLog_Click(object sender, RoutedEventArgs e) => LogBox.Text = "";
 
     private void Log(string message)
     {
-        var timestamp = DateTime.Now.ToString("HH:mm:ss.fff");
-        var line = $"[{timestamp}] {message}\n";
-
-        if (Dispatcher.CheckAccess())
-        {
-            LogBox.Text += line;
-        }
-        else
-        {
-            Dispatcher.Invoke(() => LogBox.Text += line);
-        }
+        var line = $"[{DateTime.Now:HH:mm:ss.fff}] {message}\n";
+        if (Dispatcher.CheckAccess()) LogBox.Text += line;
+        else Dispatcher.Invoke(() => LogBox.Text += line);
     }
 
-    private void MainWindow_Closed(object? sender, EventArgs e)
-    {
-        _bridgeHost?.Dispose();
-    }
+    private void OnClosed(object? sender, EventArgs e) => _bridgeHost?.Dispose();
 }
 
-// DTOs
 public record EchoParams(string Message);
 public record AddParams(int A, int B);
 public record GreetResult(string Message);

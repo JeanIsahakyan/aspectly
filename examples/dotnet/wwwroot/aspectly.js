@@ -105,6 +105,31 @@ var BridgeInternal = class {
     this.available = false;
     this.supportedMethods = [];
     this.listeners = [];
+    this.initResultReceived = false;
+    /**
+     * Reset bridge state for a new connection context.
+     * Call this when the remote side has changed (e.g., new popup window).
+     */
+    this.reset = () => {
+      this.handlers = {};
+      this.available = false;
+      this.supportedMethods = [];
+      this.initPromise = void 0;
+      this.initResultReceived = false;
+    };
+    /**
+     * Register a single handler for a method.
+     * Can be called before or after init().
+     */
+    this.registerHandler = (method, handler) => {
+      this.handlers[method] = handler;
+    };
+    /**
+     * Remove a previously registered handler.
+     */
+    this.unregisterHandler = (method) => {
+      delete this.handlers[method];
+    };
     /**
      * Subscribe to all result events
      */
@@ -258,19 +283,27 @@ var BridgeInternal = class {
         return;
       }
       if (type === "Error" /* Error */) {
-        request.reject(data);
+        request.reject(data || result.error);
       }
     };
     this.handleInit = (data) => {
       this.available = true;
       this.supportedMethods = data.methods;
       this.sendEvent(internalEvent("InitResult" /* InitResult */, true));
+      this.initResultReceived = true;
+      this.tryResolveInit();
     };
     this.handleInitResult = (success) => {
       if (success) {
-        this.initPromise?.resolve(true);
+        this.initResultReceived = true;
+        this.tryResolveInit();
       } else {
         this.initPromise?.reject();
+      }
+    };
+    this.tryResolveInit = () => {
+      if (this.initResultReceived && this.available) {
+        this.initPromise?.resolve(true);
       }
     };
     /**
@@ -353,11 +386,31 @@ var BridgeBase = class {
       return this.bridge.unsubscribe(listener);
     };
     /**
+     * Register a single handler for a method.
+     * Can be called before or after init().
+     * @param method Method name to handle
+     * @param handler Async function to handle the method
+     */
+    this.registerHandler = (method, handler) => {
+      this.bridge.registerHandler(method, handler);
+    };
+    /**
+     * Remove a previously registered handler.
+     * @param method Method name to remove
+     */
+    this.unregisterHandler = (method) => {
+      this.bridge.unregisterHandler(method);
+    };
+    /**
      * Initialize the bridge with handlers
      * @param handlers Map of method names to handler functions
      * @returns Promise resolving when initialization is complete
      */
     this.init = (handlers) => this.bridge.init(handlers);
+    /**
+     * Reset bridge state for a new connection context
+     */
+    this.reset = () => this.bridge.reset();
     this.bridge = bridge;
   }
 };
