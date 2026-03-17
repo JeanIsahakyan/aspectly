@@ -10,6 +10,7 @@ const navLinks = [
   { name: 'Installation', href: '#installation' },
   { name: 'Examples', href: '#examples' },
   { name: 'Docs', href: '#docs' },
+  { name: 'Changelog', href: '#changelog' },
 ]
 
 export function Navbar() {

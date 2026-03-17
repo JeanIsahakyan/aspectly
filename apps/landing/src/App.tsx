@@ -7,6 +7,7 @@ import {
   LiveDemo,
   LiveDemoWindow,
   Docs,
+  Changelog,
   Footer,
 } from './components/sections'
 
@@ -22,6 +23,7 @@ function App() {
         <Installation />
         <Examples />
         <Docs />
+        <Changelog />
       </main>
       <Footer />
     </div>
