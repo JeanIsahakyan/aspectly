@@ -686,4 +686,25 @@ bridge.init({
 });
 ```
 
+### Dynamic Handler Registration
+
+Handlers can be added or removed after initialization using `registerHandler()` and `unregisterHandler()`:
+
+```tsx
+const bridge = new AspectlyBridge();
+
+// Initialize with initial handlers
+await bridge.init({
+  getStatus: async () => ({ online: true })
+});
+
+// Later, add new handlers dynamically
+bridge.registerHandler('fetchProfile', async (params) => {
+  return { name: 'Jane', id: params.userId };
+});
+
+// Remove a handler when no longer needed
+bridge.unregisterHandler('fetchProfile');
+```
+
 These examples demonstrate the flexibility and power of the Aspectly framework for building sophisticated cross-platform applications with seamless communication between native and web components.

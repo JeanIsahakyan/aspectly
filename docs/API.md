@@ -37,7 +37,7 @@ const bridge = new AspectlyBridge(options?: BridgeOptions);
 
 ##### `init(handlers?: BridgeHandlers): Promise<boolean>`
 
-Initialize the bridge with handlers for incoming requests.
+Initialize the bridge with handlers for incoming requests. The returned promise resolves only when both `Init` and `InitResult` messages have been exchanged (via `tryResolveInit`), ensuring full handshake completion.
 
 ```typescript
 await bridge.init({
@@ -63,6 +63,24 @@ Check if a method is supported by the host.
 ##### `isAvailable(): boolean`
 
 Check if the bridge is initialized and ready.
+
+##### `registerHandler(method: string, handler: (params: object) => Promise<unknown>): void`
+
+Register a handler for incoming requests after initialization. This allows adding new handlers dynamically without re-initializing the bridge.
+
+```typescript
+bridge.registerHandler('newMethod', async (params) => {
+  return { result: 'value' };
+});
+```
+
+##### `unregisterHandler(method: string): void`
+
+Remove a previously registered handler.
+
+```typescript
+bridge.unregisterHandler('newMethod');
+```
 
 ##### `subscribe(listener: BridgeListener): number`
 
@@ -313,6 +331,19 @@ interface BridgeHandlers {
   [key: string]: (params: object) => Promise<unknown>;
 }
 ```
+
+### BridgeResultEvent
+
+```typescript
+interface BridgeResultEvent {
+  method: string;
+  request_id: string;
+  data?: any;
+  error?: BridgeResultError;  // Optional error field for C# error compatibility
+}
+```
+
+The JS `handleRequestResult` checks both `data` and `result.error` fields to properly handle errors sent from C# hosts.
 
 ### BridgeResultError
 

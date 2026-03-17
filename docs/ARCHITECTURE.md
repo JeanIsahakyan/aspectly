@@ -107,6 +107,8 @@ export class BridgeInternal {
   // Public API
   public init(handlers: BridgeHandlers): Promise<boolean>
   public send(method: string, params: object): Promise<any>
+  public registerHandler(method: string, handler: Function): void
+  public unregisterHandler(method: string): void
   public subscribe(listener: BridgeListener): number
   public unsubscribe(listener: BridgeListener): void
   public handleCoreEvent(event: BridgeEvent): void
@@ -124,6 +126,7 @@ export class BridgeInternal {
 - Promise-based request/response pattern
 - Automatic timeout handling (100 seconds)
 - Method availability synchronization
+- Dynamic handler registration/unregistration via `registerHandler()` / `unregisterHandler()`
 - Event subscription system
 - Comprehensive error types
 
@@ -139,6 +142,8 @@ export class BridgeBase {
   public supports(method: string): boolean
   public isAvailable(): boolean
   public send(method: string, params: object): Promise<any>
+  public registerHandler(method: string, handler: Function): void
+  public unregisterHandler(method: string): void
   public subscribe(listener: BridgeListener): number
   public unsubscribe(listener: BridgeListener): void
   public init(handlers?: BridgeHandlers): Promise<boolean>
@@ -191,14 +196,15 @@ sequenceDiagram
     Bridge->>Internal: init(handlers)
     Internal->>Core: sendEvent(Init)
     Core->>Web: postMessage(Init)
-    
+
     Web->>Core: message event
     Core->>Internal: handleCoreEvent(Init)
     Internal->>Core: sendEvent(InitResult)
     Core->>Web: postMessage(InitResult)
-    
+
     Web->>Core: message event
     Core->>Internal: handleCoreEvent(InitResult)
+    Note over Internal: tryResolveInit(): resolves only when BOTH Init and InitResult received
     Internal->>App: Promise.resolve(true)
 ```
 
@@ -291,6 +297,21 @@ enum BridgeErrorType {
   BRIDGE_NOT_AVAILABLE = 'BRIDGE_NOT_AVAILABLE'
 }
 ```
+
+### BridgeResultEvent
+
+The `BridgeResultEvent` type includes an optional `error` field for cross-platform error compatibility:
+
+```tsx
+interface BridgeResultEvent {
+  method: string;
+  request_id: string;
+  data?: any;
+  error?: BridgeResultError;  // Optional, used for C# error compat
+}
+```
+
+On the JS side, `handleRequestResult` checks both `data` and `result.error` to handle errors sent from C# hosts.
 
 ### Error Flow
 

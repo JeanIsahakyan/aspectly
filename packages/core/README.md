@@ -80,7 +80,7 @@ const bridge = new AspectlyBridge(options?: BridgeOptions);
 
 ##### `init(handlers?: BridgeHandlers): Promise<boolean>`
 
-Initialize the bridge with handlers for incoming requests.
+Initialize the bridge with handlers for incoming requests. The returned promise resolves only when both `Init` and `InitResult` messages have been exchanged (via `tryResolveInit`), ensuring the full handshake is complete.
 
 ```typescript
 await bridge.init({
@@ -127,6 +127,24 @@ Subscribe to all result events for monitoring/debugging.
 bridge.subscribe((result) => {
   console.log('Event:', result.method, result.data);
 });
+```
+
+##### `registerHandler(method: string, handler: (params: object) => Promise<unknown>): void`
+
+Register a handler for incoming requests after initialization.
+
+```typescript
+bridge.registerHandler('newMethod', async (params) => {
+  return { result: 'value' };
+});
+```
+
+##### `unregisterHandler(method: string): void`
+
+Remove a previously registered handler.
+
+```typescript
+bridge.unregisterHandler('newMethod');
 ```
 
 ##### `unsubscribe(listener: BridgeListener): void`

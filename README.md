@@ -132,8 +132,15 @@ var bridge = new BridgeHost(browserBridge);
 bridge.RegisterHandler<object, object>("getUserData", async _ =>
     new { name = "John", id = 123 });
 
+// InitializeAsync() awaits both Init and InitResult from the JS side
 await bridge.InitializeAsync();
 var result = await bridge.SendAsync<string>("jsMethod");
+
+// Or initialize with handlers in one call:
+await bridge.InitializeAsync(new Dictionary<string, Delegate>
+{
+    ["getUserData"] = async (object _) => new { name = "John", id = 123 }
+});
 ```
 
 ## Features
