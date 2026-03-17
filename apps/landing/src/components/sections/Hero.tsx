@@ -72,7 +72,28 @@ export function Hero() {
           </BlurFade>
 
           <BlurFade delay={0.5} inView>
-            <div className="mt-12 flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
+              <a href="https://github.com/JeanIsahakyan/aspectly" target="_blank" rel="noopener noreferrer">
+                <img alt="GitHub stars" src="https://img.shields.io/github/stars/JeanIsahakyan/aspectly?style=flat-square&logo=github" />
+              </a>
+              <a href="https://www.npmjs.com/package/@aspectly/core" target="_blank" rel="noopener noreferrer">
+                <img alt="npm version" src="https://img.shields.io/npm/v/@aspectly/core?style=flat-square&logo=npm&color=cb3837" />
+              </a>
+              <a href="https://www.nuget.org/packages/Aspectly.Bridge" target="_blank" rel="noopener noreferrer">
+                <img alt="NuGet version" src="https://img.shields.io/nuget/v/Aspectly.Bridge?style=flat-square&logo=nuget&color=004880" />
+              </a>
+              <a href="https://www.npmjs.com/package/@aspectly/core" target="_blank" rel="noopener noreferrer">
+                <img alt="npm downloads" src="https://img.shields.io/npm/dm/@aspectly/core?style=flat-square&color=22c55e" />
+              </a>
+              <a href="https://github.com/JeanIsahakyan/aspectly/actions" target="_blank" rel="noopener noreferrer">
+                <img alt="CI" src="https://img.shields.io/github/actions/workflow/status/JeanIsahakyan/aspectly/ci.yml?style=flat-square&logo=github-actions&logoColor=white&label=CI" />
+              </a>
+              <img alt="License" src="https://img.shields.io/github/license/JeanIsahakyan/aspectly?style=flat-square" />
+            </div>
+          </BlurFade>
+
+          <BlurFade delay={0.6} inView>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-green-500" />
                 <span>TypeScript & C#</span>
