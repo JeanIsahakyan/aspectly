@@ -128,9 +128,24 @@ export function Changelog() {
             {releases.map((release) => (
               <div key={release.version} className="relative pl-6 border-l-2 border-border">
                 <div className="absolute -left-2 top-0 w-4 h-4 rounded-full bg-primary" />
-                <div className="flex items-baseline gap-3 mb-3">
+                <div className="flex items-baseline gap-3 mb-1">
                   <h3 className="text-xl font-bold">v{release.version}</h3>
                   <span className="text-sm text-muted-foreground">{release.date}</span>
+                </div>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  <a href={`https://github.com/JeanIsahakyan/aspectly/releases/tag/v${release.version}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-muted hover:bg-muted/80 text-muted-foreground transition-colors">
+                    GitHub
+                  </a>
+                  {release.version >= '2.0.0' && (
+                    <>
+                      <a href={`https://www.npmjs.com/package/@aspectly/core/v/${release.version}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-500/20 transition-colors">
+                        npm
+                      </a>
+                      <a href={`https://www.nuget.org/packages/Aspectly.Bridge/${release.version}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 hover:bg-purple-500/20 transition-colors">
+                        NuGet
+                      </a>
+                    </>
+                  )}
                 </div>
                 <ul className="space-y-2">
                   {release.changes.map((change, i) => (
