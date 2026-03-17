@@ -30,6 +30,24 @@ const releases = [
       { type: 'feat', text: 'Pluggable transport layer (CefSharp, React Native, iframe, window)' },
       { type: 'feat', text: '.NET packages: Aspectly.Bridge, CefSharp, WebView2' },
       { type: 'feat', text: 'React hooks: @aspectly/react-native, @aspectly/web' },
+      { type: 'feat', text: 'Landing page with live demo, CI/CD pipeline' },
+    ],
+  },
+  {
+    version: '1.0.0',
+    date: '2025-12-05',
+    changes: [
+      { type: 'feat', text: 'Rename from Aspect to Aspectly' },
+      { type: 'feat', text: 'Monorepo with pnpm workspaces, vitest, CI/CD' },
+    ],
+  },
+  {
+    version: '0.1.x',
+    date: '2022-2023',
+    changes: [
+      { type: 'feat', text: 'Initial Chirp bridge core with React Native WebView support' },
+      { type: 'fix', text: 'ReactNativeWebView.postMessage cross-platform support' },
+      { type: 'feat', text: 'Browser UMD bundle, RNW detection, window init fixes' },
     ],
   },
 ]
