@@ -1,5 +1,9 @@
 # Aspectly .NET
 
+[![NuGet version](https://img.shields.io/nuget/v/Aspectly.Bridge?style=flat-square&logo=nuget&color=004880)](https://www.nuget.org/packages/Aspectly.Bridge)
+[![NuGet downloads](https://img.shields.io/nuget/dt/Aspectly.Bridge?style=flat-square&color=22c55e)](https://www.nuget.org/packages/Aspectly.Bridge)
+[![CI](https://img.shields.io/github/actions/workflow/status/JeanIsahakyan/aspectly/ci.yml?style=flat-square&logo=github-actions&logoColor=white&label=CI)](https://github.com/JeanIsahakyan/aspectly/actions)
+
 .NET implementation of the Aspectly bridge protocol.
 
 ## Packages

@@ -1,5 +1,8 @@
 # @aspectly/web
 
+[![npm version](https://img.shields.io/npm/v/@aspectly/web?style=flat-square&logo=npm&color=cb3837)](https://www.npmjs.com/package/@aspectly/web)
+[![npm downloads](https://img.shields.io/npm/dm/@aspectly/web?style=flat-square&color=22c55e)](https://www.npmjs.com/package/@aspectly/web)
+
 React hooks for embedding iframes and communicating with them using the Aspectly bridge protocol.
 
 ## Installation

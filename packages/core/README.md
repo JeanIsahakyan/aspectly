@@ -1,5 +1,9 @@
 # @aspectly/core
 
+[![npm version](https://img.shields.io/npm/v/@aspectly/core?style=flat-square&logo=npm&color=cb3837)](https://www.npmjs.com/package/@aspectly/core)
+[![npm downloads](https://img.shields.io/npm/dm/@aspectly/core?style=flat-square&color=22c55e)](https://www.npmjs.com/package/@aspectly/core)
+[![CI](https://img.shields.io/github/actions/workflow/status/JeanIsahakyan/aspectly/ci.yml?style=flat-square&logo=github-actions&logoColor=white&label=CI)](https://github.com/JeanIsahakyan/aspectly/actions)
+
 The core bridge framework for cross-platform communication between WebViews, iframes, and web applications.
 
 ## Installation

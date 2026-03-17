@@ -2,7 +2,12 @@
 
 A powerful, type-safe communication bridge framework for React Native, Web, and iframes.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![GitHub stars](https://img.shields.io/github/stars/JeanIsahakyan/aspectly?style=flat-square&logo=github)](https://github.com/JeanIsahakyan/aspectly)
+[![npm version](https://img.shields.io/npm/v/@aspectly/core?style=flat-square&logo=npm&color=cb3837)](https://www.npmjs.com/package/@aspectly/core)
+[![NuGet version](https://img.shields.io/nuget/v/Aspectly.Bridge?style=flat-square&logo=nuget&color=004880)](https://www.nuget.org/packages/Aspectly.Bridge)
+[![npm downloads](https://img.shields.io/npm/dm/@aspectly/core?style=flat-square&color=22c55e)](https://www.npmjs.com/package/@aspectly/core)
+[![CI](https://img.shields.io/github/actions/workflow/status/JeanIsahakyan/aspectly/ci.yml?style=flat-square&logo=github-actions&logoColor=white&label=CI)](https://github.com/JeanIsahakyan/aspectly/actions)
+[![License: MIT](https://img.shields.io/github/license/JeanIsahakyan/aspectly?style=flat-square)](https://opensource.org/licenses/MIT)
 
 ## Overview
 

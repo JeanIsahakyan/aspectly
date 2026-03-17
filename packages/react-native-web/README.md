@@ -1,5 +1,8 @@
 # @aspectly/react-native-web
 
+[![npm version](https://img.shields.io/npm/v/@aspectly/react-native-web?style=flat-square&logo=npm&color=cb3837)](https://www.npmjs.com/package/@aspectly/react-native-web)
+[![npm downloads](https://img.shields.io/npm/dm/@aspectly/react-native-web?style=flat-square&color=22c55e)](https://www.npmjs.com/package/@aspectly/react-native-web)
+
 Cross-platform Aspectly bridge integration for React Native Web, Expo, and universal React Native apps.
 
 ## Installation

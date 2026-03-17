@@ -1,5 +1,8 @@
 # @aspectly/transports
 
+[![npm version](https://img.shields.io/npm/v/@aspectly/transports?style=flat-square&logo=npm&color=cb3837)](https://www.npmjs.com/package/@aspectly/transports)
+[![npm downloads](https://img.shields.io/npm/dm/@aspectly/transports?style=flat-square&color=22c55e)](https://www.npmjs.com/package/@aspectly/transports)
+
 Transport layer for cross-platform communication between WebViews, iframes, and web applications.
 
 ## Installation

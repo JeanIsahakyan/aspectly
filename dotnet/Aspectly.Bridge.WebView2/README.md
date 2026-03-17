@@ -1,5 +1,8 @@
 # Aspectly.Bridge.WebView2
 
+[![NuGet version](https://img.shields.io/nuget/v/Aspectly.Bridge.WebView2?style=flat-square&logo=nuget&color=004880)](https://www.nuget.org/packages/Aspectly.Bridge.WebView2)
+[![NuGet downloads](https://img.shields.io/nuget/dt/Aspectly.Bridge.WebView2?style=flat-square&color=22c55e)](https://www.nuget.org/packages/Aspectly.Bridge.WebView2)
+
 WebView2 browser bridge for [Aspectly](https://github.com/JeanIsahakyan/aspectly) - enables bidirectional communication with JavaScript via Microsoft Edge WebView2.
 
 ## Installation

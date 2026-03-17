@@ -1,5 +1,8 @@
 # @aspectly/react-native
 
+[![npm version](https://img.shields.io/npm/v/@aspectly/react-native?style=flat-square&logo=npm&color=cb3837)](https://www.npmjs.com/package/@aspectly/react-native)
+[![npm downloads](https://img.shields.io/npm/dm/@aspectly/react-native?style=flat-square&color=22c55e)](https://www.npmjs.com/package/@aspectly/react-native)
+
 React Native WebView integration for the Aspectly bridge - communicate with web content in your React Native app.
 
 ## Installation
