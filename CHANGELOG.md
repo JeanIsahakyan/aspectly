@@ -52,7 +52,7 @@ All notable changes to Aspectly Bridge are documented here.
 - **dotnet**: Thread-safe WPF dispatcher support in `CefSharpBrowserBridge`
 - **dotnet**: Auto-send `InitResult` on receiving `Init` from JS
 
-## [2.0.6] - 2026-03-10
+## [2.0.6] - 2026-03-09
 
 ### Fixed
 - **ci**: Allow landing deploy from `workflow_dispatch` trigger
@@ -94,7 +94,7 @@ All notable changes to Aspectly Bridge are documented here.
 ### Added
 - **landing**: Inject package version at build time
 
-## [2.0.0] - 2026-03-08
+## [2.0.0] - 2026-03-07
 
 ### Added
 - Complete rewrite of the bridge protocol
@@ -118,7 +118,7 @@ All notable changes to Aspectly Bridge are documented here.
 - Protocol redesign from v1 — fully bidirectional with typed handlers
 - Transport layer extracted to separate package with auto-detection
 
-## [1.0.0] - 2025-12-05
+## [1.0.0] - 2025-12-04
 
 Renamed from **Aspect** to **Aspectly**.
 
@@ -139,17 +139,17 @@ Renamed from **Aspect** to **Aspectly**.
 
 ---
 
-## [0.1.11] - 2023-03-11 (as Chirp / Aspect)
+## [0.1.11] - 2023-03-10 (as Chirp / Aspect)
 
 ### Fixed
 - Prevent unnecessary window init events
 
-## [0.1.10] - 2023-03-11
+## [0.1.10] - 2023-03-10
 
 ### Fixed
 - React Native Web detection fix
 
-## [0.1.9] - 2023-03-11
+## [0.1.9] - 2023-03-10
 
 ### Fixed
 - Browser version fixes
@@ -160,32 +160,37 @@ Renamed from **Aspect** to **Aspectly**.
 - Version fix
 - Codestyle fixes
 
-## [0.1.7]
+## [0.1.7] - 2022-11-20
 
 ### Fixed
 - Support `ReactNativeWebView.postMessage` for all platforms
 
-## [0.1.6]
+## [0.1.6] - 2022-11-20
 
 ### Fixed
 - Support `ReactNativeWebView.postMessage` for all platforms
 
-## [0.1.5]
+## [0.1.5] - 2022-11-20
 
 ### Fixed
 - Core error fixes
 
-## [0.1.4]
+## [0.1.4] - 2022-11-20
 
 ### Added
 - Browser version support (UMD bundle)
 
-## [0.1.3]
+## [0.1.3] - 2022-11-19
 
 ### Added
 - Initial public release as `@jeanisahakyan/chirp`
 
-## [0.1.1] - 2022
+## [0.1.2] - 2022-11-19
+
+### Fixed
+- Release fixes
+
+## [0.1.1] - 2022-11-19
 
 ### Added
 - Initial commit — Chirp bridge core with React Native WebView support
