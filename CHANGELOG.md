@@ -135,7 +135,7 @@ Renamed from **Aspect** to **Aspectly**.
 
 ---
 
-*Previously published as `@aspect/chirp-core` (v0.1.x) and later as Aspect. The project was renamed twice: Chirp → Aspect → Aspectly.*
+*Previously published as `@jeanisahakyan/chirp` (v0.1.x). The project was renamed twice: Chirp → Aspect → Aspectly.*
 
 ---
 
@@ -183,7 +183,7 @@ Renamed from **Aspect** to **Aspectly**.
 ## [0.1.3]
 
 ### Added
-- Initial public release as `@aspect/chirp-core`
+- Initial public release as `@jeanisahakyan/chirp`
 
 ## [0.1.1] - 2022
 

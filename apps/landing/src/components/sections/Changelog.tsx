@@ -45,7 +45,7 @@ const releases = [
     version: '0.1.x',
     date: '2022-2023',
     changes: [
-      { type: 'feat', text: 'Initial release as Chirp (@aspect/chirp-core)' },
+      { type: 'feat', text: 'Initial release as @jeanisahakyan/chirp' },
       { type: 'feat', text: 'React Native WebView bridge with platform detection' },
       { type: 'fix', text: 'ReactNativeWebView.postMessage cross-platform support' },
       { type: 'feat', text: 'Browser UMD bundle, RNW detection, window init fixes' },
