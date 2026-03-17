@@ -24,7 +24,7 @@ const releases = [
   },
   {
     version: '2.0.0',
-    date: '2026-03-08',
+    date: '2026-03-07',
     changes: [
       { type: 'feat', text: 'Complete protocol rewrite with Init/InitResult handshake' },
       { type: 'feat', text: 'Pluggable transport layer (CefSharp, React Native, iframe, window)' },
@@ -35,7 +35,7 @@ const releases = [
   },
   {
     version: '1.0.0',
-    date: '2025-12-05',
+    date: '2025-12-04',
     changes: [
       { type: 'feat', text: 'Rename from Aspect to Aspectly' },
       { type: 'feat', text: 'Monorepo with pnpm workspaces, vitest, CI/CD' },
@@ -43,7 +43,7 @@ const releases = [
   },
   {
     version: '0.1.x',
-    date: '2022-2023',
+    date: '2022-11-19 — 2023-03-10',
     changes: [
       { type: 'feat', text: 'Initial release as @jeanisahakyan/chirp' },
       { type: 'feat', text: 'React Native WebView bridge with platform detection' },
