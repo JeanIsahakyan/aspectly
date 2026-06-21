@@ -36,9 +36,8 @@
     <PackageReference Include="CefSharp.Wpf.NETCore" Version="143.*" />
   </ItemGroup>
 
-  <!-- For net48: use CefSharp.Wpf (matches Revit 2024's bundled version) -->
   <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
-    <PackageReference Include="CefSharp.Wpf" Version="119.4.30" IncludeAssets="compile" PrivateAssets="All" />
+    <PackageReference Include="CefSharp.Wpf" Version="*" IncludeAssets="compile" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
