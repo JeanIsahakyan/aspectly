@@ -2,6 +2,15 @@ import { BlurFade } from '../reactbits'
 
 const releases = [
   {
+    version: '2.0.15',
+    date: '06/21/2026',
+    changes: [
+      { type: 'fix', date: '06/21/2026', text: 'CefSharp: use floating CefSharp.Wpf version for net48' },
+      { type: 'docs', date: '06/21/2026', text: 'shields.io badges (stars, npm, NuGet, CI, license) across READMEs and landing' },
+      { type: 'docs', date: '06/21/2026', text: 'Changelog: full dates, GitHub/npm/NuGet links per release' },
+    ],
+  },
+  {
     version: '2.0.14',
     date: '03/16/2026',
     changes: [
@@ -102,12 +111,14 @@ const typeColors: Record<string, string> = {
   feat: 'bg-green-500/10 text-green-600 dark:text-green-400',
   fix: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
   ci: 'bg-orange-500/10 text-orange-600 dark:text-orange-400',
+  docs: 'bg-purple-500/10 text-purple-600 dark:text-purple-400',
 }
 
 const typeLabels: Record<string, string> = {
   feat: 'new',
   fix: 'fix',
   ci: 'ci',
+  docs: 'docs',
 }
 
 export function Changelog() {

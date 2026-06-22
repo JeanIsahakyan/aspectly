@@ -2,6 +2,15 @@
 
 All notable changes to Aspectly Bridge are documented here.
 
+## [2.0.15] - 2026-06-21
+
+### Fixed
+- **dotnet**: CefSharp.CefSharp.Wpf now uses a floating version for `net48` to avoid pinning conflicts
+
+### Docs
+- Added shields.io badges (stars, npm, NuGet, CI, license) to all READMEs and the landing page
+- Changelog entries now show full dates and link to GitHub, npm, and NuGet
+
 ## [2.0.14] - 2026-03-16
 
 ### Fixed
