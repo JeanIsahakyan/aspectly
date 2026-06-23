@@ -84,7 +84,7 @@ export function LiveDemoWindow() {
   }
 
   return (
-    <section id="demo-window" className="py-24">
+    <section id="demo-window" className="py-16 lg:py-20">
       <div className="container px-4 mx-auto">
         <BlurFade delay={0.1} inView>
           <div className="text-center mb-12">

@@ -81,7 +81,7 @@ export function LiveDemo() {
   }
 
   return (
-    <section id="demo" className="py-24 bg-muted/30">
+    <section id="demo" className="py-16 lg:py-20 bg-muted/30">
       <div className="container px-4 mx-auto">
         <BlurFade delay={0.1} inView>
           <div className="text-center mb-12">
@@ -101,7 +101,7 @@ export function LiveDemo() {
 
         <BlurFade delay={0.2} inView>
           <div className="max-w-5xl mx-auto">
-            <div className="grid lg:grid-cols-2 gap-6">
+            <div className="grid lg:grid-cols-2 gap-5">
               {/* Parent Side */}
               <div className="bg-background rounded-xl border shadow-sm overflow-hidden">
                 <div className="px-4 py-3 border-b bg-muted/50 flex items-center gap-2">

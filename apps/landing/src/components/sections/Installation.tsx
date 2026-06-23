@@ -130,10 +130,10 @@ export function Installation() {
   const getCommand = platform === 'javascript' ? getJsCommand : (pkg: string) => pkg
 
   return (
-    <section id="installation" className="py-24 bg-muted/30">
+    <section id="installation" className="py-16 lg:py-20 bg-muted/30">
       <div className="container px-4 mx-auto">
         <BlurFade delay={0.1} inView>
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">
               Quick Installation
             </h2>

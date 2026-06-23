@@ -132,7 +132,7 @@ export function Examples() {
   const current = hosts[host]
 
   return (
-    <section id="examples" className="py-24">
+    <section id="examples" className="py-16 lg:py-20">
       <div className="container px-4 mx-auto">
         <BlurFade delay={0.1} inView>
           <div className="text-center mb-12">
@@ -161,7 +161,7 @@ export function Examples() {
         </BlurFade>
 
         <BlurFade delay={0.2} inView>
-          <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-6">
+          <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-5">
             <div>
               <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-blue-500" />
