@@ -44,11 +44,19 @@ interface Transport {
 
 Built-in transports (detection priority order):
 1. CefSharpTransport (100) -- .NET desktop apps with CefSharp
-2. ReactNativeTransport (90) -- React Native WebView
-3. IframeTransport (80) -- Web iframe (window.parent.postMessage)
-4. WindowTransport (70) -- Popup window communication
-5. PostMessageTransport (10) -- Generic postMessage fallback
-6. NullTransport -- SSR-safe fallback (no-op)
+2. WebKitTransport (95) -- native WKWebView host on iOS/macOS (Swift)
+3. ReactNativeTransport (90) -- React Native WebView
+4. AndroidTransport (85) -- native Android WebView host (Kotlin)
+5. IframeTransport (80) -- Web iframe (window.parent.postMessage)
+6. WindowTransport (70) -- Popup window communication
+7. PostMessageTransport (10) -- Generic postMessage fallback
+8. NullTransport -- SSR-safe fallback (no-op)
+
+The native host transports pair with the platform bridge libraries:
+`AspectlyBridge` (Swift, `WKWebViewBrowserBridge`) and `aspectly-bridge`
+(Kotlin, `AndroidWebViewBrowserBridge`). Both speak the identical wire protocol
+as the .NET `BridgeHost`, so the same `@aspectly/core` web content works
+unchanged across every host.
 
 Custom transports can be registered via `registerTransport()`.
 

@@ -2,6 +2,42 @@
 
 All notable changes to Aspectly Bridge are documented here.
 
+## [2.1.0] - 2026-06-22
+
+Native mobile platforms. Aspectly now bridges to **iOS / macOS (Swift, SwiftUI)**
+and **Android (Kotlin)** — the same `@aspectly/core` web content runs unchanged
+across Web, React Native, .NET, Apple, and Android hosts.
+
+### Added — Swift (iOS / macOS / visionOS)
+- New Swift package (`Package.swift` at the repo root), products:
+  - `AspectlyBridge` — core `BridgeHost`, protocol types, `BrowserBridge` /
+    `BridgeHandler` / `BridgeLogger` protocols, `JSONValue`, `BridgeError`
+    (1:1 port of the .NET `BridgeHost`)
+  - `AspectlyBridgeWebKit` — `WKWebViewBrowserBridge` plus the SwiftUI
+    `AspectlyWebView` + `AspectlyWebViewModel` (the `useAspectlyWebView` analog)
+- Distribution via Swift Package Manager and CocoaPods (`AspectlyBridge`,
+  `AspectlyBridgeWebKit` podspecs)
+- `examples/swiftui` sample app; verified at runtime on the iOS Simulator and macOS
+
+### Added — Android (Kotlin)
+- New Gradle modules:
+  - `com.aspectly:aspectly-bridge` — pure Kotlin/JVM core (`BridgeHost`,
+    coroutine-based, Gson serialization)
+  - `com.aspectly:aspectly-bridge-webview` — `AndroidWebViewBrowserBridge` for
+    Android `WebView`
+- Maven publishing (Maven Central + GitHub Packages) and a JUnit test suite
+- `examples/android` sample app; verified at runtime on an Android emulator
+
+### Added — JS transports
+- `WebKitTransport` (`@aspectly/transports/webkit`, priority 95) — auto-detects a
+  native WKWebView host via `window.webkit.messageHandlers.aspectly`
+- `AndroidTransport` (`@aspectly/transports/android`, priority 85) — auto-detects a
+  native Android WebView host via `window.AspectlyAndroid`
+
+### Docs / infra
+- New [`docs/PUBLISHING.md`](./docs/PUBLISHING.md); Swift + Android CI jobs;
+  release workflow publishes to CocoaPods and Maven Central
+
 ## [2.0.15] - 2026-06-21
 
 ### Fixed

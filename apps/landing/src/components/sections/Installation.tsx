@@ -52,6 +52,36 @@ const dotnetPackages = [
   },
 ]
 
+const swiftPackages = [
+  {
+    name: 'AspectlyBridge + AspectlyBridgeWebKit',
+    description: 'Swift bridge — core + WKWebView / SwiftUI',
+    install: '.package(url: "https://github.com/JeanIsahakyan/aspectly.git", from: "2.1.0")',
+    useCase: 'Swift Package Manager — iOS, macOS, visionOS',
+  },
+  {
+    name: 'AspectlyBridgeWebKit',
+    description: 'CocoaPods — pulls in AspectlyBridge automatically',
+    install: "pod 'AspectlyBridgeWebKit'",
+    useCase: 'CocoaPods (Podfile)',
+  },
+]
+
+const androidPackages = [
+  {
+    name: 'com.aspectly:aspectly-bridge-webview',
+    description: 'Android WebView bridge (pulls in the core)',
+    install: 'implementation("com.aspectly:aspectly-bridge-webview:2.1.0")',
+    useCase: 'Gradle (Kotlin DSL) — Android WebView integration',
+  },
+  {
+    name: 'com.aspectly:aspectly-bridge',
+    description: 'Core bridge — pure Kotlin/JVM, no Android deps',
+    install: 'implementation("com.aspectly:aspectly-bridge:2.1.0")',
+    useCase: 'Gradle — core library only',
+  },
+]
+
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false)
 
@@ -89,7 +119,14 @@ export function Installation() {
     }
   }
 
-  const packages = platform === 'javascript' ? jsPackages : dotnetPackages
+  const packages =
+    platform === 'javascript'
+      ? jsPackages
+      : platform === 'dotnet'
+        ? dotnetPackages
+        : platform === 'swift'
+          ? swiftPackages
+          : androidPackages
   const getCommand = platform === 'javascript' ? getJsCommand : (pkg: string) => pkg
 
   return (
@@ -119,6 +156,12 @@ export function Installation() {
                   <TabsTrigger value="dotnet" className="gap-2">
                     <span className="text-purple-500">C#</span> .NET
                   </TabsTrigger>
+                  <TabsTrigger value="swift" className="gap-2">
+                    <span className="text-orange-500">Swift</span> iOS / macOS
+                  </TabsTrigger>
+                  <TabsTrigger value="android" className="gap-2">
+                    <span className="text-green-500">Kotlin</span> Android
+                  </TabsTrigger>
                 </TabsList>
               </Tabs>
             </div>
@@ -142,6 +185,24 @@ export function Installation() {
               <div className="flex justify-center mb-8">
                 <div className="text-sm text-muted-foreground">
                   Using .NET CLI or NuGet Package Manager
+                </div>
+              </div>
+            )}
+
+            {/* Swift info */}
+            {platform === 'swift' && (
+              <div className="flex justify-center mb-8">
+                <div className="text-sm text-muted-foreground">
+                  Swift Package Manager (Xcode) or CocoaPods
+                </div>
+              </div>
+            )}
+
+            {/* Android info */}
+            {platform === 'android' && (
+              <div className="flex justify-center mb-8">
+                <div className="text-sm text-muted-foreground">
+                  Gradle — published to Maven Central
                 </div>
               </div>
             )}

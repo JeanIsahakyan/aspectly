@@ -244,11 +244,18 @@ unsubscribe();
 | Transport | Detection | Priority | Use Case |
 |-----------|-----------|----------|----------|
 | CefSharpTransport | `window.CefSharp.PostMessage` | 100 | Desktop apps with CefSharp (.NET) |
+| WebKitTransport | `window.webkit.messageHandlers.aspectly` | 95 | Native WKWebView host on iOS/macOS (Swift) |
 | ReactNativeTransport | `window.ReactNativeWebView.postMessage` | 90 | React Native WebView |
+| AndroidTransport | `window.AspectlyAndroid.postMessage` | 85 | Native Android WebView host (Kotlin) |
 | IframeTransport | `window.parent !== window` | 80 | Web content in iframes |
 | WindowTransport | `window.addEventListener('message')` | 70 | Popup window communication |
 | PostMessageTransport | `window.postMessage` | 10 | Generic postMessage fallback |
 | NullTransport | Always available | - | Fallback for SSR/testing |
+
+> The `webkit` and `android` transports are also available as standalone entry
+> points: `@aspectly/transports/webkit` and `@aspectly/transports/android`. They
+> pair with the native [`AspectlyBridge`](../swift) (Swift) and
+> [`aspectly-bridge`](../android) (Kotlin) libraries.
 
 ### TransportRegistry
 

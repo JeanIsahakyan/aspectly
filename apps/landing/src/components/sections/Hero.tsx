@@ -47,8 +47,8 @@ export function Hero() {
           <BlurFade delay={0.3} inView>
             <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
               A powerful, type-safe communication framework for WebViews, iframes,
-              popup windows, and .NET desktop apps. Build hybrid apps with confidence
-              using a modern, promise-based API.
+              popup windows, .NET desktop, iOS/macOS, and Android apps. Build hybrid
+              apps with confidence using a modern, promise-based API.
             </p>
           </BlurFade>
 
@@ -100,7 +100,7 @@ export function Hero() {
               </div>
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-blue-500" />
-                <span>React Native, Web & .NET</span>
+                <span>RN, Web, .NET, iOS &amp; Android</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-purple-500" />

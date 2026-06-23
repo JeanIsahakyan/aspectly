@@ -34,7 +34,7 @@ const features = [
     icon: Smartphone,
     title: 'Universal',
     description:
-      'Single API works on iOS, Android, and Web platforms seamlessly.',
+      'One protocol across Web, React Native, .NET, iOS/macOS (Swift) and Android (Kotlin) — the same web content runs on every host.',
     color: 'text-blue-500',
     bgColor: 'bg-blue-500/10',
   },
@@ -74,7 +74,7 @@ const features = [
     icon: Globe,
     title: 'Platform Detection',
     description:
-      'Automatic detection of environment (WebView vs iframe vs browser).',
+      'Auto-detects the host: CefSharp, WKWebView (iOS/macOS), Android WebView, React Native, iframe, or browser.',
     color: 'text-cyan-500',
     bgColor: 'bg-cyan-500/10',
   },
