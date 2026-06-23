@@ -42,6 +42,58 @@ jobs:
           dotnet restore examples/dotnet/Aspectly.Bridge.Example.CefSharp.csproj
           dotnet build examples/dotnet/Aspectly.Bridge.Example.CefSharp.csproj -c Release --no-restore
 
+  # Swift (iOS / macOS) build and test
+  swift:
+    name: Swift Build & Test
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build & test core (macOS)
+        run: |
+          swift build
+          swift test
+
+      - name: Build SwiftUI example (macOS)
+        run: |
+          cd examples/swiftui
+          swift build
+
+      - name: Compile-check for iOS
+        run: |
+          xcodebuild build -scheme AspectlyBridgeWebKit \
+            -destination 'generic/platform=iOS Simulator' \
+            -skipPackagePluginValidation
+
+  # Android (Kotlin) build and test
+  android:
+    name: Android Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10'
+
+      - name: Run core unit tests (JVM)
+        run: gradle -p android :aspectly-bridge:test
+
+      - name: Build WebView module (AAR)
+        run: gradle -p android :aspectly-bridge-webview:assembleRelease
+
   # Node.js packages build and test
   build:
     runs-on: ubuntu-latest

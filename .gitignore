@@ -71,4 +71,17 @@ dist/
 # .NET
 bin/
 obj/
+
+# Swift / SwiftPM
+.build/
+.build-ios/
+.swiftpm/
+Package.resolved
+
+# Android / Gradle
+.gradle/
+android/build/
+android/**/build/
+.kotlin/
+
 .npmrc
