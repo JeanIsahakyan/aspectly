@@ -26,6 +26,26 @@
         "default": "./dist/cefsharp.js"
       }
     },
+    "./webkit": {
+      "import": {
+        "types": "./dist/webkit.d.mts",
+        "default": "./dist/webkit.mjs"
+      },
+      "require": {
+        "types": "./dist/webkit.d.ts",
+        "default": "./dist/webkit.js"
+      }
+    },
+    "./android": {
+      "import": {
+        "types": "./dist/android.d.mts",
+        "default": "./dist/android.mjs"
+      },
+      "require": {
+        "types": "./dist/android.d.ts",
+        "default": "./dist/android.js"
+      }
+    },
     "./react-native": {
       "import": {
         "types": "./dist/react-native.d.mts",
@@ -75,6 +95,11 @@
     "bridge",
     "transport",
     "cefsharp",
+    "webkit",
+    "wkwebview",
+    "ios",
+    "macos",
+    "android",
     "webview",
     "iframe",
     "postmessage"

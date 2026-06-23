@@ -19,10 +19,12 @@ describe('TransportRegistry', () => {
 
   it('should have built-in detectors registered by default', () => {
     const detectors = TransportRegistry.getDetectors();
-    expect(detectors.length).toBe(5);
+    expect(detectors.length).toBe(7);
 
     const names = detectors.map(d => d.name);
     expect(names).toContain('cefsharp');
+    expect(names).toContain('webkit');
+    expect(names).toContain('android');
     expect(names).toContain('react-native');
     expect(names).toContain('iframe');
     expect(names).toContain('window');
@@ -32,23 +34,27 @@ describe('TransportRegistry', () => {
   it('should sort detectors by priority (descending)', () => {
     const detectors = TransportRegistry.getDetectors();
 
-    // Should be sorted: cefsharp (100), react-native (90), iframe (80), window (70), postmessage (10)
+    // Sorted: cefsharp (100), webkit (95), react-native (90), android (85), iframe (80), window (70), postmessage (10)
     expect(detectors[0].name).toBe('cefsharp');
     expect(detectors[0].priority).toBe(100);
-    expect(detectors[1].name).toBe('react-native');
-    expect(detectors[1].priority).toBe(90);
-    expect(detectors[2].name).toBe('iframe');
-    expect(detectors[2].priority).toBe(80);
-    expect(detectors[3].name).toBe('window');
-    expect(detectors[3].priority).toBe(70);
-    expect(detectors[4].name).toBe('postmessage');
-    expect(detectors[4].priority).toBe(10);
+    expect(detectors[1].name).toBe('webkit');
+    expect(detectors[1].priority).toBe(95);
+    expect(detectors[2].name).toBe('react-native');
+    expect(detectors[2].priority).toBe(90);
+    expect(detectors[3].name).toBe('android');
+    expect(detectors[3].priority).toBe(85);
+    expect(detectors[4].name).toBe('iframe');
+    expect(detectors[4].priority).toBe(80);
+    expect(detectors[5].name).toBe('window');
+    expect(detectors[5].priority).toBe(70);
+    expect(detectors[6].name).toBe('postmessage');
+    expect(detectors[6].priority).toBe(10);
   });
 
   it('should register new detector and sort by priority', () => {
     const customDetector: TransportDetector = {
       name: 'custom',
-      priority: 95,
+      priority: 96,
       detect: () => false,
       createTransport: () => new NullTransport(),
     };
@@ -56,10 +62,10 @@ describe('TransportRegistry', () => {
     TransportRegistry.register(customDetector);
     const detectors = TransportRegistry.getDetectors();
 
-    expect(detectors.length).toBe(6);
-    // Should be: cefsharp (100), custom (95), react-native (90), iframe (80), window (70), postmessage (10)
+    expect(detectors.length).toBe(8);
+    // Should be: cefsharp (100), custom (96), webkit (95), react-native (90), ...
     expect(detectors[1].name).toBe('custom');
-    expect(detectors[1].priority).toBe(95);
+    expect(detectors[1].priority).toBe(96);
   });
 
   it('should replace existing detector with same name', () => {
@@ -78,10 +84,10 @@ describe('TransportRegistry', () => {
     };
 
     TransportRegistry.register(customDetector1);
-    expect(TransportRegistry.getDetectors().length).toBe(6);
+    expect(TransportRegistry.getDetectors().length).toBe(8);
 
     TransportRegistry.register(customDetector2);
-    expect(TransportRegistry.getDetectors().length).toBe(6); // Still 6, not 7
+    expect(TransportRegistry.getDetectors().length).toBe(8); // Still 8, not 9
 
     const detectors = TransportRegistry.getDetectors();
     const customDetector = detectors.find(d => d.name === 'custom');
@@ -92,7 +98,7 @@ describe('TransportRegistry', () => {
     TransportRegistry.unregister('iframe');
     const detectors = TransportRegistry.getDetectors();
 
-    expect(detectors.length).toBe(4);
+    expect(detectors.length).toBe(6);
     expect(detectors.map(d => d.name)).not.toContain('iframe');
   });
 
@@ -251,13 +257,13 @@ describe('TransportRegistry', () => {
     };
 
     TransportRegistry.register(customDetector);
-    expect(TransportRegistry.getDetectors().length).toBe(6);
+    expect(TransportRegistry.getDetectors().length).toBe(8);
 
     TransportRegistry.reset();
     const detectors = TransportRegistry.getDetectors();
 
-    expect(detectors.length).toBe(5);
-    expect(detectors.map(d => d.name)).toEqual(['cefsharp', 'react-native', 'iframe', 'window', 'postmessage']);
+    expect(detectors.length).toBe(7);
+    expect(detectors.map(d => d.name)).toEqual(['cefsharp', 'webkit', 'react-native', 'android', 'iframe', 'window', 'postmessage']);
   });
 
   it('should clear cache when reset is called', () => {
