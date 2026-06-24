@@ -84,4 +84,19 @@ android/build/
 android/**/build/
 .kotlin/
 
+# Dart / Flutter
+.dart_tool/
+.packages
+pubspec.lock
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+dist/
+
 .npmrc
