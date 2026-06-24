@@ -1,0 +1,20 @@
+name: aspectly_flutter_example
+description: Aspectly bridge example for Flutter (webview_flutter).
+publish_to: none
+version: 1.0.0
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.10.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  webview_flutter: ^4.4.0
+  aspectly_bridge:
+    path: ../../dart
+
+flutter:
+  assets:
+    - web/index.html
+    - web/aspectly.js

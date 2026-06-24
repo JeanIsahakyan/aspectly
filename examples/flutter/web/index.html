@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aspectly Bridge - JS Side (Flutter)</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 24px; color: #333; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        h1 { color: white; margin-bottom: 24px; }
+        h2 { font-size: 16px; color: #666; margin-bottom: 16px; }
+        .status { display: flex; align-items: center; gap: 8px; }
+        .status-dot { width: 12px; height: 12px; border-radius: 50%; background: #ef4444; }
+        .status-dot.connected { background: #22c55e; }
+        .methods { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+        .method-badge { background: #e0e7ff; color: #4338ca; padding: 4px 12px; border-radius: 16px; font-size: 13px; font-family: monospace; }
+        .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+        button { background: #4f46e5; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 14px; }
+        button:disabled { background: #9ca3af; cursor: not-allowed; }
+        .log { background: #1e1e1e; color: #d4d4d4; font-family: monospace; font-size: 12px; padding: 16px; border-radius: 8px; height: 200px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Aspectly Bridge - JavaScript Side</h1>
+        <div class="card">
+            <h2>Bridge Status</h2>
+            <div class="status"><div id="statusDot" class="status-dot"></div><span id="statusText">Waiting for native connection...</span></div>
+            <div id="nativeMethods" class="methods"></div>
+        </div>
+        <div class="card">
+            <h2>Call Native (Dart) Methods</h2>
+            <div class="actions">
+                <button id="btnPing" disabled>Call ping()</button>
+                <button id="btnEcho" disabled>Call echo("Hello from JS")</button>
+                <button id="btnAdd" disabled>Call add(10, 20)</button>
+                <button id="btnGetSystemInfo" disabled>Call getSystemInfo()</button>
+            </div>
+        </div>
+        <div class="card"><h2>Event Log</h2><div id="log" class="log"></div></div>
+    </div>
+
+    <script src="aspectly.js"></script>
+    <script>
+        var statusDot = document.getElementById('statusDot');
+        var statusText = document.getElementById('statusText');
+        var nativeMethods = document.getElementById('nativeMethods');
+        var logEl = document.getElementById('log');
+        function log(message) {
+            var time = new Date().toLocaleTimeString('en-US', { hour12: false });
+            logEl.innerHTML += '<div>[' + time + '] ' + message + '</div>';
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+        log('Waiting for bridge initialization...');
+
+        window.aspectlyBridge.init({
+            greet: function (p) { log('greet({ name: "' + p.name + '" })'); return Promise.resolve({ message: 'Hello, ' + p.name + '! Greetings from JavaScript.' }); },
+            getTime: function () { return Promise.resolve({ time: new Date().toISOString() }); },
+            calculate: function (p) { return Promise.resolve({ sum: p.a + p.b, product: p.a * p.b }); }
+        }).then(function () {
+            statusDot.classList.add('connected');
+            statusText.textContent = 'Connected to native (Dart)';
+            log('Bridge initialized!');
+            var known = ['ping', 'echo', 'add', 'getSystemInfo'];
+            var supported = known.filter(function (m) { return window.aspectlyBridge.supports(m); });
+            log('Native supports: ' + supported.join(', '));
+            nativeMethods.innerHTML = supported.map(function (m) { return '<span class="method-badge">' + m + '</span>'; }).join('');
+            ['btnPing', 'btnEcho', 'btnAdd', 'btnGetSystemInfo'].forEach(function (id) { document.getElementById(id).disabled = false; });
+            window.aspectlyBridge.send('getSystemInfo').then(function (info) { log('JS -> native getSystemInfo -> ' + JSON.stringify(info)); }).catch(function () {});
+        });
+
+        function call(method, params) { window.aspectlyBridge.send(method, params).then(function (r) { log('Result: ' + JSON.stringify(r)); }).catch(function (e) { log('Error: ' + (e.error_message || e.message)); }); }
+        document.getElementById('btnPing').addEventListener('click', function () { call('ping'); });
+        document.getElementById('btnEcho').addEventListener('click', function () { call('echo', { message: 'Hello from JS' }); });
+        document.getElementById('btnAdd').addEventListener('click', function () { call('add', { a: 10, b: 20 }); });
+        document.getElementById('btnGetSystemInfo').addEventListener('click', function () { call('getSystemInfo'); });
+    </script>
+</body>
+</html>
