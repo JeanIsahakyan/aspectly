@@ -18,6 +18,26 @@ communication between native Android code and JavaScript running in an Android
 The core module depends only on **Gson** and **kotlinx-coroutines**, so it can be
 unit-tested on a plain JVM (no Android SDK required).
 
+## Install
+
+From [Maven Central](https://central.sonatype.com/), add to your `build.gradle.kts`:
+
+```kotlin
+dependencies {
+    implementation("com.aspectly:aspectly-bridge:2.1.0")
+    implementation("com.aspectly:aspectly-bridge-webview:2.1.0")
+}
+```
+
+Or with Groovy `build.gradle`:
+
+```groovy
+dependencies {
+    implementation 'com.aspectly:aspectly-bridge:2.1.0'
+    implementation 'com.aspectly:aspectly-bridge-webview:2.1.0'
+}
+```
+
 ## Quick Start
 
 ```kotlin
@@ -128,6 +148,12 @@ gradle :aspectly-bridge-webview:assemble       # build the WebView module (AAR)
 ```
 
 See [`examples/android`](../examples/android) for a runnable sample app.
+
+## Other platforms
+
+Aspectly ships the same bridge for Web (iframe/popup), React Native, .NET
+(CefSharp/WebView2), iOS/macOS/visionOS, Flutter, and Linux/WebKitGTK — all at
+version `2.1.0`. See the [main README](../README.md) for the full platform list.
 
 ## License
 

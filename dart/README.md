@@ -98,6 +98,13 @@ dart pub get
 dart test
 ```
 
+## Other platforms
+
+Aspectly also ships for Web (iframe/popup), React Native, React Native Web/Expo,
+.NET (CefSharp/WebView2 on Windows), iOS/macOS/visionOS, Android, and
+Linux/WebKitGTK (Python) — all at version 2.1.0. See the
+[repository README](../README.md) for the full platform matrix.
+
 ## License
 
 MIT

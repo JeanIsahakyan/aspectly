@@ -34,7 +34,7 @@ const features = [
     icon: Smartphone,
     title: 'Universal',
     description:
-      'One protocol across Web, React Native, .NET, iOS/macOS (Swift) and Android (Kotlin) — the same web content runs on every host.',
+      'One protocol across Web, React Native, .NET, iOS/macOS/visionOS, Android, Flutter, and Linux/WebKitGTK — the same web content runs on every host.',
     color: 'text-blue-500',
     bgColor: 'bg-blue-500/10',
   },

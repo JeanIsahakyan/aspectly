@@ -11,10 +11,27 @@ A powerful, type-safe communication bridge framework for React Native, Web, ifra
 
 ## Overview
 
-Aspectly enables seamless bidirectional communication between:
-- **React Native apps** and **WebViews**
-- **Web pages** and **iframes**
-- **Universal apps** (React Native Web / Expo) and embedded content
+Aspectly enables seamless, type-safe, bidirectional communication between
+embedded web content (iframe / WebView) and a native host — across **8 platform
+families**. The same `@aspectly/core` web content runs unchanged on every host.
+
+## Supported platforms
+
+All packages are at **v2.1.0** (the .NET packages publish at the release tag
+version; the Swift package is consumed via the git tag / `2.1.0` CocoaPods).
+
+| Platform | Package | Version | Registry | Install |
+|----------|---------|:-------:|----------|---------|
+| Web (iframe / popup) | `@aspectly/core`, `@aspectly/web` | 2.1.0 | npm | `npm i @aspectly/web` |
+| React Native | `@aspectly/react-native` | 2.1.0 | npm | `npm i @aspectly/react-native react-native-webview` |
+| React Native Web / Expo | `@aspectly/react-native-web` | 2.1.0 | npm | `npm i @aspectly/react-native-web` |
+| Transports (platform detection) | `@aspectly/transports` | 2.1.0 | npm | `npm i @aspectly/transports` |
+| .NET — CefSharp (Windows) | `Aspectly.Bridge.CefSharp` | 2.1.0 | NuGet | `dotnet add package Aspectly.Bridge.CefSharp` |
+| .NET — WebView2 (Windows) | `Aspectly.Bridge.WebView2` | 2.1.0 | NuGet | `dotnet add package Aspectly.Bridge.WebView2` |
+| iOS / macOS / visionOS | `AspectlyBridge`, `AspectlyBridgeWebKit` | 2.1.0 | SwiftPM · CocoaPods | `.package(url: "…/aspectly.git", from: "2.1.0")` · `pod 'AspectlyBridgeWebKit'` |
+| Android | `com.aspectly:aspectly-bridge(-webview)` | 2.1.0 | Maven Central | `implementation("com.aspectly:aspectly-bridge-webview:2.1.0")` |
+| Flutter (Dart) | `aspectly_bridge` | 2.1.0 | pub.dev | `flutter pub add aspectly_bridge` |
+| Linux / WebKitGTK (Python) | `aspectly-bridge` | 2.1.0 | PyPI | `pip install "aspectly-bridge[webkitgtk]"` |
 
 ## Packages
 

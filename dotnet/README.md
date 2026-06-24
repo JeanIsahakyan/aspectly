@@ -74,3 +74,16 @@ await bridge.InitializeAsync(new Dictionary<string, Delegate>
 dotnet build Aspectly.sln
 dotnet test
 ```
+
+## Other platforms
+
+Aspectly is a type-safe, bidirectional bridge between embedded web (iframe/WebView) and a native host, available for 8 platform families (all at version 2.1.0). Besides .NET (CefSharp/WebView2 on Windows), it also supports:
+
+- **Web (iframe/popup)** — `@aspectly/web` (npm)
+- **React Native** — `@aspectly/react-native` (npm)
+- **iOS/macOS** — `AspectlyBridgeWebKit` (SwiftPM + CocoaPods)
+- **Android** — `com.aspectly:aspectly-bridge-webview` (Maven Central)
+- **Flutter** — `aspectly_bridge` (pub.dev)
+- **Python (Linux/WebKitGTK)** — `aspectly-bridge` (PyPI)
+
+See the [main README](../README.md) for the full platform matrix.

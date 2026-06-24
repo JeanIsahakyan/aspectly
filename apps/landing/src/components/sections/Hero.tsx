@@ -100,7 +100,7 @@ export function Hero() {
               </div>
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-blue-500" />
-                <span>RN, Web, .NET, iOS &amp; Android</span>
+                <span>Web · RN · .NET · Apple · Android · Flutter · Python</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-purple-500" />

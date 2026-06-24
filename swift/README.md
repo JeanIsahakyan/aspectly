@@ -1,13 +1,13 @@
 # Aspectly Swift
 
 [![Swift](https://img.shields.io/badge/Swift-5.9+-orange?style=flat-square&logo=swift)](https://swift.org)
-[![Platforms](https://img.shields.io/badge/platforms-iOS%20%7C%20macOS%20%7C%20tvOS%20%7C%20visionOS-blue?style=flat-square&logo=apple)](https://developer.apple.com)
+[![Platforms](https://img.shields.io/badge/platforms-iOS%20%7C%20macOS%20%7C%20visionOS-blue?style=flat-square&logo=apple)](https://developer.apple.com)
 [![CI](https://img.shields.io/github/actions/workflow/status/JeanIsahakyan/aspectly/ci.yml?style=flat-square&logo=github-actions&logoColor=white&label=CI)](https://github.com/JeanIsahakyan/aspectly/actions)
 
 Swift implementation of the Aspectly bridge protocol — bidirectional, type-safe
 communication between native Swift / SwiftUI code and JavaScript running in a
-`WKWebView`. Works on **iOS and macOS** (and tvOS / visionOS) from a single
-codebase.
+`WKWebView`. Works on **iOS, macOS, and visionOS** from a single codebase
+(verified at runtime on iOS + macOS; visionOS builds and passes `pod lib lint`).
 
 ## Products
 
@@ -44,7 +44,7 @@ at the repository root).
 ### CocoaPods
 
 ```ruby
-pod 'AspectlyBridgeWebKit'   # pulls in AspectlyBridge automatically
+pod 'AspectlyBridgeWebKit', '~> 2.1.0'   # pulls in AspectlyBridge automatically
 ```
 
 The web content loaded in the WebView uses [`@aspectly/core`](../packages/core):
@@ -201,6 +201,21 @@ xcodebuild build -scheme AspectlyBridgeWebKit \
 ```
 
 See [`examples/swiftui`](../examples/swiftui) for a runnable SwiftUI demo.
+
+## Other platforms
+
+Aspectly speaks the same protocol across 8 platform families (all at **2.1.0**).
+Beyond Swift (iOS / macOS / visionOS), the bridge is also available for:
+
+- **Web** (iframe / popup) — `@aspectly/web` (npm)
+- **React Native** — `@aspectly/react-native` (npm)
+- **.NET** (CefSharp / WebView2 on Windows) — `Aspectly.Bridge.CefSharp` / `Aspectly.Bridge.WebView2` (NuGet)
+- **Android** — `com.aspectly:aspectly-bridge-webview` (Maven Central)
+- **Flutter** (Dart) — `aspectly_bridge` (pub.dev)
+- **Python** (Linux / WebKitGTK) — `aspectly-bridge` (PyPI)
+
+See the [project README](../README.md) for the full platform matrix and install
+instructions.
 
 ## License
 
