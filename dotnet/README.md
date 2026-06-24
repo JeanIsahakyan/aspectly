@@ -81,7 +81,8 @@ Aspectly is a type-safe, bidirectional bridge between embedded web (iframe/WebVi
 
 - **Web (iframe/popup)** — `@aspectly/web` (npm)
 - **React Native** — `@aspectly/react-native` (npm)
-- **iOS/macOS** — `AspectlyBridgeWebKit` (SwiftPM + CocoaPods)
+- **React Native Web / Expo** — `@aspectly/react-native-web` (npm)
+- **iOS/macOS/visionOS** — `AspectlyBridge` + `AspectlyBridgeWebKit` (SwiftPM + CocoaPods)
 - **Android** — `com.aspectly:aspectly-bridge-webview` (Maven Central)
 - **Flutter** — `aspectly_bridge` (pub.dev)
 - **Python (Linux/WebKitGTK)** — `aspectly-bridge` (PyPI)

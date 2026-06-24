@@ -32,6 +32,13 @@ _bridgeHost = new BridgeHost(_browserBridge);
 _bridgeHost.RegisterHandler<string>("ping", async () => "pong");
 _bridgeHost.RegisterHandler<EchoParams, string>("echo", async (p) => p.Message);
 _bridgeHost.RegisterHandler<AddParams, int>("add", async (p) => p.A + p.B);
+_bridgeHost.RegisterHandler<object>("getSystemInfo", async () => new
+{
+    machineName = Environment.MachineName,
+    osVersion = Environment.OSVersion.ToString(),
+    dotnetVersion = Environment.Version.ToString(),
+    processId = Environment.ProcessId,
+});
 
 // Initialize and wait for JS
 await _bridgeHost.InitializeAsync();

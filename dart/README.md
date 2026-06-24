@@ -5,7 +5,8 @@
 Type-safe, bidirectional bridge between native Dart/Flutter code and JavaScript
 running in a web view. Speaks the [Aspectly](https://github.com/JeanIsahakyan/aspectly)
 protocol, so the same `@aspectly/core` web content runs unchanged across Web,
-React Native, .NET, iOS/macOS, Android, and Flutter hosts.
+React Native, React Native Web/Expo, .NET, iOS/macOS/visionOS, Android, Flutter,
+and Linux/WebKitGTK (Python) hosts.
 
 The package is **pure Dart** (no Flutter dependency) — wire it to any web view by
 implementing `BrowserBridge`. The example shows the `webview_flutter` glue.

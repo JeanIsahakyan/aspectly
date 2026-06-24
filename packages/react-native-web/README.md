@@ -34,6 +34,14 @@ cd ios && pod install
 
 This package allows you to write one codebase that works seamlessly across all platforms.
 
+### Other hosts
+
+The embedded web content (`@aspectly/core`) speaks the same protocol against
+every Aspectly host beyond Web/iOS/Android — .NET (CefSharp/WebView2),
+macOS/visionOS (WebKit), Flutter, and Linux/WebKitGTK — with the transport
+auto-detected by [`@aspectly/transports`](../transports). See the
+[main README](../../README.md) for the full host matrix.
+
 ## Quick Start
 
 ```tsx

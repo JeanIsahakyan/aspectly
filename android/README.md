@@ -151,9 +151,10 @@ See [`examples/android`](../examples/android) for a runnable sample app.
 
 ## Other platforms
 
-Aspectly ships the same bridge for Web (iframe/popup), React Native, .NET
-(CefSharp/WebView2), iOS/macOS/visionOS, Flutter, and Linux/WebKitGTK — all at
-version `2.1.0`. See the [main README](../README.md) for the full platform list.
+Aspectly ships the same bridge for Web (iframe/popup), React Native, React Native
+Web/Expo, .NET (CefSharp/WebView2), iOS/macOS/visionOS, Flutter, and
+Linux/WebKitGTK — all at version `2.1.0`. See the [main README](../README.md) for
+the full platform list.
 
 ## License
 

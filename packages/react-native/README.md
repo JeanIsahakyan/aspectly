@@ -236,6 +236,14 @@ const handleSend = async () => {
 - `javaScriptEnabled` is automatically set to `true`
 - `mixedContentMode` is set to `"always"` for development
 
+### Other hosts
+
+The web content you load here uses `@aspectly/core` and speaks the same protocol
+against every Aspectly host — Web (iframe/popup), .NET (CefSharp/WebView2),
+iOS/macOS/visionOS (WebKit), Android, Flutter, and Linux/WebKitGTK — with the
+transport auto-detected by [`@aspectly/transports`](../transports). See the
+[main README](../../README.md) for the full host matrix.
+
 ## Related Packages
 
 - [`@aspectly/core`](../core) - Core bridge framework (used in web content)

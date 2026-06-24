@@ -55,6 +55,22 @@ public class MyBrowserBridge : IBrowserBridge
 }
 ```
 
+## Other platforms
+
+`Aspectly.Bridge` is the .NET core of an 8-family bridge ecosystem (all at
+version **2.1.0**). The same protocol ships for:
+
+- **Web (iframe/popup)** — `@aspectly/web` (npm)
+- **React Native** — `@aspectly/react-native` (npm)
+- **React Native Web / Expo** — `@aspectly/react-native-web` (npm)
+- **.NET (CefSharp/WebView2, Windows)** — `Aspectly.Bridge.CefSharp` / `Aspectly.Bridge.WebView2` (NuGet)
+- **iOS/macOS/visionOS** — `AspectlyBridge` + `AspectlyBridgeWebKit` (SwiftPM + CocoaPods)
+- **Android** — `com.aspectly:aspectly-bridge-webview` (Maven Central)
+- **Flutter** — `aspectly_bridge` (pub.dev)
+- **Python (Linux/WebKitGTK)** — `aspectly-bridge` (PyPI)
+
+See the [main README](../../README.md) for the full platform matrix.
+
 ## License
 
 MIT

@@ -83,7 +83,8 @@ See [`examples/webkitgtk`](../examples/webkitgtk) for a runnable GTK app.
 
 This is the Python / WebKitGTK host (PyPI `aspectly-bridge`, **2.1.0**). The same
 Aspectly protocol ships for Web (`@aspectly/web`), React Native
-(`@aspectly/react-native`), .NET CefSharp/WebView2
+(`@aspectly/react-native`), React Native Web/Expo
+(`@aspectly/react-native-web`), .NET CefSharp/WebView2
 (`Aspectly.Bridge.CefSharp` / `Aspectly.Bridge.WebView2`), iOS/macOS/visionOS
 (`AspectlyBridge`), Android (`com.aspectly:aspectly-bridge`), and Flutter
 (`aspectly_bridge`) — all at version **2.1.0**. See the

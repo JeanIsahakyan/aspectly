@@ -209,6 +209,7 @@ Beyond Swift (iOS / macOS / visionOS), the bridge is also available for:
 
 - **Web** (iframe / popup) — `@aspectly/web` (npm)
 - **React Native** — `@aspectly/react-native` (npm)
+- **React Native Web / Expo** — `@aspectly/react-native-web` (npm)
 - **.NET** (CefSharp / WebView2 on Windows) — `Aspectly.Bridge.CefSharp` / `Aspectly.Bridge.WebView2` (NuGet)
 - **Android** — `com.aspectly:aspectly-bridge-webview` (Maven Central)
 - **Flutter** (Dart) — `aspectly_bridge` (pub.dev)

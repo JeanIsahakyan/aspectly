@@ -1,6 +1,6 @@
 # Publishing
 
-Aspectly ships to five package registries. Everything is automated by
+Aspectly ships to seven package registries. Everything is automated by
 [`.github/workflows/release.yml`](../.github/workflows/release.yml), which runs
 when you publish a GitHub Release (tag `vX.Y.Z`). You can also publish each
 ecosystem manually with the commands below.

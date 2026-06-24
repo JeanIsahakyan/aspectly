@@ -15,8 +15,12 @@ and iOS**.
 
 ```bash
 cd examples/swiftui
-swift run
+swift run AspectlyExample
 ```
+
+The package also ships a headless `AspectlySmokeTest` executable used in CI —
+pass its name to `swift run` (`swift run AspectlySmokeTest`) since the package
+defines more than one executable target.
 
 ### iOS / macOS (Xcode)
 
@@ -37,6 +41,9 @@ Select the `AspectlyExample` scheme. To run on an iOS simulator, drop
 Registers handlers that JavaScript can call, then initializes the bridge:
 
 ```swift
+// The real ContentView builds the model from the bundled web page:
+// AspectlyWebViewModel(url: Bundle.module.url(
+//   forResource: "index", withExtension: "html", subdirectory: "web")!)
 let model = AspectlyWebViewModel(url: indexHtmlURL)
 
 // Register handlers
@@ -76,12 +83,14 @@ Uses the `@aspectly/core` browser bundle (`aspectly.js`):
 ```
 examples/swiftui/
 ├── Package.swift
-└── Sources/AspectlyExample/
-    ├── AspectlyExampleApp.swift     # @main SwiftUI App
-    ├── ContentView.swift            # Bridge setup, handlers, JS calls
-    └── Resources/web/
-        ├── index.html               # Demo page
-        └── aspectly.js              # @aspectly/core browser bundle (IIFE)
+├── Sources/AspectlyExample/
+│   ├── AspectlyExampleApp.swift     # @main SwiftUI App
+│   ├── ContentView.swift            # Bridge setup, handlers, JS calls
+│   └── Resources/web/
+│       ├── index.html               # Demo page
+│       └── aspectly.js              # @aspectly/core browser bundle (IIFE)
+└── Sources/AspectlySmokeTest/
+    └── main.swift                   # Headless handshake smoke test (CI)
 ```
 
 ## Regenerating the browser bundle
