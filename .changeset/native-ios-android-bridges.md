@@ -8,6 +8,8 @@ Add native mobile/desktop transports for the new Swift and Kotlin bridges:
   host on iOS/macOS via `window.webkit.messageHandlers.aspectly`.
 - `AndroidTransport` (`@aspectly/transports/android`) — detects a native Android
   WebView host via `window.AspectlyAndroid`.
+- `FlutterTransport` (`@aspectly/transports/flutter`) — detects a native Flutter
+  host via `window.AspectlyFlutter`.
 
 Both are registered in the auto-detection registry (priorities: WebKit 95,
 Android 85), so `@aspectly/core` running in a native WebView is detected

@@ -46,6 +46,16 @@
         "default": "./dist/android.js"
       }
     },
+    "./flutter": {
+      "import": {
+        "types": "./dist/flutter.d.mts",
+        "default": "./dist/flutter.mjs"
+      },
+      "require": {
+        "types": "./dist/flutter.d.ts",
+        "default": "./dist/flutter.js"
+      }
+    },
     "./react-native": {
       "import": {
         "types": "./dist/react-native.d.mts",
@@ -100,6 +110,7 @@
     "ios",
     "macos",
     "android",
+    "flutter",
     "webview",
     "iframe",
     "postmessage"

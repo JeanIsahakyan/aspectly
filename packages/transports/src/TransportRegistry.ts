@@ -2,6 +2,7 @@ import type { Transport, TransportDetector } from './types';
 import { cefSharpDetector } from './transports/CefSharpTransport';
 import { webKitDetector } from './transports/WebKitTransport';
 import { androidDetector } from './transports/AndroidTransport';
+import { flutterDetector } from './transports/FlutterTransport';
 import { reactNativeDetector } from './transports/ReactNativeTransport';
 import { iframeDetector } from './transports/IframeTransport';
 import { windowDetector } from './transports/WindowTransport';
@@ -21,6 +22,7 @@ class TransportRegistryClass {
     this.register(cefSharpDetector);
     this.register(webKitDetector);
     this.register(androidDetector);
+    this.register(flutterDetector);
     this.register(reactNativeDetector);
     this.register(iframeDetector);
     this.register(windowDetector);
@@ -99,6 +101,7 @@ class TransportRegistryClass {
     this.register(cefSharpDetector);
     this.register(webKitDetector);
     this.register(androidDetector);
+    this.register(flutterDetector);
     this.register(reactNativeDetector);
     this.register(iframeDetector);
     this.register(windowDetector);
