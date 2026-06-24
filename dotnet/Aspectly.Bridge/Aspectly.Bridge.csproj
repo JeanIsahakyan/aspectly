@@ -9,7 +9,7 @@
 
     <!-- NuGet Package Metadata -->
     <PackageId>Aspectly.Bridge</PackageId>
-    <Version>0.1.0</Version>
+    <Version>2.1.0</Version>
     <Authors>Zhan Isaakian</Authors>
     <Company>Aspectly</Company>
     <Description>Core bridge library for Aspectly - bidirectional communication between .NET and JavaScript via the Aspectly protocol</Description>

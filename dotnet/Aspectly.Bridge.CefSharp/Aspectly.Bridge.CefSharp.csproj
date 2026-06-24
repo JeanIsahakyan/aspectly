@@ -10,7 +10,7 @@
 
     <!-- NuGet Package Metadata -->
     <PackageId>Aspectly.Bridge.CefSharp</PackageId>
-    <Version>0.1.0</Version>
+    <Version>2.1.0</Version>
     <Authors>Zhan Isaakian</Authors>
     <Company>Aspectly</Company>
     <Description>CefSharp browser bridge for Aspectly - enables communication with JavaScript via CefSharp (Chromium Embedded Framework)</Description>
