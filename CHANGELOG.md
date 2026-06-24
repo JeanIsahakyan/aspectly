@@ -28,11 +28,24 @@ across Web, React Native, .NET, Apple, and Android hosts.
 - Maven publishing (Maven Central + GitHub Packages) and a JUnit test suite
 - `examples/android` sample app; verified at runtime on an Android emulator
 
+### Added — Flutter (Dart)
+- New `aspectly_bridge` Dart package (pure Dart, pub.dev) — `BridgeHost` +
+  `BrowserBridge`; wires to `webview_flutter` via the example glue
+- `examples/flutter` sample app; 23 unit tests pass (`dart test`)
+
+### Added — Linux / WebKitGTK (Python)
+- New `aspectly-bridge` Python package (PyPI) — pure-Python `BridgeHost` +
+  `WebKitGTKBrowserBridge` (Linux). Reuses the WebKit transport (same
+  `window.webkit.messageHandlers.aspectly` mechanism as WKWebView)
+- `examples/webkitgtk` sample app; 23 unit tests pass (`pytest`)
+
 ### Added — JS transports
 - `WebKitTransport` (`@aspectly/transports/webkit`, priority 95) — auto-detects a
   native WKWebView host via `window.webkit.messageHandlers.aspectly`
 - `AndroidTransport` (`@aspectly/transports/android`, priority 85) — auto-detects a
   native Android WebView host via `window.AspectlyAndroid`
+- `FlutterTransport` (`@aspectly/transports/flutter`, priority 84) — auto-detects a
+  native Flutter host via `window.AspectlyFlutter`
 
 ### Docs / infra
 - New [`docs/PUBLISHING.md`](./docs/PUBLISHING.md); Swift + Android CI jobs;

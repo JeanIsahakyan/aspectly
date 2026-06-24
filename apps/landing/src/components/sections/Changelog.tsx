@@ -9,7 +9,9 @@ const releases = [
     changes: [
       { type: 'feat', date: '06/22/2026', text: 'Swift bridge for iOS / macOS / visionOS — AspectlyBridge + AspectlyBridgeWebKit (WKWebView + SwiftUI)' },
       { type: 'feat', date: '06/22/2026', text: 'Android bridge for Kotlin — aspectly-bridge + aspectly-bridge-webview (Android WebView)' },
-      { type: 'feat', date: '06/22/2026', text: 'JS transports: @aspectly/transports/webkit and /android for native host detection' },
+      { type: 'feat', date: '06/22/2026', text: 'Flutter (Dart) bridge — aspectly_bridge (webview_flutter) on pub.dev' },
+      { type: 'feat', date: '06/22/2026', text: 'Linux / WebKitGTK (Python) bridge — aspectly-bridge on PyPI' },
+      { type: 'feat', date: '06/22/2026', text: 'JS transports: webkit, android, and flutter for native host detection' },
       { type: 'feat', date: '06/22/2026', text: 'Publishing to Swift Package Manager, CocoaPods, and Maven Central' },
       { type: 'docs', date: '06/22/2026', text: 'examples/swiftui and examples/android sample apps; docs/PUBLISHING.md' },
     ],

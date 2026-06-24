@@ -82,6 +82,33 @@ const androidPackages = [
   },
 ]
 
+const flutterPackages = [
+  {
+    name: 'aspectly_bridge',
+    description: 'Dart / Flutter bridge (works with webview_flutter)',
+    install: 'flutter pub add aspectly_bridge',
+    useCase: 'pub.dev — Flutter & Dart',
+  },
+]
+
+const pythonPackages = [
+  {
+    name: 'aspectly-bridge[webkitgtk]',
+    description: 'Python WebKitGTK bridge (Linux desktop)',
+    install: 'pip install "aspectly-bridge[webkitgtk]"',
+    useCase: 'PyPI — Linux / WebKitGTK',
+  },
+]
+
+const packagesByPlatform: Record<string, typeof jsPackages> = {
+  javascript: jsPackages,
+  dotnet: dotnetPackages,
+  swift: swiftPackages,
+  android: androidPackages,
+  flutter: flutterPackages,
+  python: pythonPackages,
+}
+
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false)
 
@@ -119,14 +146,7 @@ export function Installation() {
     }
   }
 
-  const packages =
-    platform === 'javascript'
-      ? jsPackages
-      : platform === 'dotnet'
-        ? dotnetPackages
-        : platform === 'swift'
-          ? swiftPackages
-          : androidPackages
+  const packages = packagesByPlatform[platform] ?? jsPackages
   const getCommand = platform === 'javascript' ? getJsCommand : (pkg: string) => pkg
 
   return (
@@ -161,6 +181,12 @@ export function Installation() {
                   </TabsTrigger>
                   <TabsTrigger value="android" className="gap-2">
                     <span className="text-green-500">Kotlin</span> Android
+                  </TabsTrigger>
+                  <TabsTrigger value="flutter" className="gap-2">
+                    <span className="text-sky-500">Dart</span> Flutter
+                  </TabsTrigger>
+                  <TabsTrigger value="python" className="gap-2">
+                    <span className="text-blue-400">Py</span> Linux
                   </TabsTrigger>
                 </TabsList>
               </Tabs>
@@ -203,6 +229,24 @@ export function Installation() {
               <div className="flex justify-center mb-8">
                 <div className="text-sm text-muted-foreground">
                   Gradle — published to Maven Central
+                </div>
+              </div>
+            )}
+
+            {/* Flutter info */}
+            {platform === 'flutter' && (
+              <div className="flex justify-center mb-8">
+                <div className="text-sm text-muted-foreground">
+                  pub.dev — pure Dart, works with any web view (webview_flutter)
+                </div>
+              </div>
+            )}
+
+            {/* Python info */}
+            {platform === 'python' && (
+              <div className="flex justify-center mb-8">
+                <div className="text-sm text-muted-foreground">
+                  PyPI — WebKitGTK on Linux desktop
                 </div>
               </div>
             )}

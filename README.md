@@ -1,6 +1,6 @@
 # Aspectly
 
-A powerful, type-safe communication bridge framework for React Native, Web, iframes, .NET desktop, **iOS/macOS (Swift)**, and **Android (Kotlin)**.
+A powerful, type-safe communication bridge framework for React Native, Web, iframes, .NET desktop, **iOS/macOS (Swift)**, **Android (Kotlin)**, **Flutter (Dart)**, and **Linux/WebKitGTK (Python)**.
 
 [![GitHub stars](https://img.shields.io/github/stars/JeanIsahakyan/aspectly?style=flat-square&logo=github)](https://github.com/JeanIsahakyan/aspectly)
 [![npm version](https://img.shields.io/npm/v/@aspectly/core?style=flat-square&logo=npm&color=cb3837)](https://www.npmjs.com/package/@aspectly/core)
@@ -35,6 +35,9 @@ Aspectly enables seamless bidirectional communication between:
 | | |
 | [`aspectly-bridge`](./android) (Kotlin) | Core Android bridge library |
 | [`aspectly-bridge-webview`](./android) (Kotlin) | Android `WebView` integration |
+| | |
+| [`aspectly_bridge`](./dart) (Dart) | Flutter / Dart bridge (`webview_flutter`) |
+| [`aspectly-bridge`](./python) (Python) | WebKitGTK bridge (Linux desktop) |
 
 ## Quick Start
 
@@ -287,6 +290,17 @@ dotnet add package Aspectly.Bridge.WebView2
 implementation("com.aspectly:aspectly-bridge-webview:2.1.0")
 ```
 
+```yaml
+# Flutter / Dart app (pubspec.yaml)
+dependencies:
+  aspectly_bridge: ^2.1.0
+```
+
+```bash
+# Python WebKitGTK app (Linux)
+pip install "aspectly-bridge[webkitgtk]"
+```
+
 ## Error Handling
 
 ```typescript
@@ -322,6 +336,8 @@ See the [examples](./examples) directory:
 - [`examples/dotnet`](./examples/dotnet) - .NET desktop app with CefSharp
 - [`examples/swiftui`](./examples/swiftui) - iOS / macOS SwiftUI app
 - [`examples/android`](./examples/android) - Android app with WebView
+- [`examples/flutter`](./examples/flutter) - Flutter app with webview_flutter
+- [`examples/webkitgtk`](./examples/webkitgtk) - Python WebKitGTK app (Linux)
 
 ## Documentation
 
@@ -331,7 +347,7 @@ See the [examples](./examples) directory:
 - [Migration Guide](./docs/MIGRATION.md)
 - [Publishing](./docs/PUBLISHING.md)
 
-Platform-specific guides: [Swift (iOS/macOS)](./swift) · [Android (Kotlin)](./android) · [.NET](./dotnet)
+Platform-specific guides: [Swift (iOS/macOS)](./swift) · [Android (Kotlin)](./android) · [Dart/Flutter](./dart) · [Python/WebKitGTK](./python) · [.NET](./dotnet)
 
 ## Development
 

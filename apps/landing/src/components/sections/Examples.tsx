@@ -111,6 +111,40 @@ webView.webViewClient = object : WebViewClient() {
 }
 webView.loadUrl("https://widget.example.com")`,
   },
+  flutter: {
+    label: 'Flutter',
+    filename: 'main.dart',
+    language: 'dart',
+    code: `import 'package:aspectly_bridge/aspectly_bridge.dart';
+
+// browserBridge wraps a webview_flutter WebViewController
+final bridge = BridgeHost(browserBridge);
+
+bridge.registerHandler('getUserData', (params) => {
+  'name': 'John Doe',
+  'role': 'Admin',
+});
+
+// In NavigationDelegate.onPageFinished:
+await bridge.initialize();`,
+  },
+  webkitgtk: {
+    label: 'Linux (Python)',
+    filename: 'main.py',
+    language: 'python',
+    code: `from aspectly_bridge import BridgeHost
+from aspectly_bridge.webkitgtk import WebKitGTKBrowserBridge
+
+bridge = BridgeHost(WebKitGTKBrowserBridge(web_view))
+
+bridge.register_handler(
+    "getUserData",
+    lambda params: {"name": "John Doe", "role": "Admin"},
+)
+
+# On WebKit2.LoadEvent.FINISHED:
+bridge.initialize()`,
+  },
   dotnet: {
     label: '.NET',
     filename: 'MainWindow.cs',

@@ -247,6 +247,7 @@ unsubscribe();
 | WebKitTransport | `window.webkit.messageHandlers.aspectly` | 95 | Native WKWebView host on iOS/macOS (Swift) |
 | ReactNativeTransport | `window.ReactNativeWebView.postMessage` | 90 | React Native WebView |
 | AndroidTransport | `window.AspectlyAndroid.postMessage` | 85 | Native Android WebView host (Kotlin) |
+| FlutterTransport | `window.AspectlyFlutter.postMessage` | 84 | Native Flutter host (Dart, webview_flutter) |
 | IframeTransport | `window.parent !== window` | 80 | Web content in iframes |
 | WindowTransport | `window.addEventListener('message')` | 70 | Popup window communication |
 | PostMessageTransport | `window.postMessage` | 10 | Generic postMessage fallback |

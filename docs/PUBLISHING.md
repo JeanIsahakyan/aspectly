@@ -14,6 +14,8 @@ ecosystem manually with the commands below.
 | Swift Package Manager | `AspectlyBridge`, `AspectlyBridgeWebKit` | the git tag itself | none (just tag) |
 | CocoaPods | `AspectlyBridge`, `AspectlyBridgeWebKit` | CocoaPods trunk | `COCOAPODS_TRUNK_TOKEN` |
 | Maven | `com.aspectly:aspectly-bridge`, `com.aspectly:aspectly-bridge-webview` | Maven Central (+ GitHub Packages) | `OSSRH_*`, `SIGNING_*` |
+| pub.dev (Dart/Flutter) | `aspectly_bridge` | pub.dev | OIDC / `pub token` |
+| PyPI (Python) | `aspectly-bridge` | PyPI | `PYPI_API_TOKEN` (or Trusted Publishing) |
 
 ## Required GitHub secrets
 
@@ -93,6 +95,28 @@ with `gradle publishAllPublicationsToGitHubPackagesRepository` and a
 dotnet pack dotnet/Aspectly.Bridge/Aspectly.Bridge.csproj -c Release /p:Version=2.1.0 -o nupkgs
 dotnet nuget push nupkgs/*.nupkg --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json
 ```
+
+### pub.dev (Dart / Flutter)
+The package is pure Dart at `dart/`. Test, then publish:
+
+```bash
+cd dart
+dart pub get && dart test
+dart pub publish            # interactive; or use pub.dev automated publishing (OIDC tag trigger)
+```
+
+### PyPI (Python)
+The package is at `python/`. Build and upload:
+
+```bash
+cd python
+python -m pytest                       # core tests (no GTK needed)
+python -m build                        # produces dist/*.whl and *.tar.gz
+python -m twine upload dist/*          # uses ~/.pypirc or TWINE_* / PYPI_API_TOKEN
+```
+
+Prefer [Trusted Publishing](https://docs.pypi.org/trusted-publishers/) (OIDC) in
+CI over a long-lived `PYPI_API_TOKEN`.
 
 ## Versioning
 
