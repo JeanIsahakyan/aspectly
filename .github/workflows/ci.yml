@@ -94,6 +94,34 @@ jobs:
       - name: Build WebView module (AAR)
         run: gradle -p android :aspectly-bridge-webview:assembleRelease
 
+  # Dart / Flutter bridge
+  dart:
+    name: Dart Build & Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+      - name: Test
+        run: |
+          cd dart
+          dart pub get
+          dart test
+
+  # Python / WebKitGTK bridge (core, no GTK needed)
+  python:
+    name: Python Build & Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Test
+        run: |
+          cd python
+          python -m pip install --upgrade pip pytest
+          python -m pytest -q
+
   # Node.js packages build and test
   build:
     runs-on: ubuntu-latest
