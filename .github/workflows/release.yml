@@ -136,3 +136,62 @@ jobs:
         run: pod trunk push AspectlyBridgeWebKit.podspec --allow-warnings
         env:
           COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
+
+  # Python -> PyPI (OIDC Trusted Publishing — NO secret needed).
+  # One-time setup: on pypi.org add a Trusted Publisher for `aspectly-bridge`
+  # (owner: JeanIsahakyan, repo: aspectly, workflow: release.yml). See docs/PUBLISHING.md.
+  publish-pypi:
+    name: Publish Python to PyPI
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write   # OIDC -> PyPI Trusted Publishing
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Sync version from tag + build sdist/wheel
+        working-directory: python
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          sed -i "s/^version = .*/version = \"${VERSION}\"/" pyproject.toml
+          python -m pip install --upgrade build
+          python -m build
+
+      - name: Publish to PyPI (Trusted Publishing / OIDC)
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: python/dist
+
+  # Dart / Flutter -> pub.dev (OIDC automated publishing — NO secret needed).
+  # One-time setup: on pub.dev enable Automated publishing for `aspectly_bridge`
+  # (repo: JeanIsahakyan/aspectly, tag pattern: v{{version}}). See docs/PUBLISHING.md.
+  publish-pub-dev:
+    name: Publish Dart to pub.dev
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write   # OIDC -> pub.dev automated publishing
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Setup Dart
+        uses: dart-lang/setup-dart@v1
+
+      - name: Sync version from tag + publish
+        working-directory: dart
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          sed -i "s/^version: .*/version: ${VERSION}/" pubspec.yaml
+          dart pub get
+          dart pub publish --force

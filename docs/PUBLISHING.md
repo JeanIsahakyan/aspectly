@@ -14,8 +14,8 @@ ecosystem manually with the commands below.
 | Swift Package Manager | `AspectlyBridge`, `AspectlyBridgeWebKit` | the git tag itself | none (just tag) |
 | CocoaPods | `AspectlyBridge`, `AspectlyBridgeWebKit` | CocoaPods trunk | `COCOAPODS_TRUNK_TOKEN` |
 | Maven | `com.aspectly:aspectly-bridge`, `com.aspectly:aspectly-bridge-webview` | Maven Central (+ GitHub Packages) | `OSSRH_*`, `SIGNING_*` |
-| pub.dev (Dart/Flutter) | `aspectly_bridge` | pub.dev | OIDC / `pub token` |
-| PyPI (Python) | `aspectly-bridge` | PyPI | `PYPI_API_TOKEN` (or Trusted Publishing) |
+| pub.dev (Dart/Flutter) | `aspectly_bridge` | pub.dev | OIDC trusted publisher (no secret) |
+| PyPI (Python) | `aspectly-bridge` | PyPI | OIDC trusted publisher (no secret) |
 
 ## Required GitHub secrets
 
@@ -27,9 +27,17 @@ ecosystem manually with the commands below.
 | `SIGNING_PASSWORD` | passphrase for the GPG key |
 | `COCOAPODS_TRUNK_TOKEN` | CocoaPods trunk session token (`pod trunk register`) |
 
-npm uses [trusted publishing / provenance](https://docs.npmjs.com/generating-provenance-statements)
-via the workflow's `id-token: write` permission — no `NPM_TOKEN` needed if the
-repo is registered as a trusted publisher (otherwise add `NODE_AUTH_TOKEN`).
+**No secret needed (OIDC):** npm, PyPI, and pub.dev all publish via OpenID
+Connect trusted publishing using the workflow's `id-token: write` permission —
+no long-lived tokens. Each requires a **one-time** trusted-publisher setup on
+the registry side (see the per-ecosystem sections):
+
+- **npm** — register the repo as a [trusted publisher](https://docs.npmjs.com/generating-provenance-statements) (otherwise add `NODE_AUTH_TOKEN`).
+- **PyPI** — add a [Trusted Publisher](https://docs.pypi.org/trusted-publishers/) for `aspectly-bridge` (otherwise add `PYPI_API_TOKEN`).
+- **pub.dev** — enable [Automated publishing](https://dart.dev/tools/pub/automated-publishing) for `aspectly_bridge`.
+
+Swift Package Manager needs nothing (consumed from the git tag). `GITHUB_TOKEN`
+is provided automatically by Actions.
 
 ## Per-ecosystem details
 
@@ -97,16 +105,35 @@ dotnet nuget push nupkgs/*.nupkg --api-key "$NUGET_API_KEY" --source https://api
 ```
 
 ### pub.dev (Dart / Flutter)
-The package is pure Dart at `dart/`. Test, then publish:
+The package is pure Dart at `dart/`. **CI publishes it automatically** via the
+`publish-pub-dev` job in `release.yml` using OIDC (no secret).
+
+**One-time setup** (pub.dev side): open the `aspectly_bridge` package →
+**Admin → Automated publishing → Enable publishing from GitHub Actions**, set
+repository `JeanIsahakyan/aspectly` and tag pattern `v{{version}}`. The
+`release.yml` job then `dart pub publish`es with a short-lived OIDC token; the
+release tag `vX.Y.Z` matches the pattern.
+
+Manual / local publish (fallback):
 
 ```bash
 cd dart
 dart pub get && dart test
-dart pub publish            # interactive; or use pub.dev automated publishing (OIDC tag trigger)
+dart pub publish            # interactive
 ```
 
 ### PyPI (Python)
-The package is at `python/`. Build and upload:
+The package is at `python/`. **CI publishes it automatically** via the
+`publish-pypi` job in `release.yml`, which builds the sdist/wheel and uploads
+with `pypa/gh-action-pypi-publish` using OIDC (no secret).
+
+**One-time setup** (PyPI side): on pypi.org go to the `aspectly-bridge` project →
+**Publishing → Add a new trusted publisher (GitHub)** with owner `JeanIsahakyan`,
+repository `aspectly`, and workflow `release.yml`. (For the very first release,
+PyPI also supports a "pending" trusted publisher so you can register it before
+the project exists.)
+
+Manual / local publish (fallback):
 
 ```bash
 cd python
@@ -114,9 +141,6 @@ python -m pytest                       # core tests (no GTK needed)
 python -m build                        # produces dist/*.whl and *.tar.gz
 python -m twine upload dist/*          # uses ~/.pypirc or TWINE_* / PYPI_API_TOKEN
 ```
-
-Prefer [Trusted Publishing](https://docs.pypi.org/trusted-publishers/) (OIDC) in
-CI over a long-lived `PYPI_API_TOKEN`.
 
 ## Versioning
 
