@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
-import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
+import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import { cn } from '../../utils/utils'
 import { Check, Copy } from 'lucide-react'
 
@@ -30,11 +30,11 @@ export function CodeBlock({
   return (
     <div className={cn('relative group rounded-lg overflow-hidden', className)}>
       {filename && (
-        <div className="flex items-center justify-between px-4 py-2 bg-zinc-800 border-b border-zinc-700">
-          <span className="text-sm text-zinc-400 font-mono">{filename}</span>
+        <div className="flex items-center justify-between px-4 py-2 bg-muted border-b border-border">
+          <span className="text-sm text-muted-foreground font-mono">{filename}</span>
           <button
             onClick={copyToClipboard}
-            className="text-zinc-400 hover:text-white transition-colors"
+            className="text-muted-foreground hover:text-foreground transition-colors"
             aria-label="Copy code"
           >
             {copied ? (
@@ -48,7 +48,7 @@ export function CodeBlock({
       {!filename && (
         <button
           onClick={copyToClipboard}
-          className="absolute top-3 right-3 text-zinc-400 hover:text-white transition-colors opacity-0 group-hover:opacity-100 z-10"
+          className="absolute top-3 right-3 text-muted-foreground hover:text-foreground transition-colors opacity-0 group-hover:opacity-100 z-10"
           aria-label="Copy code"
         >
           {copied ? (
@@ -60,17 +60,19 @@ export function CodeBlock({
       )}
       <SyntaxHighlighter
         language={language}
-        style={oneDark}
+        style={oneLight}
         showLineNumbers={showLineNumbers}
         customStyle={{
           margin: 0,
           borderRadius: filename ? 0 : '0.5rem',
-          fontSize: '0.875rem',
-          padding: '1rem',
+          fontSize: '0.84rem',
+          padding: '1.1rem',
+          background: 'transparent',
         }}
         codeTagProps={{
           style: {
-            fontFamily: '"JetBrains Mono", ui-monospace, monospace',
+            fontFamily: '"Geist Mono", "JetBrains Mono", ui-monospace, monospace',
+            background: 'transparent',
           },
         }}
       >

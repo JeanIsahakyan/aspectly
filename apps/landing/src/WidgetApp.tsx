@@ -64,18 +64,37 @@ export function WidgetApp() {
     }
   }
 
+  const card = dark
+    ? 'bg-white/[0.04] border border-white/10'
+    : 'bg-white border border-slate-200 shadow-sm'
+  const muted = dark ? 'text-slate-400' : 'text-slate-500'
+
   return (
-    <div className={`min-h-screen p-4 transition-colors ${dark ? 'bg-slate-900' : 'bg-gradient-to-br from-indigo-500 to-purple-600'}`}>
-      {/* Status Card */}
-      <div className="bg-white/15 backdrop-blur-sm rounded-xl p-4 mb-3">
-        <div className="flex items-center gap-2 text-white text-sm">
-          <div className={`w-2 h-2 rounded-full transition-colors ${connected ? 'bg-green-400' : 'bg-red-400'}`} />
-          <span>{connected ? 'Connected' : 'Connecting...'}</span>
+    <div
+      className={`min-h-screen p-4 transition-colors duration-300 ${
+        dark ? 'bg-slate-950 text-slate-100' : 'bg-[#f7f6f2] text-slate-900'
+      }`}
+      style={{ fontFamily: '"Geist", ui-sans-serif, system-ui, sans-serif' }}
+    >
+      {/* Status */}
+      <div className={`mb-3 rounded-xl p-3.5 ${card}`}>
+        <div className="flex items-center gap-2 text-sm">
+          <span className="relative flex h-2 w-2">
+            <span className={`absolute inline-flex h-full w-full rounded-full opacity-60 ${connected ? 'animate-ping bg-emerald-400' : 'bg-red-400'}`} />
+            <span className={`relative inline-flex h-2 w-2 rounded-full ${connected ? 'bg-emerald-500' : 'bg-red-500'}`} />
+          </span>
+          <span className="font-medium">{connected ? 'Connected' : 'Connecting…'}</span>
+          <span className={`ml-auto font-mono text-[10px] ${muted}`}>@aspectly/core</span>
         </div>
         {parentMethods.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mt-2">
+          <div className="mt-2.5 flex flex-wrap gap-1.5">
             {parentMethods.map(m => (
-              <span key={m} className="bg-white/20 text-white text-xs px-2 py-1 rounded-full font-mono">
+              <span
+                key={m}
+                className={`rounded-full px-2 py-0.5 font-mono text-[11px] ${
+                  dark ? 'bg-white/10 text-slate-200' : 'bg-violet-50 text-violet-700'
+                }`}
+              >
                 {m}
               </span>
             ))}
@@ -83,48 +102,50 @@ export function WidgetApp() {
         )}
       </div>
 
-      {/* Actions Card */}
-      <div className="bg-white/15 backdrop-blur-sm rounded-xl p-4 mb-3">
-        <h3 className="text-white text-sm font-medium mb-2 opacity-90">Call Parent Methods</h3>
+      {/* Actions */}
+      <div className={`mb-3 rounded-xl p-3.5 ${card}`}>
+        <h3 className={`mb-2.5 text-[11px] font-semibold uppercase tracking-wider ${muted}`}>Call parent</h3>
         <div className="flex flex-wrap gap-2">
           <button
             onClick={callGetTime}
             disabled={!connected}
-            className="bg-white text-indigo-600 px-3 py-1.5 rounded-md text-xs font-medium hover:scale-105 transition-transform disabled:opacity-50 disabled:hover:scale-100"
+            className="rounded-lg bg-violet-600 px-3 py-1.5 font-mono text-xs font-medium text-white shadow-sm transition hover:bg-violet-500 disabled:opacity-40"
           >
             getTime()
           </button>
           <button
             onClick={callGetUserInfo}
             disabled={!connected}
-            className="bg-white text-indigo-600 px-3 py-1.5 rounded-md text-xs font-medium hover:scale-105 transition-transform disabled:opacity-50 disabled:hover:scale-100"
+            className={`rounded-lg px-3 py-1.5 font-mono text-xs font-medium transition disabled:opacity-40 ${
+              dark ? 'bg-white/10 text-slate-100 hover:bg-white/15' : 'bg-slate-100 text-slate-800 hover:bg-slate-200'
+            }`}
           >
             getUserInfo()
           </button>
         </div>
       </div>
 
-      {/* Log Card */}
-      <div className="bg-white/15 backdrop-blur-sm rounded-xl p-4">
-        <h3 className="text-white text-sm font-medium mb-2 opacity-90">Log</h3>
-        <div className="bg-black/20 rounded-lg p-2 max-h-28 overflow-y-auto font-mono text-xs space-y-1">
+      {/* Log */}
+      <div className={`rounded-xl p-3.5 ${card}`}>
+        <h3 className={`mb-2 text-[11px] font-semibold uppercase tracking-wider ${muted}`}>Log</h3>
+        <div className={`max-h-28 space-y-1 overflow-y-auto rounded-lg p-2.5 font-mono text-[11px] leading-relaxed ${dark ? 'bg-black/30' : 'bg-slate-50'}`}>
           {logs.map((log, i) => (
             <div
               key={i}
-              className={`${
-                log.direction === 'in' ? 'text-green-300' :
-                log.direction === 'out' ? 'text-blue-300' :
-                'text-white/70'
-              }`}
+              className={
+                log.direction === 'in'
+                  ? dark ? 'text-emerald-300' : 'text-emerald-600'
+                  : log.direction === 'out'
+                  ? dark ? 'text-sky-300' : 'text-sky-600'
+                  : muted
+              }
             >
               {log.direction === 'in' && '← '}
               {log.direction === 'out' && '→ '}
               {log.message}
             </div>
           ))}
-          {logs.length === 0 && (
-            <div className="text-white/50">Waiting...</div>
-          )}
+          {logs.length === 0 && <div className={muted}>Waiting…</div>}
         </div>
       </div>
     </div>
