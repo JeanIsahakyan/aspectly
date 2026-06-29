@@ -177,6 +177,25 @@ export function Changelog() {
                       </a>
                     </>
                   )}
+                  {release.version >= '2.1.0' && (
+                    <>
+                      <a href={`https://central.sonatype.com/artifact/io.github.jeanisahakyan/aspectly-bridge/${release.version}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-orange-500/10 text-orange-600 dark:text-orange-400 hover:bg-orange-500/20 transition-colors">
+                        Maven Central
+                      </a>
+                      <a href="https://cocoapods.org/pods/AspectlyBridge" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-500/20 transition-colors">
+                        CocoaPods
+                      </a>
+                      <a href={`https://pub.dev/packages/aspectly_bridge/versions/${release.version}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-600 dark:text-sky-400 hover:bg-sky-500/20 transition-colors">
+                        pub.dev
+                      </a>
+                      <a href={`https://pypi.org/project/aspectly-bridge/${release.version}/`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 hover:bg-yellow-500/20 transition-colors">
+                        PyPI
+                      </a>
+                      <a href="https://github.com/JeanIsahakyan/aspectly?tab=readme-ov-file#supported-platforms" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-orange-600/10 text-orange-700 dark:text-orange-300 hover:bg-orange-600/20 transition-colors">
+                        SwiftPM
+                      </a>
+                    </>
+                  )}
                 </div>
                 <ul className="space-y-2">
                   {release.changes.map((change, i) => (
