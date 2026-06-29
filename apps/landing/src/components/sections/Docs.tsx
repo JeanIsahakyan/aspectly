@@ -34,48 +34,50 @@ const docs = [
 
 export function Docs() {
   return (
-    <section id="docs" className="py-16 lg:py-20 bg-muted/30">
-      <div className="container px-4 mx-auto">
+    <section id="docs" className="relative py-20 lg:py-28">
+      <div className="container mx-auto px-4">
         <BlurFade delay={0.1} inView>
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+          <div className="mx-auto max-w-2xl text-center mb-14">
+            <span className="inline-flex items-center gap-2 rounded-full glass px-3 py-1 text-xs font-medium text-muted-foreground">
               Documentation
+            </span>
+            <h2 className="mt-5 font-display text-3xl font-semibold sm:text-4xl lg:text-5xl">
+              Everything you need to go deeper
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Everything you need to get started and go deeper.
+            <p className="mt-4 text-pretty text-lg leading-relaxed text-muted-foreground">
+              Reference, examples, and guides to take you from first call to production.
             </p>
           </div>
         </BlurFade>
 
-        <BlurFade delay={0.2} inView>
-          <div className="max-w-4xl mx-auto grid sm:grid-cols-2 gap-4">
-            {docs.map((doc) => {
-              const Icon = doc.icon
-              return (
+        <div className="mx-auto grid max-w-4xl gap-5 sm:grid-cols-2">
+          {docs.map((doc, i) => {
+            const Icon = doc.icon
+            return (
+              <BlurFade key={doc.title} delay={0.15 + i * 0.08} inView>
                 <a
-                  key={doc.title}
                   href={doc.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group flex items-start gap-4 p-5 rounded-xl border bg-background hover:border-primary/30 hover:shadow-sm transition-all"
+                  className="group flex h-full items-start gap-4 rounded-2xl border border-border bg-card p-6 shadow-soft transition-shadow hover:shadow-lift"
                 >
-                  <div className={`p-2.5 rounded-lg shrink-0 ${doc.color}`}>
+                  <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${doc.color}`}>
                     <Icon className="h-5 w-5" />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold mb-1 flex items-center gap-2">
+                  <div className="min-w-0 flex-1">
+                    <h3 className="flex items-center gap-2 font-display text-lg font-semibold text-foreground">
                       {doc.title}
-                      <ArrowRight className="h-4 w-4 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                      <ArrowRight className="h-4 w-4 -translate-x-1 text-primary opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
                     </h3>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="mt-1.5 text-pretty text-sm leading-relaxed text-muted-foreground">
                       {doc.description}
                     </p>
                   </div>
                 </a>
-              )
-            })}
-          </div>
-        </BlurFade>
+              </BlurFade>
+            )
+          })}
+        </div>
       </div>
     </section>
   )

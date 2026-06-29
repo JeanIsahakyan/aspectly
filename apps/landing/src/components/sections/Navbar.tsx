@@ -7,8 +7,7 @@ import { cn } from '../../utils/utils'
 const navLinks = [
   { name: 'Features', href: '#features' },
   { name: 'Demo', href: '#demo' },
-  { name: 'Installation', href: '#installation' },
-  { name: 'Examples', href: '#examples' },
+  { name: 'Get started', href: '#installation' },
   { name: 'Docs', href: '#docs' },
   { name: 'Changelog', href: '#changelog' },
 ]
@@ -31,7 +30,7 @@ export function Navbar() {
       className={cn(
         'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
         isScrolled
-          ? 'bg-background/80 backdrop-blur-lg border-b shadow-sm'
+          ? 'glass border-b shadow-soft'
           : 'bg-transparent'
       )}
     >
@@ -39,10 +38,10 @@ export function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="flex items-center gap-2 cursor-pointer">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
-              <span className="text-white font-bold text-lg">A</span>
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary shadow-soft">
+              <span className="font-display text-lg font-semibold text-primary-foreground">A</span>
             </div>
-            <span className="text-xl font-bold">Aspectly</span>
+            <span className="font-display text-xl font-semibold tracking-tight">Aspectly</span>
           </a>
 
           {/* Desktop Navigation */}

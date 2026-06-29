@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ChevronDown } from 'lucide-react'
 import { BlurFade } from '../reactbits'
+import { BrandIcon } from '../ui/brand-icon'
 
 const releases = [
   {
@@ -143,83 +144,157 @@ export function Changelog() {
   const visible = showAll ? releases : releases.slice(0, INITIAL_COUNT)
 
   return (
-    <section id="changelog" className="py-16 lg:py-20">
-      <div className="container px-4 mx-auto">
+    <section id="changelog" className="relative py-20 lg:py-28">
+      <div className="container mx-auto px-4">
         <BlurFade delay={0.1} inView>
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4">Changelog</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Recent releases and what changed.
+          <div className="mx-auto max-w-2xl text-center mb-14">
+            <span className="inline-flex items-center gap-2 rounded-full glass px-3 py-1 text-xs font-medium text-muted-foreground">
+              Release history
+            </span>
+            <h2 className="mt-5 font-display text-3xl font-semibold sm:text-4xl lg:text-5xl">
+              Changelog
+            </h2>
+            <p className="mt-4 text-pretty text-lg leading-relaxed text-muted-foreground">
+              Recent releases and what changed across every platform.
             </p>
           </div>
         </BlurFade>
 
         <BlurFade delay={0.2} inView>
-          <div className="max-w-2xl mx-auto space-y-6">
-            {visible.map((release) => (
-              <div key={release.version} className="relative pl-6 border-l-2 border-border">
-                <div className="absolute -left-2 top-0 w-4 h-4 rounded-full bg-primary" />
-                <div className="flex items-baseline gap-3 mb-1">
-                  <h3 className="text-xl font-bold">v{release.version}</h3>
-                  <span className="text-sm text-muted-foreground">{release.date}</span>
-                </div>
-                <div className="flex flex-wrap gap-2 mb-3">
-                  <a href={`https://github.com/JeanIsahakyan/aspectly/releases/tag/v${release.version}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-muted hover:bg-muted/80 text-muted-foreground transition-colors">
-                    GitHub
-                  </a>
-                  {release.version >= '2.0.0' && (
-                    <>
-                      <a href={`https://www.npmjs.com/package/@aspectly/core/v/${release.version}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-500/20 transition-colors">
-                        npm
-                      </a>
-                      <a href={`https://www.nuget.org/packages/Aspectly.Bridge/${release.version}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 hover:bg-purple-500/20 transition-colors">
-                        NuGet
-                      </a>
-                    </>
-                  )}
-                  {release.version >= '2.1.0' && (
-                    <>
-                      <a href={`https://central.sonatype.com/artifact/io.github.jeanisahakyan/aspectly-bridge/${release.version}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-orange-500/10 text-orange-600 dark:text-orange-400 hover:bg-orange-500/20 transition-colors">
-                        Maven Central
-                      </a>
-                      <a href="https://cocoapods.org/pods/AspectlyBridge" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-500/20 transition-colors">
-                        CocoaPods
-                      </a>
-                      <a href={`https://pub.dev/packages/aspectly_bridge/versions/${release.version}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-600 dark:text-sky-400 hover:bg-sky-500/20 transition-colors">
-                        pub.dev
-                      </a>
-                      <a href={`https://pypi.org/project/aspectly-bridge/${release.version}/`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 hover:bg-yellow-500/20 transition-colors">
-                        PyPI
-                      </a>
-                      <a href="https://github.com/JeanIsahakyan/aspectly?tab=readme-ov-file#supported-platforms" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-orange-600/10 text-orange-700 dark:text-orange-300 hover:bg-orange-600/20 transition-colors">
-                        SwiftPM
-                      </a>
-                    </>
-                  )}
-                </div>
-                <ul className="space-y-2">
-                  {release.changes.map((change, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm">
-                      <span className="text-xs text-muted-foreground/50 font-mono shrink-0 mt-0.5 w-20">{change.date}</span>
-                      <span
-                        className={`px-1.5 py-0.5 rounded text-xs font-medium shrink-0 mt-0.5 ${typeColors[change.type] || ''}`}
+          <div className="relative mx-auto max-w-2xl">
+            {/* vertical timeline rail */}
+            <div className="absolute left-2 top-2 bottom-2 w-px bg-border sm:left-2.5" aria-hidden="true" />
+
+            <div className="space-y-8">
+              {visible.map((release) => (
+                <div key={release.version} className="relative pl-10 sm:pl-12">
+                  {/* timeline node */}
+                  <span
+                    className="absolute left-0 top-1.5 flex h-5 w-5 items-center justify-center rounded-full border border-border bg-card shadow-soft"
+                    aria-hidden="true"
+                  >
+                    <span className="h-2 w-2 rounded-full bg-primary" />
+                  </span>
+
+                  <div className="rounded-2xl border border-border bg-card p-6 shadow-soft transition-shadow hover:shadow-lift">
+                    <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                      <h3 className="font-display text-xl font-semibold tracking-tight">
+                        v{release.version}
+                      </h3>
+                      <span className="font-mono text-xs text-muted-foreground">{release.date}</span>
+                    </div>
+
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      <a
+                        href={`https://github.com/JeanIsahakyan/aspectly/releases/tag/v${release.version}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted"
                       >
-                        {typeLabels[change.type] || change.type}
-                      </span>
-                      <span className="text-muted-foreground">{change.text}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+                        GitHub
+                      </a>
+                      {release.version >= '2.0.0' && (
+                        <>
+                          <a
+                            href={`https://www.npmjs.com/package/@aspectly/core/v/${release.version}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 rounded-full border border-border bg-red-500/10 px-3 py-1 text-xs font-medium text-red-600 transition-colors hover:bg-red-500/20 dark:text-red-400"
+                          >
+                            <BrandIcon name="npm" className="h-3 w-3" />
+                            npm
+                          </a>
+                          <a
+                            href={`https://www.nuget.org/packages/Aspectly.Bridge/${release.version}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 rounded-full border border-border bg-purple-500/10 px-3 py-1 text-xs font-medium text-purple-600 transition-colors hover:bg-purple-500/20 dark:text-purple-400"
+                          >
+                            <BrandIcon name="nuget" className="h-3 w-3" />
+                            NuGet
+                          </a>
+                        </>
+                      )}
+                      {release.version >= '2.1.0' && (
+                        <>
+                          <a
+                            href={`https://central.sonatype.com/artifact/io.github.jeanisahakyan/aspectly-bridge/${release.version}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 rounded-full border border-border bg-orange-500/10 px-3 py-1 text-xs font-medium text-orange-600 transition-colors hover:bg-orange-500/20 dark:text-orange-400"
+                          >
+                            <BrandIcon name="maven central" className="h-3 w-3" />
+                            Maven Central
+                          </a>
+                          <a
+                            href="https://cocoapods.org/pods/AspectlyBridge"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 rounded-full border border-border bg-rose-500/10 px-3 py-1 text-xs font-medium text-rose-600 transition-colors hover:bg-rose-500/20 dark:text-rose-400"
+                          >
+                            <BrandIcon name="cocoapods" className="h-3 w-3" />
+                            CocoaPods
+                          </a>
+                          <a
+                            href={`https://pub.dev/packages/aspectly_bridge/versions/${release.version}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 rounded-full border border-border bg-sky-500/10 px-3 py-1 text-xs font-medium text-sky-600 transition-colors hover:bg-sky-500/20 dark:text-sky-400"
+                          >
+                            <BrandIcon name="pub.dev" className="h-3 w-3" />
+                            pub.dev
+                          </a>
+                          <a
+                            href={`https://pypi.org/project/aspectly-bridge/${release.version}/`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 rounded-full border border-border bg-yellow-500/10 px-3 py-1 text-xs font-medium text-yellow-700 transition-colors hover:bg-yellow-500/20 dark:text-yellow-400"
+                          >
+                            <BrandIcon name="pypi" className="h-3 w-3" />
+                            PyPI
+                          </a>
+                          <a
+                            href="https://github.com/JeanIsahakyan/aspectly?tab=readme-ov-file#supported-platforms"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 rounded-full border border-border bg-orange-600/10 px-3 py-1 text-xs font-medium text-orange-700 transition-colors hover:bg-orange-600/20 dark:text-orange-300"
+                          >
+                            <BrandIcon name="swiftpm" className="h-3 w-3" />
+                            SwiftPM
+                          </a>
+                        </>
+                      )}
+                    </div>
+
+                    <ul className="mt-5 space-y-3 border-t border-border pt-4">
+                      {release.changes.map((change, i) => (
+                        <li key={i} className="flex flex-wrap items-start gap-x-3 gap-y-1 text-sm">
+                          <span
+                            className={`inline-flex shrink-0 items-center rounded-md px-2 py-0.5 text-xs font-medium ${typeColors[change.type] || ''}`}
+                          >
+                            {typeLabels[change.type] || change.type}
+                          </span>
+                          <span className="w-20 shrink-0 pt-0.5 font-mono text-xs text-muted-foreground/60">
+                            {change.date}
+                          </span>
+                          <span className="flex-1 text-pretty pt-0.5 leading-relaxed text-muted-foreground">
+                            {change.text}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </BlurFade>
 
         {!showAll && releases.length > INITIAL_COUNT && (
-          <div className="text-center mt-8">
+          <div className="mt-10 text-center">
             <button
               onClick={() => setShowAll(true)}
-              className="inline-flex items-center gap-1.5 text-sm font-medium px-4 py-2 rounded-full border border-border hover:bg-muted/50 transition-colors"
+              className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-5 py-2.5 text-sm font-medium shadow-soft transition-colors hover:bg-muted"
             >
               Show {releases.length - INITIAL_COUNT} older releases
               <ChevronDown className="h-4 w-4" />
@@ -228,12 +303,12 @@ export function Changelog() {
         )}
 
         <BlurFade delay={0.3} inView>
-          <div className="text-center mt-8">
+          <div className="mt-8 text-center">
             <a
               href="https://github.com/JeanIsahakyan/aspectly/blob/main/CHANGELOG.md"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-muted-foreground hover:text-primary transition-colors"
+              className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
             >
               View full changelog on GitHub
             </a>

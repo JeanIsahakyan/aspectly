@@ -3,9 +3,7 @@ import {
   Hero,
   Features,
   Installation,
-  Examples,
   LiveDemo,
-  LiveDemoWindow,
   Docs,
   Changelog,
   Footer,
@@ -13,15 +11,13 @@ import {
 
 function App() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="grain min-h-screen bg-background">
       <Navbar />
       <main>
         <Hero />
-        <Features />
         <LiveDemo />
-        <LiveDemoWindow />
+        <Features />
         <Installation />
-        <Examples />
         <Docs />
         <Changelog />
       </main>
