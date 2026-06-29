@@ -7,7 +7,7 @@ plugins {
 }
 
 allprojects {
-    group = "com.aspectly"
+    group = "io.github.jeanisahakyan"
     // Overridable from CI: `gradle publish -PreleaseVersion=2.1.0`
     version = (findProperty("releaseVersion") as String?) ?: "2.1.0"
 }
@@ -28,9 +28,12 @@ subprojects {
                     }
                 }
                 maven {
+                    // Central Portal via the OSSRH Staging API compatibility service
+                    // (legacy s01.oss.sonatype.org was sunset on 2025-06-30). Credentials
+                    // are a Central Portal user token (central.sonatype.com -> Generate User Token).
                     name = "OSSRH"
-                    val releasesUrl = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-                    val snapshotsUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+                    val releasesUrl = uri("https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/")
+                    val snapshotsUrl = uri("https://central.sonatype.com/repository/maven-snapshots/")
                     url = if (version.toString().endsWith("SNAPSHOT")) snapshotsUrl else releasesUrl
                     credentials {
                         username = (findProperty("ossrhUsername") as String?) ?: System.getenv("OSSRH_USERNAME")

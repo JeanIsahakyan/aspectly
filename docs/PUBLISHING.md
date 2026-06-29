@@ -13,7 +13,7 @@ ecosystem manually with the commands below.
 | NuGet | `Aspectly.Bridge`, `Aspectly.Bridge.CefSharp`, `Aspectly.Bridge.WebView2` | nuget.org | `NUGET_API_KEY` |
 | Swift Package Manager | `AspectlyBridge`, `AspectlyBridgeWebKit` | the git tag itself | none (just tag) |
 | CocoaPods | `AspectlyBridge`, `AspectlyBridgeWebKit` | CocoaPods trunk | `COCOAPODS_TRUNK_TOKEN` |
-| Maven | `com.aspectly:aspectly-bridge`, `com.aspectly:aspectly-bridge-webview` | Maven Central (+ GitHub Packages) | `OSSRH_*`, `SIGNING_*` |
+| Maven | `io.github.jeanisahakyan:aspectly-bridge`, `io.github.jeanisahakyan:aspectly-bridge-webview` | Maven Central (+ GitHub Packages) | `OSSRH_*`, `SIGNING_*` |
 | pub.dev (Dart/Flutter) | `aspectly_bridge` | pub.dev | OIDC trusted publisher (no secret) |
 | PyPI (Python) | `aspectly-bridge` | PyPI | OIDC trusted publisher (no secret) |
 
@@ -72,31 +72,35 @@ Update `s.version` in both podspecs (and the `s.dependency` in the WebKit
 podspec) to match the tag — the release workflow does this automatically.
 
 ### Maven Central (Android / Kotlin)
-The Gradle modules under `android/` are configured with `maven-publish` +
-`signing`. Validate locally first:
+Group ID **`io.github.jeanisahakyan`** (artifacts `aspectly-bridge`,
+`aspectly-bridge-webview`). The Gradle modules under `android/` use
+`maven-publish` + `signing`.
+
+> **Legacy OSSRH (`s01.oss.sonatype.org`) was sunset on 2025-06-30.** Publishing
+> now goes through the **Central Portal** via its **OSSRH Staging API**
+> compatibility service. The Gradle repo URL points at
+> `https://ossrh-staging-api.central.sonatype.com`.
+
+**One-time setup:**
+1. Register the namespace at https://central.sonatype.com/publishing/namespaces —
+   `io.github.jeanisahakyan` is verified by creating the GitHub repo Sonatype names.
+2. Generate a **Portal user token** at https://central.sonatype.com/account →
+   *Generate User Token* → use as `OSSRH_USERNAME` / `OSSRH_PASSWORD`.
+
+The release workflow then (a) stages with
+`publishAllPublicationsToOSSRHRepository`, then (b) finalizes + auto-releases by
+`POST`ing to the staging API's `manual/upload/defaultRepository/io.github.jeanisahakyan?publishing_type=automatic`.
+
+Validate locally first (no remote upload):
 
 ```bash
 cd android
 gradle publishToMavenLocal -PreleaseVersion=2.1.0
 ```
 
-Publish to Maven Central (Sonatype OSSRH) — requires the `OSSRH_*` and
-`SIGNING_*` credentials:
-
-```bash
-cd android
-gradle publishAllPublicationsToOSSRHRepository -PreleaseVersion=2.1.0 \
-  -PossrhUsername=… -PossrhPassword=… \
-  -PsigningKey="$(cat key.asc)" -PsigningPassword=…
-```
-
 GitHub Packages is also configured (repository name `GitHubPackages`); publish
 with `gradle publishAllPublicationsToGitHubPackagesRepository` and a
 `GITHUB_TOKEN`.
-
-> After OSSRH upload, complete the release in the Sonatype UI (or via the
-> Nexus staging plugin) — Central requires the staging repository to be closed
-> and released.
 
 ### NuGet (.NET)
 ```bash

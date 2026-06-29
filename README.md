@@ -29,7 +29,7 @@ version; the Swift package is consumed via the git tag / `2.1.0` CocoaPods).
 | .NET — CefSharp (Windows) | `Aspectly.Bridge.CefSharp` | 2.1.0 | NuGet | `dotnet add package Aspectly.Bridge.CefSharp` |
 | .NET — WebView2 (Windows) | `Aspectly.Bridge.WebView2` | 2.1.0 | NuGet | `dotnet add package Aspectly.Bridge.WebView2` |
 | iOS / macOS / visionOS | `AspectlyBridge`, `AspectlyBridgeWebKit` | 2.1.0 | SwiftPM · CocoaPods | `.package(url: "…/aspectly.git", from: "2.1.0")` · `pod 'AspectlyBridgeWebKit'` |
-| Android | `com.aspectly:aspectly-bridge(-webview)` | 2.1.0 | Maven Central | `implementation("com.aspectly:aspectly-bridge-webview:2.1.0")` |
+| Android | `io.github.jeanisahakyan:aspectly-bridge(-webview)` | 2.1.0 | Maven Central | `implementation("io.github.jeanisahakyan:aspectly-bridge-webview:2.1.0")` |
 | Flutter (Dart) | `aspectly_bridge` | 2.1.0 | pub.dev | `flutter pub add aspectly_bridge` |
 | Linux / WebKitGTK (Python) | `aspectly-bridge` | 2.1.0 | PyPI | `pip install "aspectly-bridge[webkitgtk]"` |
 
@@ -304,7 +304,7 @@ dotnet add package Aspectly.Bridge.WebView2
 
 ```kotlin
 // Android app (Gradle)
-implementation("com.aspectly:aspectly-bridge-webview:2.1.0")
+implementation("io.github.jeanisahakyan:aspectly-bridge-webview:2.1.0")
 ```
 
 ```yaml

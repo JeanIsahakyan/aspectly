@@ -84,7 +84,7 @@ jobs:
         with:
           gradle-version: '8.10'
 
-      - name: Publish Android to Maven Central
+      - name: Publish Android to Maven Central (Central Portal staging)
         working-directory: android
         run: gradle publishAllPublicationsToOSSRHRepository -PreleaseVersion="${VERSION}" --no-daemon
         env:
@@ -92,6 +92,18 @@ jobs:
           OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
           SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
           SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+
+      - name: Release the Central Portal staging deployment
+        # The OSSRH Staging API only stages the upload; finalize + auto-release it
+        # to Maven Central. publishing_type=automatic releases if validation passes.
+        run: |
+          AUTH=$(printf '%s:%s' "${OSSRH_USERNAME}" "${OSSRH_PASSWORD}" | base64 -w 0)
+          curl -sS -f -X POST \
+            -H "Authorization: Bearer ${AUTH}" \
+            "https://ossrh-staging-api.central.sonatype.com/manual/upload/defaultRepository/io.github.jeanisahakyan?publishing_type=automatic"
+        env:
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
 
       # Note: the Swift package is consumed via Swift Package Manager directly
       # from the git tag (no registry publish needed). CocoaPods publishing is

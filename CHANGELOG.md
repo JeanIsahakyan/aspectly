@@ -21,9 +21,9 @@ across Web, React Native, .NET, Apple, and Android hosts.
 
 ### Added — Android (Kotlin)
 - New Gradle modules:
-  - `com.aspectly:aspectly-bridge` — pure Kotlin/JVM core (`BridgeHost`,
+  - `io.github.jeanisahakyan:aspectly-bridge` — pure Kotlin/JVM core (`BridgeHost`,
     coroutine-based, Gson serialization)
-  - `com.aspectly:aspectly-bridge-webview` — `AndroidWebViewBrowserBridge` for
+  - `io.github.jeanisahakyan:aspectly-bridge-webview` — `AndroidWebViewBrowserBridge` for
     Android `WebView`
 - Maven publishing (Maven Central + GitHub Packages) and a JUnit test suite
 - `examples/android` sample app; verified at runtime on an Android emulator

@@ -208,7 +208,7 @@ The same `@aspectly/core` web code talks to native hosts on every supported plat
 - **Web** (iframe/popup), **React Native**, and **React Native Web/Expo** — npm packages
 - **.NET** (CefSharp / WebView2, Windows) — NuGet
 - **iOS/macOS/visionOS** — SwiftPM + CocoaPods (`AspectlyBridge`, `AspectlyBridgeWebKit`)
-- **Android** — Maven Central (`com.aspectly:aspectly-bridge-webview`)
+- **Android** — Maven Central (`io.github.jeanisahakyan:aspectly-bridge-webview`)
 - **Flutter** (Dart) — pub.dev (`aspectly_bridge`)
 - **Linux/WebKitGTK** (Python) — PyPI (`aspectly-bridge`, reuses the WebKit transport)
 

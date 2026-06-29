@@ -33,6 +33,6 @@ android {
 
 dependencies {
     // Resolved from the included build (../../android) via composite build.
-    implementation("com.aspectly:aspectly-bridge-webview")
+    implementation("io.github.jeanisahakyan:aspectly-bridge-webview")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 }

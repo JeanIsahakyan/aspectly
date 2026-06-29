@@ -69,15 +69,15 @@ const swiftPackages = [
 
 const androidPackages = [
   {
-    name: 'com.aspectly:aspectly-bridge-webview',
+    name: 'io.github.jeanisahakyan:aspectly-bridge-webview',
     description: 'Android WebView bridge (pulls in the core)',
-    install: 'implementation("com.aspectly:aspectly-bridge-webview:2.1.0")',
+    install: 'implementation("io.github.jeanisahakyan:aspectly-bridge-webview:2.1.0")',
     useCase: 'Gradle (Kotlin DSL) — Android WebView integration',
   },
   {
-    name: 'com.aspectly:aspectly-bridge',
+    name: 'io.github.jeanisahakyan:aspectly-bridge',
     description: 'Core bridge — pure Kotlin/JVM, no Android deps',
-    install: 'implementation("com.aspectly:aspectly-bridge:2.1.0")',
+    install: 'implementation("io.github.jeanisahakyan:aspectly-bridge:2.1.0")',
     useCase: 'Gradle — core library only',
   },
 ]

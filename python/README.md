@@ -86,7 +86,7 @@ Aspectly protocol ships for Web (`@aspectly/web`), React Native
 (`@aspectly/react-native`), React Native Web/Expo
 (`@aspectly/react-native-web`), .NET CefSharp/WebView2
 (`Aspectly.Bridge.CefSharp` / `Aspectly.Bridge.WebView2`), iOS/macOS/visionOS
-(`AspectlyBridge`), Android (`com.aspectly:aspectly-bridge`), and Flutter
+(`AspectlyBridge`), Android (`io.github.jeanisahakyan:aspectly-bridge`), and Flutter
 (`aspectly_bridge`) — all at version **2.1.0**. See the
 [repository README](../README.md) for the full platform matrix.
 

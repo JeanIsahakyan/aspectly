@@ -15,7 +15,7 @@ The Aspectly library has been restructured into a monorepo with multiple focused
 
 > This guide covers the JavaScript packages only. The native host bridges — .NET
 > (`Aspectly.Bridge.*`), Swift/iOS/macOS/visionOS (`AspectlyBridge`), Android
-> (`com.aspectly:aspectly-bridge`), Flutter (`aspectly_bridge`), and Python /
+> (`io.github.jeanisahakyan:aspectly-bridge`), Flutter (`aspectly_bridge`), and Python /
 > WebKitGTK (`aspectly-bridge`) — are new in the 2.x line and have no `chirp`
 > predecessor, so there is nothing to migrate. See
 > [`EXAMPLES.md`](./EXAMPLES.md) and the per-platform guides to adopt them.

@@ -17,7 +17,7 @@ Welcome to the Aspectly framework documentation! This guide will help you unders
 
 ### Per-Platform Guides
 - **[Swift (iOS/macOS/visionOS)](../swift)** - `AspectlyBridge` / `AspectlyBridgeWebKit` for WKWebView + SwiftUI
-- **[Android (Kotlin)](../android)** - `com.aspectly:aspectly-bridge(-webview)` for Android WebView
+- **[Android (Kotlin)](../android)** - `io.github.jeanisahakyan:aspectly-bridge(-webview)` for Android WebView
 - **[Dart (Flutter)](../dart)** - `aspectly_bridge` wrapping `webview_flutter`
 - **[Python (Linux/WebKitGTK)](../python)** - `aspectly-bridge` for WebKitGTK / WKWebView-style hosts
 - **[.NET (Windows)](../dotnet)** - `Aspectly.Bridge.CefSharp` / `Aspectly.Bridge.WebView2`
@@ -86,7 +86,7 @@ Aspectly ships **8 platform families**, all at version **2.1.0**:
 | Transports | `@aspectly/transports` | npm | `npm i @aspectly/transports` |
 | .NET CefSharp/WebView2 (Windows) | `Aspectly.Bridge.CefSharp`, `Aspectly.Bridge.WebView2` | NuGet | `dotnet add package Aspectly.Bridge.WebView2` |
 | iOS/macOS/visionOS | `AspectlyBridge`, `AspectlyBridgeWebKit` | SwiftPM + CocoaPods | `.package(url: "…/aspectly.git", from: "2.1.0")` or `pod 'AspectlyBridgeWebKit'` |
-| Android | `com.aspectly:aspectly-bridge(-webview)` | Maven Central | `implementation("com.aspectly:aspectly-bridge-webview:2.1.0")` |
+| Android | `io.github.jeanisahakyan:aspectly-bridge(-webview)` | Maven Central | `implementation("io.github.jeanisahakyan:aspectly-bridge-webview:2.1.0")` |
 | Flutter (Dart) | `aspectly_bridge` | pub.dev | `flutter pub add aspectly_bridge` (`aspectly_bridge: ^2.1.0`) |
 | Linux/WebKitGTK (Python) | `aspectly-bridge` | PyPI | `pip install "aspectly-bridge[webkitgtk]"` |
 

@@ -65,7 +65,7 @@ version **2.1.0**). The same protocol ships for:
 - **React Native Web / Expo** — `@aspectly/react-native-web` (npm)
 - **.NET (CefSharp/WebView2, Windows)** — `Aspectly.Bridge.CefSharp` / `Aspectly.Bridge.WebView2` (NuGet)
 - **iOS/macOS/visionOS** — `AspectlyBridge` + `AspectlyBridgeWebKit` (SwiftPM + CocoaPods)
-- **Android** — `com.aspectly:aspectly-bridge-webview` (Maven Central)
+- **Android** — `io.github.jeanisahakyan:aspectly-bridge-webview` (Maven Central)
 - **Flutter** — `aspectly_bridge` (pub.dev)
 - **Python (Linux/WebKitGTK)** — `aspectly-bridge` (PyPI)
 

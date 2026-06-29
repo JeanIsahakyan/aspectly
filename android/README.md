@@ -24,8 +24,8 @@ From [Maven Central](https://central.sonatype.com/), add to your `build.gradle.k
 
 ```kotlin
 dependencies {
-    implementation("com.aspectly:aspectly-bridge:2.1.0")
-    implementation("com.aspectly:aspectly-bridge-webview:2.1.0")
+    implementation("io.github.jeanisahakyan:aspectly-bridge:2.1.0")
+    implementation("io.github.jeanisahakyan:aspectly-bridge-webview:2.1.0")
 }
 ```
 
@@ -33,8 +33,8 @@ Or with Groovy `build.gradle`:
 
 ```groovy
 dependencies {
-    implementation 'com.aspectly:aspectly-bridge:2.1.0'
-    implementation 'com.aspectly:aspectly-bridge-webview:2.1.0'
+    implementation 'io.github.jeanisahakyan:aspectly-bridge:2.1.0'
+    implementation 'io.github.jeanisahakyan:aspectly-bridge-webview:2.1.0'
 }
 ```
 

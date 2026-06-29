@@ -61,7 +61,7 @@ afterEvaluate {
                         developer {
                             id.set("JeanIsahakyan")
                             name.set("Zhan Isaakian")
-                            email.set("jeanisahkyan@gmail.com")
+                            email.set("jeanisahakyan@gmail.com")
                         }
                     }
                     scm {
