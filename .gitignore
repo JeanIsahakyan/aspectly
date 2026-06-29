@@ -74,6 +74,9 @@ dist/
 # .NET
 bin/
 obj/
+nupkgs/
+*.nupkg
+*.snupkg
 
 # Swift / SwiftPM
 .build/
