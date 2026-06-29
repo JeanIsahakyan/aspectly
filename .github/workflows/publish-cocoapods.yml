@@ -1,0 +1,73 @@
+name: Publish CocoaPods (manual)
+
+# Manual one-shot publisher for the CocoaPods pods. Useful when a release run's
+# CocoaPods step failed mid-way (e.g. AspectlyBridge published but the dependent
+# AspectlyBridgeWebKit failed on CDN-propagation lag). Idempotent: each pod is
+# skipped if its version is already on trunk, so re-running is safe.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish (without the leading v)'
+        required: true
+        default: '2.1.0'
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Set podspec versions from input
+        run: |
+          V="${{ inputs.version }}"
+          sed -i '' "s/s\.version *= *'[^']*'/s.version          = '${V}'/" AspectlyBridge.podspec
+          sed -i '' "s/s\.version *= *'[^']*'/s.version          = '${V}'/" AspectlyBridgeWebKit.podspec
+          sed -i '' "s/s\.dependency 'AspectlyBridge', '[^']*'/s.dependency 'AspectlyBridge', '${V}'/" AspectlyBridgeWebKit.podspec
+
+      - name: Ensure a visionOS simulator exists (podspec declares visionOS)
+        run: |
+          if ! xcrun simctl list devices visionOS 2>/dev/null | grep -qiE "Vision"; then
+            RT=$(xcrun simctl list runtimes visionOS 2>/dev/null | grep -oE "com.apple.CoreSimulator.SimRuntime.xrOS-[0-9-]+" | head -1)
+            DT=$(xcrun simctl list devicetypes 2>/dev/null | grep -oE "com.apple.CoreSimulator.SimDeviceType.Apple-Vision-Pro" | head -1)
+            if [ -n "$RT" ] && [ -n "$DT" ]; then xcrun simctl create "Apple Vision Pro" "$DT" "$RT" || true; fi
+          fi
+          xcrun simctl list devices visionOS || true
+
+      - name: Push AspectlyBridge to trunk (skip if already published)
+        run: |
+          V="${{ inputs.version }}"
+          on_trunk() { curl -s "https://trunk.cocoapods.org/api/v1/pods/$1" | python3 -c "import sys,json;v='${V}';sys.exit(0 if any(x.get('name')==v for x in json.load(sys.stdin).get('versions',[])) else 1)" 2>/dev/null; }
+          if on_trunk AspectlyBridge; then
+            echo "AspectlyBridge ${V} already on trunk — skipping."
+          else
+            pod trunk push AspectlyBridge.podspec --allow-warnings --synchronous
+          fi
+        env:
+          COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
+
+      - name: Push AspectlyBridgeWebKit to trunk (skip if published, retry on CDN lag)
+        run: |
+          V="${{ inputs.version }}"
+          on_trunk() { curl -s "https://trunk.cocoapods.org/api/v1/pods/$1" | python3 -c "import sys,json;v='${V}';sys.exit(0 if any(x.get('name')==v for x in json.load(sys.stdin).get('versions',[])) else 1)" 2>/dev/null; }
+          for i in 1 2 3 4 5 6; do
+            if on_trunk AspectlyBridgeWebKit; then
+              echo "AspectlyBridgeWebKit ${V} already on trunk — done."; exit 0
+            fi
+            pod repo update 2>/dev/null || true
+            if pod trunk push AspectlyBridgeWebKit.podspec --allow-warnings; then
+              echo "AspectlyBridgeWebKit published"; exit 0
+            fi
+            echo "attempt $i failed (AspectlyBridge not propagated to CDN yet) — waiting 60s"
+            sleep 60
+          done
+          echo "AspectlyBridgeWebKit push failed after retries"; exit 1
+        env:
+          COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
