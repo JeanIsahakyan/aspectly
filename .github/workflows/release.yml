@@ -140,12 +140,36 @@ jobs:
           sed -i '' "s/s\.dependency 'AspectlyBridge', '[^']*'/s.dependency 'AspectlyBridge', '${VERSION}'/" AspectlyBridgeWebKit.podspec
 
       - name: Push AspectlyBridge to CocoaPods trunk
-        run: pod trunk push AspectlyBridge.podspec --allow-warnings --synchronous
+        # Idempotent: skip if this version is already on trunk (e.g. a re-run).
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          on_trunk() { curl -s "https://trunk.cocoapods.org/api/v1/pods/$1" | python3 -c "import sys,json;v='${VERSION}';sys.exit(0 if any(x.get('name')==v for x in json.load(sys.stdin).get('versions',[])) else 1)" 2>/dev/null; }
+          if on_trunk AspectlyBridge; then
+            echo "AspectlyBridge ${VERSION} already on trunk — skipping."; exit 0
+          fi
+          pod trunk push AspectlyBridge.podspec --allow-warnings --synchronous
         env:
           COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
 
       - name: Push AspectlyBridgeWebKit to CocoaPods trunk
-        run: pod trunk push AspectlyBridgeWebKit.podspec --allow-warnings
+        # AspectlyBridgeWebKit depends on AspectlyBridge (= version) just pushed;
+        # the CocoaPods CDN can lag several minutes before the dependency resolves.
+        # Skip if already published, otherwise refresh the spec repo and retry.
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          on_trunk() { curl -s "https://trunk.cocoapods.org/api/v1/pods/$1" | python3 -c "import sys,json;v='${VERSION}';sys.exit(0 if any(x.get('name')==v for x in json.load(sys.stdin).get('versions',[])) else 1)" 2>/dev/null; }
+          for i in 1 2 3 4 5 6 7 8; do
+            if on_trunk AspectlyBridgeWebKit; then
+              echo "AspectlyBridgeWebKit ${VERSION} already on trunk — done."; exit 0
+            fi
+            pod repo update 2>/dev/null || true
+            if pod trunk push AspectlyBridgeWebKit.podspec --allow-warnings; then
+              echo "AspectlyBridgeWebKit published"; exit 0
+            fi
+            echo "attempt $i failed (AspectlyBridge not propagated to CDN yet) — waiting 90s"
+            sleep 90
+          done
+          echo "AspectlyBridgeWebKit push failed after retries"; exit 1
         env:
           COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
 
