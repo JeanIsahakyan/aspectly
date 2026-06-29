@@ -181,6 +181,7 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: python/dist
+          skip-existing: true
 
   # Dart / Flutter -> pub.dev (OIDC automated publishing — NO secret needed).
   # One-time setup: on pub.dev enable Automated publishing for `aspectly_bridge`
@@ -200,10 +201,15 @@ jobs:
       - name: Setup Dart
         uses: dart-lang/setup-dart@v1
 
-      - name: Sync version from tag + publish
+      - name: Sync version from tag + publish (skip if already on pub.dev)
         working-directory: dart
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
+          CODE=$(curl -s -o /dev/null -w '%{http_code}' "https://pub.dev/api/packages/aspectly_bridge/versions/${VERSION}")
+          if [ "$CODE" = "200" ]; then
+            echo "aspectly_bridge ${VERSION} is already published on pub.dev — skipping."
+            exit 0
+          fi
           sed -i "s/^version: .*/version: ${VERSION}/" pubspec.yaml
           dart pub get
           dart pub publish --force
