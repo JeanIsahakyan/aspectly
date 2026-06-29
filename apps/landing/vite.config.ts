@@ -11,7 +11,7 @@ const corePkg = JSON.parse(readFileSync(resolve(__dirname, '../../packages/core/
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  base: '/aspectly/',
+  base: '/',
   build: {
     rollupOptions: {
       input: {
