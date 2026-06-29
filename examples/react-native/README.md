@@ -44,8 +44,8 @@ All platforms use the same API and React component!
 
 The example uses different URLs based on platform:
 
-- **Web**: `http://localhost:3001`
-- **Android Emulator**: `http://10.0.2.2:3001` (maps to host machine)
+- **Web**: `http://localhost:3001/index.html`
+- **Android Emulator**: `http://10.0.2.2:3001/index.html` (maps to host machine)
 - **iOS Simulator**: Use your machine's IP address
 - **Physical Device**: Use your machine's IP address on local network
 
@@ -71,10 +71,14 @@ examples/react-native/
 
 ## Native Setup (Optional)
 
-For running on physical iOS devices:
+This is a **managed Expo** project, so there is no `ios/` or `android/` directory
+checked in. `pnpm ios` / `pnpm android` build through Expo. If you need the bare
+native projects (e.g. to add a CocoaPods dependency on a physical device),
+generate them first with prebuild:
 
 ```bash
-cd ios && pod install
+npx expo prebuild        # generates ios/ and android/
+cd ios && pod install    # iOS CocoaPods (after prebuild)
 ```
 
 For Android, no additional setup is required.

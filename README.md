@@ -1,6 +1,6 @@
 # Aspectly
 
-A powerful, type-safe communication bridge framework for React Native, Web, and iframes.
+A powerful, type-safe communication bridge framework for React Native, Web, iframes, .NET desktop, **iOS/macOS (Swift)**, **Android (Kotlin)**, **Flutter (Dart)**, and **Linux/WebKitGTK (Python)**.
 
 [![GitHub stars](https://img.shields.io/github/stars/JeanIsahakyan/aspectly?style=flat-square&logo=github)](https://github.com/JeanIsahakyan/aspectly)
 [![npm version](https://img.shields.io/npm/v/@aspectly/core?style=flat-square&logo=npm&color=cb3837)](https://www.npmjs.com/package/@aspectly/core)
@@ -11,10 +11,27 @@ A powerful, type-safe communication bridge framework for React Native, Web, and 
 
 ## Overview
 
-Aspectly enables seamless bidirectional communication between:
-- **React Native apps** and **WebViews**
-- **Web pages** and **iframes**
-- **Universal apps** (React Native Web / Expo) and embedded content
+Aspectly enables seamless, type-safe, bidirectional communication between
+embedded web content (iframe / WebView) and a native host — across **8 platform
+families**. The same `@aspectly/core` web content runs unchanged on every host.
+
+## Supported platforms
+
+All packages are at **v2.1.0** (the .NET packages publish at the release tag
+version; the Swift package is consumed via the git tag / `2.1.0` CocoaPods).
+
+| Platform | Package | Version | Registry | Install |
+|----------|---------|:-------:|----------|---------|
+| Web (iframe / popup) | `@aspectly/core`, `@aspectly/web` | 2.1.0 | npm | `npm i @aspectly/web` |
+| React Native | `@aspectly/react-native` | 2.1.0 | npm | `npm i @aspectly/react-native react-native-webview` |
+| React Native Web / Expo | `@aspectly/react-native-web` | 2.1.0 | npm | `npm i @aspectly/react-native-web` |
+| Transports (platform detection) | `@aspectly/transports` | 2.1.0 | npm | `npm i @aspectly/transports` |
+| .NET — CefSharp (Windows) | `Aspectly.Bridge.CefSharp` | 2.1.0 | NuGet | `dotnet add package Aspectly.Bridge.CefSharp` |
+| .NET — WebView2 (Windows) | `Aspectly.Bridge.WebView2` | 2.1.0 | NuGet | `dotnet add package Aspectly.Bridge.WebView2` |
+| iOS / macOS / visionOS | `AspectlyBridge`, `AspectlyBridgeWebKit` | 2.1.0 | SwiftPM · CocoaPods | `.package(url: "…/aspectly.git", from: "2.1.0")` · `pod 'AspectlyBridgeWebKit'` |
+| Android | `io.github.jeanisahakyan:aspectly-bridge(-webview)` | 2.1.0 | Maven Central | `implementation("io.github.jeanisahakyan:aspectly-bridge-webview:2.1.0")` |
+| Flutter (Dart) | `aspectly_bridge` | 2.1.0 | pub.dev | `flutter pub add aspectly_bridge` |
+| Linux / WebKitGTK (Python) | `aspectly-bridge` | 2.1.0 | PyPI | `pip install "aspectly-bridge[webkitgtk]"` |
 
 ## Packages
 
@@ -29,6 +46,15 @@ Aspectly enables seamless bidirectional communication between:
 | [`Aspectly.Bridge`](./dotnet/Aspectly.Bridge) | Core .NET bridge library |
 | [`Aspectly.Bridge.CefSharp`](./dotnet/Aspectly.Bridge.CefSharp) | CefSharp (Chromium) integration |
 | [`Aspectly.Bridge.WebView2`](./dotnet/Aspectly.Bridge.WebView2) | WebView2 (Edge) integration |
+| | |
+| [`AspectlyBridge`](./swift) (Swift) | Core Swift bridge — iOS & macOS |
+| [`AspectlyBridgeWebKit`](./swift) (Swift) | `WKWebView` bridge + SwiftUI `AspectlyWebView` |
+| | |
+| [`aspectly-bridge`](./android) (Kotlin) | Core Android bridge library |
+| [`aspectly-bridge-webview`](./android) (Kotlin) | Android `WebView` integration |
+| | |
+| [`aspectly_bridge`](./dart) (Dart) | Flutter / Dart bridge (`webview_flutter`) |
+| [`aspectly-bridge`](./python) (Python) | WebKitGTK bridge (Linux desktop) |
 
 ## Quick Start
 
@@ -148,6 +174,65 @@ await bridge.InitializeAsync(new Dictionary<string, Delegate>
 });
 ```
 
+### Scenario 5: iOS / macOS app with SwiftUI
+
+**Swift host app:**
+
+```swift
+import SwiftUI
+import AspectlyBridge
+import AspectlyBridgeWebKit
+
+struct ContentView: View {
+    @StateObject private var model = AspectlyWebViewModel(
+        url: URL(string: "https://webapp.example.com")!
+    )
+
+    var body: some View {
+        AspectlyWebView(model: model)
+            .onChange(of: model.isLoaded) { loaded in
+                guard loaded else { return }
+                Task {
+                    model.bridge.registerHandler("getDeviceInfo") { _ in
+                        DeviceInfo(platform: "iOS")
+                    }
+                    try await model.bridge.initialize()
+                    let result: GreetResult = try await model.bridge.send(
+                        "greet", params: GreetParams(name: "Native")
+                    )
+                }
+            }
+    }
+}
+```
+
+### Scenario 6: Android app with WebView
+
+**Kotlin host app:**
+
+```kotlin
+import com.aspectly.bridge.BridgeHost
+import com.aspectly.bridge.webview.AndroidWebViewBrowserBridge
+
+val browserBridge = AndroidWebViewBrowserBridge(webView)
+val bridge = BridgeHost(browserBridge)
+
+bridge.registerHandler("getDeviceInfo") { _ -> DeviceInfo("Android") }
+
+webView.webViewClient = object : WebViewClient() {
+    override fun onPageFinished(view: WebView?, url: String?) {
+        lifecycleScope.launch {
+            bridge.initialize()
+            val result: GreetResult = bridge.send("greet", GreetParams("Native"))
+        }
+    }
+}
+webView.loadUrl("https://webapp.example.com")
+```
+
+The web content inside the WebView is the **same** `@aspectly/core` code as every
+other scenario — the transport is auto-detected.
+
 ## Features
 
 - **Type-safe** - Full TypeScript support with generics
@@ -157,7 +242,7 @@ await bridge.InitializeAsync(new Dictionary<string, Delegate>
 - **Event-driven** - Subscribe to all bridge events
 - **Error handling** - Typed errors with detailed messages
 - **Timeout protection** - Configurable request timeouts
-- **Cross-platform** - JavaScript, TypeScript, and .NET support
+- **Cross-platform** - JavaScript, TypeScript, .NET, Swift (iOS/macOS), and Kotlin (Android) support
 
 ## Architecture
 
@@ -211,6 +296,28 @@ dotnet add package Aspectly.Bridge.CefSharp
 dotnet add package Aspectly.Bridge.WebView2
 ```
 
+```swift
+// iOS / macOS app (Swift Package Manager)
+.package(url: "https://github.com/JeanIsahakyan/aspectly.git", from: "2.1.0")
+// products: AspectlyBridge, AspectlyBridgeWebKit
+```
+
+```kotlin
+// Android app (Gradle)
+implementation("io.github.jeanisahakyan:aspectly-bridge-webview:2.1.0")
+```
+
+```yaml
+# Flutter / Dart app (pubspec.yaml)
+dependencies:
+  aspectly_bridge: ^2.1.0
+```
+
+```bash
+# Python WebKitGTK app (Linux)
+pip install "aspectly-bridge[webkitgtk]"
+```
+
 ## Error Handling
 
 ```typescript
@@ -244,6 +351,10 @@ See the [examples](./examples) directory:
 - [`examples/web`](./examples/web) - React app embedding an iframe
 - [`examples/react-native`](./examples/react-native) - Universal Expo app
 - [`examples/dotnet`](./examples/dotnet) - .NET desktop app with CefSharp
+- [`examples/swiftui`](./examples/swiftui) - iOS / macOS SwiftUI app
+- [`examples/android`](./examples/android) - Android app with WebView
+- [`examples/flutter`](./examples/flutter) - Flutter app with webview_flutter
+- [`examples/webkitgtk`](./examples/webkitgtk) - Python WebKitGTK app (Linux)
 
 ## Documentation
 
@@ -251,6 +362,9 @@ See the [examples](./examples) directory:
 - [Architecture](./docs/ARCHITECTURE.md)
 - [Examples](./docs/EXAMPLES.md)
 - [Migration Guide](./docs/MIGRATION.md)
+- [Publishing](./docs/PUBLISHING.md)
+
+Platform-specific guides: [Swift (iOS/macOS)](./swift) · [Android (Kotlin)](./android) · [Dart/Flutter](./dart) · [Python/WebKitGTK](./python) · [.NET](./dotnet)
 
 ## Development
 

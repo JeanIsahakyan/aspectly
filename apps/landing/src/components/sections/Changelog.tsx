@@ -1,6 +1,21 @@
+import { useState } from 'react'
+import { ChevronDown } from 'lucide-react'
 import { BlurFade } from '../reactbits'
 
 const releases = [
+  {
+    version: '2.1.0',
+    date: '06/22/2026',
+    changes: [
+      { type: 'feat', date: '06/22/2026', text: 'Swift bridge for iOS / macOS / visionOS — AspectlyBridge + AspectlyBridgeWebKit (WKWebView + SwiftUI)' },
+      { type: 'feat', date: '06/22/2026', text: 'Android bridge for Kotlin — aspectly-bridge + aspectly-bridge-webview (Android WebView)' },
+      { type: 'feat', date: '06/22/2026', text: 'Flutter (Dart) bridge — aspectly_bridge (webview_flutter) on pub.dev' },
+      { type: 'feat', date: '06/22/2026', text: 'Linux / WebKitGTK (Python) bridge — aspectly-bridge on PyPI' },
+      { type: 'feat', date: '06/22/2026', text: 'JS transports: webkit, android, and flutter for native host detection' },
+      { type: 'feat', date: '06/22/2026', text: 'Publishing to Swift Package Manager, CocoaPods, and Maven Central' },
+      { type: 'docs', date: '06/22/2026', text: 'examples/swiftui and examples/android sample apps; docs/PUBLISHING.md' },
+    ],
+  },
   {
     version: '2.0.15',
     date: '06/21/2026',
@@ -121,9 +136,14 @@ const typeLabels: Record<string, string> = {
   docs: 'docs',
 }
 
+const INITIAL_COUNT = 4
+
 export function Changelog() {
+  const [showAll, setShowAll] = useState(false)
+  const visible = showAll ? releases : releases.slice(0, INITIAL_COUNT)
+
   return (
-    <section id="changelog" className="py-24">
+    <section id="changelog" className="py-16 lg:py-20">
       <div className="container px-4 mx-auto">
         <BlurFade delay={0.1} inView>
           <div className="text-center mb-12">
@@ -135,8 +155,8 @@ export function Changelog() {
         </BlurFade>
 
         <BlurFade delay={0.2} inView>
-          <div className="max-w-2xl mx-auto space-y-8">
-            {releases.map((release) => (
+          <div className="max-w-2xl mx-auto space-y-6">
+            {visible.map((release) => (
               <div key={release.version} className="relative pl-6 border-l-2 border-border">
                 <div className="absolute -left-2 top-0 w-4 h-4 rounded-full bg-primary" />
                 <div className="flex items-baseline gap-3 mb-1">
@@ -175,6 +195,18 @@ export function Changelog() {
             ))}
           </div>
         </BlurFade>
+
+        {!showAll && releases.length > INITIAL_COUNT && (
+          <div className="text-center mt-8">
+            <button
+              onClick={() => setShowAll(true)}
+              className="inline-flex items-center gap-1.5 text-sm font-medium px-4 py-2 rounded-full border border-border hover:bg-muted/50 transition-colors"
+            >
+              Show {releases.length - INITIAL_COUNT} older releases
+              <ChevronDown className="h-4 w-4" />
+            </button>
+          </div>
+        )}
 
         <BlurFade delay={0.3} inView>
           <div className="text-center mt-8">

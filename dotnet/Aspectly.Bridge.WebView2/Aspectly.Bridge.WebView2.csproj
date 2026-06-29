@@ -8,7 +8,7 @@
     <UseWPF>true</UseWPF>
 
     <PackageId>Aspectly.Bridge.WebView2</PackageId>
-    <Version>0.1.0</Version>
+    <Version>2.1.0</Version>
     <Authors>Zhan Isaakian</Authors>
     <Description>WebView2 browser bridge for Aspectly - enables communication with JavaScript via Microsoft Edge WebView2</Description>
     <PackageTags>aspectly;bridge;webview2;edge;chromium</PackageTags>

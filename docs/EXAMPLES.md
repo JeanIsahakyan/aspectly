@@ -6,6 +6,10 @@ This document provides comprehensive examples of how to use the Aspectly framewo
 
 - [Basic WebView Communication](#basic-webview-communication)
 - [Web Iframe Communication](#web-iframe-communication)
+- [Native iOS / macOS (Swift)](#native-ios--macos-swift)
+- [Native Android (Kotlin)](#native-android-kotlin)
+- [Native Flutter (Dart)](#native-flutter-dart)
+- [Native Linux / WebKitGTK (Python)](#native-linux--webkitgtk-python)
 - [Data Exchange Patterns](#data-exchange-patterns)
 - [Error Handling Examples](#error-handling-examples)
 - [Event Monitoring](#event-monitoring)
@@ -371,6 +375,283 @@ function IframeContent() {
     </div>
   );
 }
+```
+
+## Native iOS / macOS (Swift)
+
+On Apple platforms the host is a `WKWebView`. The web content auto-detects it
+through the WebKit transport (`@aspectly/transports/webkit`, bundled in
+`@aspectly/core`), so the JavaScript side stays identical to every other
+platform. Import `AspectlyBridge` for the core protocol and
+`AspectlyBridgeWebKit` for the WebView integration.
+
+### SwiftUI App with AspectlyWebView
+
+`AspectlyWebView` + `AspectlyWebViewModel` mirror the React
+`useAspectlyWebView` hook's `[bridge, loaded]` return. Register handlers as soon
+as `model.isLoaded` becomes `true`, then call `initialize()`.
+
+```swift
+import SwiftUI
+import AspectlyBridge
+import AspectlyBridgeWebKit
+
+struct AddParams: Decodable { let a: Int; let b: Int }
+struct GreetParams: Encodable { let name: String }
+struct GreetResult: Decodable { let message: String }
+
+struct ContentView: View {
+    @StateObject private var model = AspectlyWebViewModel(
+        url: URL(string: "https://app.example.com")!
+    )
+
+    var body: some View {
+        AspectlyWebView(model: model)
+            .onChange(of: model.isLoaded) { loaded in
+                guard loaded else { return }
+                Task {
+                    // Register handlers JS can call (before initialize).
+                    model.bridge.registerHandler("ping") { _ in "pong" }
+                    model.bridge.registerHandler("add") { (p: AddParams) in p.a + p.b }
+
+                    // Run the handshake.
+                    try await model.bridge.initialize()
+
+                    // Call a method on the JS side.
+                    let result: GreetResult = try await model.bridge.send(
+                        "greet", params: GreetParams(name: "Native")
+                    )
+                    print(result.message)
+                }
+            }
+    }
+}
+```
+
+### Manual WKWebView (UIKit / AppKit)
+
+If you manage your own `WKWebView`, wrap it in a `WKWebViewBrowserBridge` and
+hand that to `BridgeHost` directly:
+
+```swift
+import WebKit
+import AspectlyBridge
+import AspectlyBridgeWebKit
+
+let bridge = BridgeHost(browserBridge: WKWebViewBrowserBridge(webView: webView))
+
+// Register handlers JS can call (before initialize).
+bridge.registerHandler("ping") { _ in "pong" }
+bridge.registerHandler("add") { (p: AddParams) in p.a + p.b }
+
+// Initialize the handshake, then call methods on the JS side.
+try await bridge.initialize()
+let result: GreetResult = try await bridge.send("greet", params: GreetParams(name: "Native"))
+```
+
+> Handler registration must happen **before** `initialize()`. Inspect
+> `bridge.supportedMethods` (JS-side methods), `bridge.registeredMethods`
+> (Swift-side handlers) and `bridge.isInitialized`, or hook
+> `bridge.onInitialized` for the handshake-complete event.
+
+### Error Handling
+
+`send` and handlers surface `BridgeError` — switch on its `errorType`:
+
+```swift
+do {
+    let result: GreetResult = try await model.bridge.send(
+        "greet", params: GreetParams(name: "Native")
+    )
+} catch let error as BridgeError {
+    switch error.errorType {
+    case .unsupportedMethod:        // method not registered on the other side
+    case .methodExecutionTimeout:   // handler didn't respond in time
+    case .rejected:                 // handler threw
+    case .bridgeNotAvailable:       // not initialized
+    }
+}
+```
+
+## Native Android (Kotlin)
+
+On Android the host is a `WebView`. The web content auto-detects it through the
+Android transport (`@aspectly/transports/android`, bundled in `@aspectly/core`),
+so the JavaScript side is unchanged. Import `BridgeHost` and
+`AndroidWebViewBrowserBridge`.
+
+### WebView App with BridgeHost
+
+Register handlers before the page finishes loading, then run the handshake from
+`WebViewClient.onPageFinished`. Raw handlers receive a `JsonElement`; typed
+handlers deserialize their params for you:
+
+```kotlin
+import com.aspectly.bridge.BridgeHost
+import com.aspectly.bridge.webview.AndroidWebViewBrowserBridge
+
+data class AddParams(val a: Int, val b: Int)
+data class GreetParams(val name: String)
+data class GreetResult(val message: String)
+
+val webView = WebView(context)
+val bridge = BridgeHost(AndroidWebViewBrowserBridge(webView))
+
+// Register handlers JS can call (before initialize).
+bridge.registerHandler("ping") { _ -> "pong" }
+bridge.registerTypedHandler<AddParams>("add") { p -> p.a + p.b }
+
+webView.webViewClient = object : WebViewClient() {
+    override fun onPageFinished(view: WebView?, url: String?) {
+        lifecycleScope.launch {
+            bridge.initialize()                                  // handshake
+            val result: GreetResult =
+                bridge.send("greet", GreetParams("Native"))      // call JS
+        }
+    }
+}
+webView.loadUrl("https://app.example.com")
+```
+
+> Inspect `bridge.supportedMethods` (JS-side methods),
+> `bridge.registeredMethods` (Kotlin-side handlers) and `bridge.isInitialized`,
+> or hook `bridge.onInitialized` for the handshake-complete event.
+
+### Error Handling
+
+`send` and handlers surface `BridgeException` — match on its `errorType`:
+
+```kotlin
+try {
+    val result: GreetResult = bridge.send("greet", GreetParams("Native"))
+} catch (e: BridgeException) {
+    when (e.errorType) {
+        BridgeErrorType.UNSUPPORTED_METHOD -> { /* method not registered */ }
+        BridgeErrorType.METHOD_EXECUTION_TIMEOUT -> { /* timed out */ }
+        BridgeErrorType.REJECTED -> { /* handler threw */ }
+        BridgeErrorType.BRIDGE_NOT_AVAILABLE -> { /* not initialized */ }
+    }
+}
+```
+
+## Native Flutter (Dart)
+
+On Flutter the host is a `webview_flutter` `WebViewController`. The web content
+auto-detects it through the Flutter transport (`@aspectly/transports/flutter`,
+bundled in `@aspectly/core`), so the JavaScript side loads `@aspectly/core`
+unchanged. Add the package with `flutter pub add aspectly_bridge`
+(`aspectly_bridge: ^2.1.0`) and hand a browser bridge wrapping your
+`WebViewController` to `BridgeHost`.
+
+### WebView App with BridgeHost
+
+Register handlers before the page finishes loading, then run the handshake once
+the controller has loaded the page. Handlers receive the decoded params:
+
+```dart
+import 'package:aspectly_bridge/aspectly_bridge.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+
+final controller = WebViewController();
+final browserBridge = /* browser bridge wrapping `controller` */;
+final bridge = BridgeHost(browserBridge);
+
+// Register handlers JS can call (before initialize).
+bridge.registerHandler('ping', (params) => 'pong');
+bridge.registerHandler('add', (params) => params['a'] + params['b']);
+bridge.registerHandler('greet', (params) => {'message': 'Hello ${params['name']}'});
+
+await controller.loadRequest(Uri.parse('https://app.example.com'));
+
+// Run the handshake, then call a method on the JS side.
+await bridge.initialize();
+final result = await bridge.send<Map>('updateStatus', {
+  'status': 'active',
+});
+```
+
+> Handler registration must happen **before** `initialize()`. Inspect
+> `bridge.supportedMethods` (JS-side methods), `bridge.registeredMethods`
+> (Dart-side handlers) and `bridge.isInitialized`, or hook
+> `bridge.onInitialized` for the handshake-complete event.
+
+### Error Handling
+
+`send` and handlers surface `BridgeException` — match on its `errorType`:
+
+```dart
+try {
+  final result = await bridge.send<Map>('greet', {'name': 'Native'});
+} on BridgeException catch (e) {
+  switch (e.errorType) {
+    case BridgeErrorType.unsupportedMethod:      // method not registered
+      break;
+    case BridgeErrorType.methodExecutionTimeout: // handler didn't respond in time
+      break;
+    case BridgeErrorType.rejected:               // handler threw
+      break;
+    case BridgeErrorType.bridgeNotAvailable:     // not initialized
+      break;
+  }
+}
+```
+
+## Native Linux / WebKitGTK (Python)
+
+On Linux the host is a WebKitGTK `WebView`. Because WebKitGTK exposes the same
+`window.webkit.messageHandlers.aspectly` mechanism as a `WKWebView`, the web
+content reuses the WebKit transport (`@aspectly/transports/webkit`, bundled in
+`@aspectly/core`) and auto-detects the host — so the JavaScript side loads
+`@aspectly/core` unchanged. Install with
+`pip install "aspectly-bridge[webkitgtk]"` and wrap your WebKitGTK `web_view` in
+a `WebKitGTKBrowserBridge`.
+
+### WebView App with BridgeHost
+
+The Python API uses futures: register handlers before the handshake, then
+resolve the futures returned by `initialize()` and `send()`:
+
+```python
+from aspectly_bridge import BridgeHost
+from aspectly_bridge.webkitgtk import WebKitGTKBrowserBridge
+
+bridge = BridgeHost(WebKitGTKBrowserBridge(web_view))
+
+# Register handlers JS can call (before initialize).
+bridge.register_handler("ping", lambda params: "pong")
+bridge.register_handler("add", lambda params: params["a"] + params["b"])
+bridge.register_handler("greet", lambda params: {"message": f"Hello {params['name']}"})
+
+web_view.load_uri("https://app.example.com")
+
+# Run the handshake, then call a method on the JS side.
+bridge.initialize().result()
+result = bridge.send("updateStatus", {"status": "active"}).result()
+```
+
+> Handler registration must happen **before** `initialize()`. Inspect
+> `bridge.supported_methods` (JS-side methods), `bridge.registered_methods`
+> (Python-side handlers) and `bridge.is_initialized`, or hook
+> `bridge.on_initialized` for the handshake-complete event.
+
+### Error Handling
+
+`send` and handlers surface `BridgeException` — match on its `error_type`:
+
+```python
+from aspectly_bridge import BridgeException, BridgeErrorType
+
+try:
+    result = bridge.send("greet", {"name": "Native"}).result()
+except BridgeException as e:
+    if e.error_type == BridgeErrorType.UNSUPPORTED_METHOD:
+        ...  # method not registered on the other side
+    elif e.error_type == BridgeErrorType.METHOD_EXECUTION_TIMEOUT:
+        ...  # handler didn't respond in time
+    elif e.error_type == BridgeErrorType.REJECTED:
+        ...  # handler threw
+    elif e.error_type == BridgeErrorType.BRIDGE_NOT_AVAILABLE:
+        ...  # not initialized
 ```
 
 ## Data Exchange Patterns

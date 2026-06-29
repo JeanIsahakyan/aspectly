@@ -27,6 +27,8 @@ yarn add @aspectly/core
 - **iframe ↔ Parent Window**: Communication between iframes and their parent pages
 - **Browser Context**: Standalone browser usage with global bridge instance
 
+`@aspectly/core` is the **web side** of the bridge. The exact same code runs **unchanged across every native host** — Web (iframe/popup), React Native, .NET (CefSharp/WebView2), iOS/macOS, Android, Flutter, and Linux/WebKitGTK. The correct host transport is **auto-detected at runtime** via [`@aspectly/transports`](../transports) (priorities: `cefsharp` 100 > `webkit` 95 > `react-native` 90 > `android` 85 > `flutter` 84 > `iframe` 80 > `window` 70 > `postmessage` 10), so your embedded web app never needs host-specific branches.
+
 ## Quick Start
 
 ### Inside a WebView or iframe
@@ -199,11 +201,25 @@ The package consists of four layers:
 3. **BridgeBase** - Clean public API interface
 4. **AspectlyBridge** - Main entry point composing all layers
 
+## Native hosts
+
+The same `@aspectly/core` web code talks to native hosts on every supported platform family, with the transport selected automatically by [`@aspectly/transports`](../transports):
+
+- **Web** (iframe/popup), **React Native**, and **React Native Web/Expo** — npm packages
+- **.NET** (CefSharp / WebView2, Windows) — NuGet
+- **iOS/macOS/visionOS** — SwiftPM + CocoaPods (`AspectlyBridge`, `AspectlyBridgeWebKit`)
+- **Android** — Maven Central (`io.github.jeanisahakyan:aspectly-bridge-webview`)
+- **Flutter** (Dart) — pub.dev (`aspectly_bridge`)
+- **Linux/WebKitGTK** (Python) — PyPI (`aspectly-bridge`, reuses the WebKit transport)
+
+See the [main README](../../README.md) for the full host matrix, install commands, and native host APIs.
+
 ## Related Packages
 
 - [`@aspectly/web`](../web) - Web/iframe integration with React hooks
 - [`@aspectly/react-native`](../react-native) - React Native WebView integration
 - [`@aspectly/react-native-web`](../react-native-web) - React Native Web + iframe support
+- [`@aspectly/transports`](../transports) - Transport layer with native host auto-detection
 
 ## License
 

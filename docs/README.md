@@ -13,6 +13,14 @@ Welcome to the Aspectly framework documentation! This guide will help you unders
 - **[Examples](EXAMPLES.md)** - Comprehensive examples and use cases
 - **[Architecture](ARCHITECTURE.md)** - Internal architecture and design decisions
 - **[Migration Guide](MIGRATION.md)** - Migration from legacy packages
+- **[Publishing Guide](PUBLISHING.md)** - Releasing and publishing packages across registries
+
+### Per-Platform Guides
+- **[Swift (iOS/macOS/visionOS)](../swift)** - `AspectlyBridge` / `AspectlyBridgeWebKit` for WKWebView + SwiftUI
+- **[Android (Kotlin)](../android)** - `io.github.jeanisahakyan:aspectly-bridge(-webview)` for Android WebView
+- **[Dart (Flutter)](../dart)** - `aspectly_bridge` wrapping `webview_flutter`
+- **[Python (Linux/WebKitGTK)](../python)** - `aspectly-bridge` for WebKitGTK / WKWebView-style hosts
+- **[.NET (Windows)](../dotnet)** - `Aspectly.Bridge.CefSharp` / `Aspectly.Bridge.WebView2`
 
 ### Additional Resources
 - **[Contributing Guide](../CONTRIBUTING.md)** - How to contribute to the project
@@ -43,7 +51,8 @@ docs/
 ├── API.md            # Complete API reference
 ├── EXAMPLES.md       # Usage examples and patterns
 ├── ARCHITECTURE.md   # Internal architecture guide
-└── MIGRATION.md      # Migration guide from legacy packages
+├── MIGRATION.md      # Migration guide from legacy packages
+└── PUBLISHING.md     # Releasing and publishing packages
 ```
 
 ## 🎯 Framework Goals
@@ -65,15 +74,27 @@ Aspectly is designed to solve the complex problem of communication between diffe
 - **Error Handling**: Comprehensive error types and recovery mechanisms
 - **TypeScript Support**: Full type safety and IntelliSense support
 
-## 📱 Platform Support
+## 📱 Supported Platforms
 
-| Platform | WebView | Iframe | Browser |
-|----------|---------|--------|---------|
-| React Native iOS | ✅ | ❌ | ❌ |
-| React Native Android | ✅ | ❌ | ❌ |
-| React Native Web | ❌ | ✅ | ✅ |
-| Web Browsers | ❌ | ✅ | ✅ |
-| .NET (CefSharp/WebView2) | ✅ | ❌ | ❌ |
+Aspectly ships **8 platform families**, all at version **2.1.0**:
+
+| Platform family | Package(s) | Registry | Install |
+|---|---|---|---|
+| Web (iframe/popup) | `@aspectly/core`, `@aspectly/web` | npm | `npm i @aspectly/web` |
+| React Native | `@aspectly/react-native` | npm | `npm i @aspectly/react-native react-native-webview` |
+| React Native Web/Expo | `@aspectly/react-native-web` | npm | `npm i @aspectly/react-native-web` |
+| Transports | `@aspectly/transports` | npm | `npm i @aspectly/transports` |
+| .NET CefSharp/WebView2 (Windows) | `Aspectly.Bridge.CefSharp`, `Aspectly.Bridge.WebView2` | NuGet | `dotnet add package Aspectly.Bridge.WebView2` |
+| iOS/macOS/visionOS | `AspectlyBridge`, `AspectlyBridgeWebKit` | SwiftPM + CocoaPods | `.package(url: "…/aspectly.git", from: "2.1.0")` or `pod 'AspectlyBridgeWebKit'` |
+| Android | `io.github.jeanisahakyan:aspectly-bridge(-webview)` | Maven Central | `implementation("io.github.jeanisahakyan:aspectly-bridge-webview:2.1.0")` |
+| Flutter (Dart) | `aspectly_bridge` | pub.dev | `flutter pub add aspectly_bridge` (`aspectly_bridge: ^2.1.0`) |
+| Linux/WebKitGTK (Python) | `aspectly-bridge` | PyPI | `pip install "aspectly-bridge[webkitgtk]"` |
+
+> Note: WebKitGTK reuses the WebKit transport — the same `window.webkit.messageHandlers.aspectly` mechanism as WKWebView.
+
+The JS transport layer auto-detects its host with the following priority order: `cefsharp` (100) > `webkit` (95) > `react-native` (90) > `android` (85) > `flutter` (84) > `iframe` (80) > `window` (70) > `postmessage` (10).
+
+See the [per-platform guides](#per-platform-guides) for native setup: [Swift](../swift), [Android](../android), [Dart](../dart), [Python](../python), and [.NET](../dotnet).
 
 ## 🛠️ Common Use Cases
 

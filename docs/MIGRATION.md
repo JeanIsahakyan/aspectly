@@ -13,6 +13,13 @@ The Aspectly library has been restructured into a monorepo with multiple focused
 | `@jeanisahakyan/chirp` | `@aspectly/react-native` | React Native apps |
 | `@jeanisahakyan/chirp` | `@aspectly/react-native-web` | Universal Expo apps |
 
+> This guide covers the JavaScript packages only. The native host bridges — .NET
+> (`Aspectly.Bridge.*`), Swift/iOS/macOS/visionOS (`AspectlyBridge`), Android
+> (`io.github.jeanisahakyan:aspectly-bridge`), Flutter (`aspectly_bridge`), and Python /
+> WebKitGTK (`aspectly-bridge`) — are new in the 2.x line and have no `chirp`
+> predecessor, so there is nothing to migrate. See
+> [`EXAMPLES.md`](./EXAMPLES.md) and the per-platform guides to adopt them.
+
 ## Step-by-Step Migration
 
 ### Step 1: Identify Your Use Case

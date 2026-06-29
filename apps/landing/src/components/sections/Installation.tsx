@@ -52,6 +52,63 @@ const dotnetPackages = [
   },
 ]
 
+const swiftPackages = [
+  {
+    name: 'AspectlyBridge + AspectlyBridgeWebKit',
+    description: 'Swift bridge — core + WKWebView / SwiftUI',
+    install: '.package(url: "https://github.com/JeanIsahakyan/aspectly.git", from: "2.1.0")',
+    useCase: 'Swift Package Manager — iOS, macOS, visionOS',
+  },
+  {
+    name: 'AspectlyBridgeWebKit',
+    description: 'CocoaPods — pulls in AspectlyBridge automatically',
+    install: "pod 'AspectlyBridgeWebKit'",
+    useCase: 'CocoaPods (Podfile)',
+  },
+]
+
+const androidPackages = [
+  {
+    name: 'io.github.jeanisahakyan:aspectly-bridge-webview',
+    description: 'Android WebView bridge (pulls in the core)',
+    install: 'implementation("io.github.jeanisahakyan:aspectly-bridge-webview:2.1.0")',
+    useCase: 'Gradle (Kotlin DSL) — Android WebView integration',
+  },
+  {
+    name: 'io.github.jeanisahakyan:aspectly-bridge',
+    description: 'Core bridge — pure Kotlin/JVM, no Android deps',
+    install: 'implementation("io.github.jeanisahakyan:aspectly-bridge:2.1.0")',
+    useCase: 'Gradle — core library only',
+  },
+]
+
+const flutterPackages = [
+  {
+    name: 'aspectly_bridge',
+    description: 'Dart / Flutter bridge (works with webview_flutter)',
+    install: 'flutter pub add aspectly_bridge',
+    useCase: 'pub.dev — Flutter & Dart',
+  },
+]
+
+const pythonPackages = [
+  {
+    name: 'aspectly-bridge[webkitgtk]',
+    description: 'Python WebKitGTK bridge (Linux desktop)',
+    install: 'pip install "aspectly-bridge[webkitgtk]"',
+    useCase: 'PyPI — Linux / WebKitGTK',
+  },
+]
+
+const packagesByPlatform: Record<string, typeof jsPackages> = {
+  javascript: jsPackages,
+  dotnet: dotnetPackages,
+  swift: swiftPackages,
+  android: androidPackages,
+  flutter: flutterPackages,
+  python: pythonPackages,
+}
+
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false)
 
@@ -89,14 +146,14 @@ export function Installation() {
     }
   }
 
-  const packages = platform === 'javascript' ? jsPackages : dotnetPackages
+  const packages = packagesByPlatform[platform] ?? jsPackages
   const getCommand = platform === 'javascript' ? getJsCommand : (pkg: string) => pkg
 
   return (
-    <section id="installation" className="py-24 bg-muted/30">
+    <section id="installation" className="py-16 lg:py-20 bg-muted/30">
       <div className="container px-4 mx-auto">
         <BlurFade delay={0.1} inView>
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">
               Quick Installation
             </h2>
@@ -118,6 +175,18 @@ export function Installation() {
                   </TabsTrigger>
                   <TabsTrigger value="dotnet" className="gap-2">
                     <span className="text-purple-500">C#</span> .NET
+                  </TabsTrigger>
+                  <TabsTrigger value="swift" className="gap-2">
+                    <span className="text-orange-500">Swift</span> iOS / macOS
+                  </TabsTrigger>
+                  <TabsTrigger value="android" className="gap-2">
+                    <span className="text-green-500">Kotlin</span> Android
+                  </TabsTrigger>
+                  <TabsTrigger value="flutter" className="gap-2">
+                    <span className="text-sky-500">Dart</span> Flutter
+                  </TabsTrigger>
+                  <TabsTrigger value="python" className="gap-2">
+                    <span className="text-blue-400">Py</span> Linux
                   </TabsTrigger>
                 </TabsList>
               </Tabs>
@@ -142,6 +211,42 @@ export function Installation() {
               <div className="flex justify-center mb-8">
                 <div className="text-sm text-muted-foreground">
                   Using .NET CLI or NuGet Package Manager
+                </div>
+              </div>
+            )}
+
+            {/* Swift info */}
+            {platform === 'swift' && (
+              <div className="flex justify-center mb-8">
+                <div className="text-sm text-muted-foreground">
+                  Swift Package Manager (Xcode) or CocoaPods
+                </div>
+              </div>
+            )}
+
+            {/* Android info */}
+            {platform === 'android' && (
+              <div className="flex justify-center mb-8">
+                <div className="text-sm text-muted-foreground">
+                  Gradle — published to Maven Central
+                </div>
+              </div>
+            )}
+
+            {/* Flutter info */}
+            {platform === 'flutter' && (
+              <div className="flex justify-center mb-8">
+                <div className="text-sm text-muted-foreground">
+                  pub.dev — pure Dart, works with any web view (webview_flutter)
+                </div>
+              </div>
+            )}
+
+            {/* Python info */}
+            {platform === 'python' && (
+              <div className="flex justify-center mb-8">
+                <div className="text-sm text-muted-foreground">
+                  PyPI — WebKitGTK on Linux desktop
                 </div>
               </div>
             )}

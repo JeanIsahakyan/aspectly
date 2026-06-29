@@ -1,0 +1,11 @@
+name: aspectly_bridge
+description: Type-safe, bidirectional bridge between native Dart/Flutter code and JavaScript in a web view. Speaks the Aspectly protocol.
+version: 2.1.0
+homepage: https://github.com/JeanIsahakyan/aspectly
+repository: https://github.com/JeanIsahakyan/aspectly
+
+environment:
+  sdk: ">=2.14.0 <4.0.0"
+
+dev_dependencies:
+  test: ">=1.16.0 <2.0.0"

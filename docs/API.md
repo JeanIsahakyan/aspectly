@@ -1,13 +1,17 @@
 # API Reference
 
-Complete API documentation for all Aspectly packages.
+Complete API documentation for the JavaScript / TypeScript Aspectly packages.
+For the native host bridges (Swift iOS/macOS/visionOS, Android/Kotlin,
+Flutter/Dart, Python/WebKitGTK) see [`EXAMPLES.md`](./EXAMPLES.md) and the
+per-platform guides ([`swift/`](../swift), [`android/`](../android),
+[`dart/`](../dart), [`python/`](../python)).
 
 ## Table of Contents
 
-- [@aspectly/core](#aspectcore)
-- [@aspectly/web](#aspectweb)
-- [@aspectly/react-native](#aspectreact-native)
-- [@aspectly/react-native-web](#aspectreact-native-web)
+- [@aspectly/core](#aspectlycore)
+- [@aspectly/web](#aspectlyweb)
+- [@aspectly/react-native](#aspectlyreact-native)
+- [@aspectly/react-native-web](#aspectlyreact-native-web)
 - [@aspectly/transports](#aspectlytransports)
 - [Types](#types)
 
@@ -225,7 +229,7 @@ Automatically detect and return the appropriate transport for the current enviro
 import { detectTransport } from '@aspectly/transports';
 
 const transport = detectTransport();
-console.log(transport.name); // 'cefsharp', 'react-native', 'iframe', 'window', 'postmessage', or 'null'
+console.log(transport.name); // 'cefsharp', 'webkit', 'react-native', 'android', 'flutter', 'iframe', 'window', 'postmessage', or 'null'
 
 // Send a message
 transport.send(JSON.stringify({ type: 'hello' }));
@@ -244,11 +248,21 @@ unsubscribe();
 | Transport | Detection | Priority | Use Case |
 |-----------|-----------|----------|----------|
 | CefSharpTransport | `window.CefSharp.PostMessage` | 100 | Desktop apps with CefSharp (.NET) |
+| WebKitTransport | `window.webkit.messageHandlers.aspectly` | 95 | Native WKWebView host on iOS/macOS (Swift) |
 | ReactNativeTransport | `window.ReactNativeWebView.postMessage` | 90 | React Native WebView |
+| AndroidTransport | `window.AspectlyAndroid.postMessage` | 85 | Native Android WebView host (Kotlin) |
+| FlutterTransport | `window.AspectlyFlutter.postMessage` | 84 | Native Flutter host (Dart, webview_flutter) |
 | IframeTransport | `window.parent !== window` | 80 | Web content in iframes |
 | WindowTransport | `window.addEventListener('message')` | 70 | Popup window communication |
 | PostMessageTransport | `window.postMessage` | 10 | Generic postMessage fallback |
 | NullTransport | Always available | - | Fallback for SSR/testing |
+
+> The `webkit`, `android`, and `flutter` transports are also available as
+> standalone entry points: `@aspectly/transports/webkit`,
+> `@aspectly/transports/android`, and `@aspectly/transports/flutter`. They pair
+> with the native [`AspectlyBridge`](../swift) (Swift),
+> [`aspectly-bridge`](../android) (Kotlin), and
+> [`aspectly_bridge`](../dart) (Dart / Flutter) libraries.
 
 ### TransportRegistry
 

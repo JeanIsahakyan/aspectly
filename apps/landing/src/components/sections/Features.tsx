@@ -34,7 +34,7 @@ const features = [
     icon: Smartphone,
     title: 'Universal',
     description:
-      'Single API works on iOS, Android, and Web platforms seamlessly.',
+      'One protocol across Web, React Native, .NET, iOS/macOS/visionOS, Android, Flutter, and Linux/WebKitGTK — the same web content runs on every host.',
     color: 'text-blue-500',
     bgColor: 'bg-blue-500/10',
   },
@@ -74,7 +74,7 @@ const features = [
     icon: Globe,
     title: 'Platform Detection',
     description:
-      'Automatic detection of environment (WebView vs iframe vs browser).',
+      'Auto-detects the host: CefSharp, WKWebView (iOS/macOS), Android WebView, React Native, iframe, or browser.',
     color: 'text-cyan-500',
     bgColor: 'bg-cyan-500/10',
   },
@@ -90,10 +90,10 @@ const features = [
 
 export function Features() {
   return (
-    <section id="features" className="py-24 relative">
+    <section id="features" className="py-16 lg:py-20 relative">
       <div className="container px-4 mx-auto">
         <BlurFade delay={0.1} inView>
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">
               Powerful Features
             </h2>
@@ -104,7 +104,7 @@ export function Features() {
           </div>
         </BlurFade>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {features.map((feature, index) => (
             <BlurFade key={feature.title} delay={0.1 + index * 0.05} inView>
               <motion.div
@@ -112,16 +112,16 @@ export function Features() {
                 transition={{ type: 'spring', stiffness: 300, damping: 20 }}
               >
                 <Card className="h-full border-border/50 bg-background/50 backdrop-blur-sm hover:border-primary/50 transition-colors">
-                  <CardHeader>
+                  <CardHeader className="pb-2">
                     <div
-                      className={`w-12 h-12 rounded-lg ${feature.bgColor} flex items-center justify-center mb-4`}
+                      className={`w-10 h-10 rounded-lg ${feature.bgColor} flex items-center justify-center mb-3`}
                     >
-                      <feature.icon className={`h-6 w-6 ${feature.color}`} />
+                      <feature.icon className={`h-5 w-5 ${feature.color}`} />
                     </div>
-                    <CardTitle className="text-xl">{feature.title}</CardTitle>
+                    <CardTitle className="text-lg">{feature.title}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <CardDescription className="text-base">
+                    <CardDescription className="text-sm">
                       {feature.description}
                     </CardDescription>
                   </CardContent>

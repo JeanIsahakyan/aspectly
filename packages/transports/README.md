@@ -20,20 +20,30 @@ yarn add @aspectly/transports
 
 ## Overview
 
-`@aspectly/transports` provides a flexible abstraction layer for platform detection and message passing across different execution contexts. It automatically detects the current environment (CefSharp, React Native WebView, iframe, or browser) and provides a unified API for bidirectional communication.
+`@aspectly/transports` provides a flexible abstraction layer for platform detection and message passing across different execution contexts. It automatically detects the current environment (CefSharp, WKWebView/WebKitGTK, React Native WebView, Android WebView, Flutter WebView, iframe, or browser window) and provides a unified API for bidirectional communication.
 
 ### Built-in Transports
 
 | Transport | Detection | Priority | Use Case |
 |-----------|-----------|----------|----------|
 | **CefSharpTransport** | `window.CefSharp.PostMessage` | 100 | Desktop apps with CefSharp (Chromium Embedded Framework for .NET) |
+| **WebKitTransport** | `window.webkit.messageHandlers.aspectly` | 95 | iOS/macOS/visionOS WKWebView and Linux WebKitGTK |
 | **ReactNativeTransport** | `window.ReactNativeWebView.postMessage` | 90 | React Native WebView |
+| **AndroidTransport** | `window.AspectlyAndroid.postMessage` | 85 | Android WebView |
+| **FlutterTransport** | `window.AspectlyFlutter.postMessage` | 84 | Flutter `webview_flutter` |
 | **IframeTransport** | `window.parent !== window` | 80 | Web content inside iframes |
-| **NullTransport** | Always available | - | Fallback for SSR/testing (no-op) |
+| **WindowTransport** | `window.opener !== null` | 70 | Popup windows opened via `window.open` |
+| **PostMessageTransport** | Always available (generic) | 10 | Generic `window.postMessage` fallback |
+| **NullTransport** | Always available | fallback | Fallback for SSR/testing (no-op) |
 
 ### Auto-Detection
 
-The `TransportRegistry` automatically selects the appropriate transport based on priority order. Higher priority transports are checked first, ensuring the most specific transport is used.
+The `TransportRegistry` automatically selects the appropriate transport based on priority order. Higher priority transports are checked first, ensuring the most specific transport is used:
+
+```
+cefsharp (100) > webkit (95) > react-native (90) > android (85) >
+flutter (84) > iframe (80) > window (70) > postmessage (10) > null (fallback)
+```
 
 ## Quick Start
 
@@ -44,7 +54,9 @@ import { detectTransport } from '@aspectly/transports';
 
 // Automatically detect the current environment
 const transport = detectTransport();
-console.log(`Using transport: ${transport.name}`); // 'cefsharp', 'react-native', 'iframe', or 'null'
+// transport.name is one of: 'cefsharp', 'webkit', 'react-native', 'android',
+// 'flutter', 'iframe', 'window', 'postmessage', or 'null'
+console.log(`Using transport: ${transport.name}`);
 
 // Send a message
 transport.send(JSON.stringify({ type: 'hello', data: 'world' }));
@@ -225,6 +237,24 @@ const unsubscribe = transport.subscribe((message) => {
 - Sends messages via `window.CefSharp.PostMessage(message)`
 - Receives messages via `window.postMessage` events
 
+### WebKitTransport
+
+For web content running inside an Apple WKWebView (iOS, macOS, visionOS) or a Linux WebKitGTK `WebKitWebView`. Both reuse the same `window.webkit.messageHandlers.aspectly` mechanism.
+
+**Detection:** Checks for `window.webkit.messageHandlers.aspectly`
+**Priority:** 95
+
+```typescript
+import { WebKitTransport } from '@aspectly/transports';
+
+const transport = new WebKitTransport();
+transport.send(JSON.stringify({ action: 'openFile' }));
+```
+
+**Messaging:**
+- Sends messages via `window.webkit.messageHandlers.aspectly.postMessage(message)`
+- Receives messages via `window.postMessage` events
+
 ### ReactNativeTransport
 
 For web content running inside [React Native WebView](https://github.com/react-native-webview/react-native-webview).
@@ -242,6 +272,42 @@ transport.send(JSON.stringify({ action: 'navigate' }));
 **Messaging:**
 - Sends messages via `window.ReactNativeWebView.postMessage(message)`
 - Messages are wrapped in quotes for iOS compatibility: `'${message}'`
+- Receives messages via `window.postMessage` events
+
+### AndroidTransport
+
+For web content running inside an Android `WebView`.
+
+**Detection:** Checks for `window.AspectlyAndroid.postMessage`
+**Priority:** 85
+
+```typescript
+import { AndroidTransport } from '@aspectly/transports';
+
+const transport = new AndroidTransport();
+transport.send(JSON.stringify({ action: 'navigate' }));
+```
+
+**Messaging:**
+- Sends messages via `window.AspectlyAndroid.postMessage(message)`
+- Receives messages via `window.postMessage` events
+
+### FlutterTransport
+
+For web content running inside a Flutter `webview_flutter` `WebViewController`.
+
+**Detection:** Checks for `window.AspectlyFlutter.postMessage`
+**Priority:** 84
+
+```typescript
+import { FlutterTransport } from '@aspectly/transports';
+
+const transport = new FlutterTransport();
+transport.send(JSON.stringify({ action: 'navigate' }));
+```
+
+**Messaging:**
+- Sends messages via `window.AspectlyFlutter.postMessage(message)`
 - Receives messages via `window.postMessage` events
 
 ### IframeTransport
@@ -270,6 +336,50 @@ transport.send(JSON.stringify({ type: 'ready' }));
 - Sends messages via `window.parent.postMessage(message, targetOrigin)`
 - Receives messages via `window.postMessage` events
 
+### WindowTransport
+
+For web content running inside a popup window opened via `window.open`.
+
+**Detection:** Checks if `window.opener !== null`
+**Priority:** 70
+
+```typescript
+import { WindowTransport } from '@aspectly/transports';
+
+// Default: sends to any origin ('*')
+const transport = new WindowTransport();
+
+// Specify target origin for security
+const secureTransport = new WindowTransport('https://opener-domain.com');
+
+transport.send(JSON.stringify({ type: 'ready' }));
+```
+
+**Constructor:**
+- `new WindowTransport(targetOrigin?: string)` - Default: `'*'`
+
+**Messaging:**
+- Sends messages via `window.opener.postMessage(message, targetOrigin)`
+- Receives messages via `window.postMessage` events
+
+### PostMessageTransport
+
+Generic `window.postMessage` transport used as a last-resort fallback before `NullTransport`.
+
+**Detection:** Always available
+**Priority:** 10 (lowest non-fallback)
+
+```typescript
+import { PostMessageTransport } from '@aspectly/transports';
+
+const transport = new PostMessageTransport();
+transport.send(JSON.stringify({ type: 'ready' }));
+```
+
+**Messaging:**
+- Sends messages via `window.postMessage(message, targetOrigin)`
+- Receives messages via `window.postMessage` events
+
 ### NullTransport
 
 Fallback transport that performs no operations. Used when no other transport is available (e.g., SSR, testing).
@@ -289,6 +399,28 @@ transport.subscribe(() => {}); // Returns no-op cleanup function
 - `isAvailable()` always returns `true`
 - `send()` is a no-op (logs warning in development mode)
 - `subscribe()` returns a no-op cleanup function
+
+## Subpath Entry Points
+
+Each platform-specific transport is also exposed as its own subpath export, so you can import only the transport you need without pulling in the others:
+
+| Entry point | Exports |
+|-------------|---------|
+| `@aspectly/transports/webkit` | `WebKitTransport` |
+| `@aspectly/transports/android` | `AndroidTransport` |
+| `@aspectly/transports/flutter` | `FlutterTransport` |
+| `@aspectly/transports/cefsharp` | `CefSharpTransport` |
+| `@aspectly/transports/react-native` | `ReactNativeTransport` |
+| `@aspectly/transports/iframe` | `IframeTransport` |
+| `@aspectly/transports/window` | `WindowTransport` |
+
+```typescript
+import { WebKitTransport } from '@aspectly/transports/webkit';
+
+const transport = new WebKitTransport();
+```
+
+The package root (`@aspectly/transports`) continues to re-export every transport along with the registry and convenience functions.
 
 ## Creating Custom Transports
 

@@ -2,6 +2,55 @@
 
 All notable changes to Aspectly Bridge are documented here.
 
+## [2.1.0] - 2026-06-22
+
+Native mobile platforms. Aspectly now bridges to **iOS / macOS (Swift, SwiftUI)**
+and **Android (Kotlin)** — the same `@aspectly/core` web content runs unchanged
+across Web, React Native, .NET, Apple, and Android hosts.
+
+### Added — Swift (iOS / macOS / visionOS)
+- New Swift package (`Package.swift` at the repo root), products:
+  - `AspectlyBridge` — core `BridgeHost`, protocol types, `BrowserBridge` /
+    `BridgeHandler` / `BridgeLogger` protocols, `JSONValue`, `BridgeError`
+    (1:1 port of the .NET `BridgeHost`)
+  - `AspectlyBridgeWebKit` — `WKWebViewBrowserBridge` plus the SwiftUI
+    `AspectlyWebView` + `AspectlyWebViewModel` (the `useAspectlyWebView` analog)
+- Distribution via Swift Package Manager and CocoaPods (`AspectlyBridge`,
+  `AspectlyBridgeWebKit` podspecs)
+- `examples/swiftui` sample app; verified at runtime on the iOS Simulator and macOS
+
+### Added — Android (Kotlin)
+- New Gradle modules:
+  - `io.github.jeanisahakyan:aspectly-bridge` — pure Kotlin/JVM core (`BridgeHost`,
+    coroutine-based, Gson serialization)
+  - `io.github.jeanisahakyan:aspectly-bridge-webview` — `AndroidWebViewBrowserBridge` for
+    Android `WebView`
+- Maven publishing (Maven Central + GitHub Packages) and a JUnit test suite
+- `examples/android` sample app; verified at runtime on an Android emulator
+
+### Added — Flutter (Dart)
+- New `aspectly_bridge` Dart package (pure Dart, pub.dev) — `BridgeHost` +
+  `BrowserBridge`; wires to `webview_flutter` via the example glue
+- `examples/flutter` sample app; 23 unit tests pass (`dart test`)
+
+### Added — Linux / WebKitGTK (Python)
+- New `aspectly-bridge` Python package (PyPI) — pure-Python `BridgeHost` +
+  `WebKitGTKBrowserBridge` (Linux). Reuses the WebKit transport (same
+  `window.webkit.messageHandlers.aspectly` mechanism as WKWebView)
+- `examples/webkitgtk` sample app; 23 unit tests pass (`pytest`)
+
+### Added — JS transports
+- `WebKitTransport` (`@aspectly/transports/webkit`, priority 95) — auto-detects a
+  native WKWebView host via `window.webkit.messageHandlers.aspectly`
+- `AndroidTransport` (`@aspectly/transports/android`, priority 85) — auto-detects a
+  native Android WebView host via `window.AspectlyAndroid`
+- `FlutterTransport` (`@aspectly/transports/flutter`, priority 84) — auto-detects a
+  native Flutter host via `window.AspectlyFlutter`
+
+### Docs / infra
+- New [`docs/PUBLISHING.md`](./docs/PUBLISHING.md); Swift + Android CI jobs;
+  release workflow publishes to CocoaPods and Maven Central
+
 ## [2.0.15] - 2026-06-21
 
 ### Fixed

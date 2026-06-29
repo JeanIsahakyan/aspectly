@@ -69,6 +69,46 @@ jobs:
           done
           dotnet nuget push ./nupkgs/*.nupkg --api-key "${{ secrets.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
 
+      # --- Android (Kotlin) -> Maven Central + GitHub Packages ---
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10'
+
+      - name: Publish Android to Maven Central (Central Portal staging)
+        working-directory: android
+        run: gradle publishAllPublicationsToOSSRHRepository -PreleaseVersion="${VERSION}" --no-daemon
+        env:
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+          SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+
+      - name: Release the Central Portal staging deployment
+        # The OSSRH Staging API only stages the upload; finalize + auto-release it
+        # to Maven Central. publishing_type=automatic releases if validation passes.
+        run: |
+          AUTH=$(printf '%s:%s' "${OSSRH_USERNAME}" "${OSSRH_PASSWORD}" | base64 -w 0)
+          curl -sS -f -X POST \
+            -H "Authorization: Bearer ${AUTH}" \
+            "https://ossrh-staging-api.central.sonatype.com/manual/upload/defaultRepository/io.github.jeanisahakyan?publishing_type=automatic"
+        env:
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+
+      # Note: the Swift package is consumed via Swift Package Manager directly
+      # from the git tag (no registry publish needed). CocoaPods publishing is
+      # handled by the separate `publish-cocoapods` job below.
+
       - name: Commit version bump
         run: |
           git config user.name "github-actions[bot]"
@@ -82,3 +122,94 @@ jobs:
         run: gh workflow run deploy-landing.yml --ref main
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Swift / iOS / macOS / visionOS -> CocoaPods (runs on macOS for Xcode-based linting)
+  publish-cocoapods:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Set podspec version from tag
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          sed -i '' "s/s\.version *= *'[^']*'/s.version          = '${VERSION}'/" AspectlyBridge.podspec
+          sed -i '' "s/s\.version *= *'[^']*'/s.version          = '${VERSION}'/" AspectlyBridgeWebKit.podspec
+          sed -i '' "s/s\.dependency 'AspectlyBridge', '[^']*'/s.dependency 'AspectlyBridge', '${VERSION}'/" AspectlyBridgeWebKit.podspec
+
+      - name: Push AspectlyBridge to CocoaPods trunk
+        run: pod trunk push AspectlyBridge.podspec --allow-warnings --synchronous
+        env:
+          COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
+
+      - name: Push AspectlyBridgeWebKit to CocoaPods trunk
+        run: pod trunk push AspectlyBridgeWebKit.podspec --allow-warnings
+        env:
+          COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
+
+  # Python -> PyPI (OIDC Trusted Publishing — NO secret needed).
+  # One-time setup: on pypi.org add a Trusted Publisher for `aspectly-bridge`
+  # (owner: JeanIsahakyan, repo: aspectly, workflow: release.yml). See docs/PUBLISHING.md.
+  publish-pypi:
+    name: Publish Python to PyPI
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write   # OIDC -> PyPI Trusted Publishing
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Sync version from tag + build sdist/wheel
+        working-directory: python
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          sed -i "s/^version = .*/version = \"${VERSION}\"/" pyproject.toml
+          python -m pip install --upgrade build
+          python -m build
+
+      - name: Publish to PyPI (Trusted Publishing / OIDC)
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: python/dist
+          skip-existing: true
+
+  # Dart / Flutter -> pub.dev (OIDC automated publishing — NO secret needed).
+  # One-time setup: on pub.dev enable Automated publishing for `aspectly_bridge`
+  # (repo: JeanIsahakyan/aspectly, tag pattern: v{{version}}). See docs/PUBLISHING.md.
+  publish-pub-dev:
+    name: Publish Dart to pub.dev
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write   # OIDC -> pub.dev automated publishing
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Setup Dart
+        uses: dart-lang/setup-dart@v1
+
+      - name: Sync version from tag + publish (skip if already on pub.dev)
+        working-directory: dart
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          CODE=$(curl -s -o /dev/null -w '%{http_code}' "https://pub.dev/api/packages/aspectly_bridge/versions/${VERSION}")
+          if [ "$CODE" = "200" ]; then
+            echo "aspectly_bridge ${VERSION} is already published on pub.dev — skipping."
+            exit 0
+          fi
+          sed -i "s/^version: .*/version: ${VERSION}/" pubspec.yaml
+          dart pub get
+          dart pub publish --force

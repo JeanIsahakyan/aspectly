@@ -22,6 +22,15 @@ yarn add @aspectly/web
 
 `@aspectly/web` provides React hooks for the parent page to embed iframes and establish bidirectional communication with them. The iframe content should use `@aspectly/core` to communicate back.
 
+### Native hosts
+
+`@aspectly/web` is the **web/parent** side (iframe + popup). The embedded content
+(`@aspectly/core`) speaks the same protocol against every Aspectly host — .NET
+(CefSharp/WebView2), iOS/macOS/visionOS (WebKit), Android, Flutter, and
+Linux/WebKitGTK (Python) — with the transport auto-detected by
+[`@aspectly/transports`](../transports). See the [main README](../../README.md)
+for the full host matrix.
+
 ## Quick Start
 
 ### Parent Page (Host)

@@ -34,7 +34,7 @@ const docs = [
 
 export function Docs() {
   return (
-    <section id="docs" className="py-24 bg-muted/30">
+    <section id="docs" className="py-16 lg:py-20 bg-muted/30">
       <div className="container px-4 mx-auto">
         <BlurFade delay={0.1} inView>
           <div className="text-center mb-12">

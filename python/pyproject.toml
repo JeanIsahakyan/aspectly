@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aspectly-bridge"
+version = "2.1.0"
+description = "Type-safe, bidirectional bridge between native Python (WebKitGTK) and JavaScript via the Aspectly protocol."
+readme = "README.md"
+requires-python = ">=3.7"
+license = { text = "MIT" }
+authors = [{ name = "Zhan Isaakian", email = "jeanisahkyan@gmail.com" }]
+keywords = ["aspectly", "bridge", "webkitgtk", "webview", "javascript", "ipc"]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Operating System :: POSIX :: Linux",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/JeanIsahakyan/aspectly"
+Repository = "https://github.com/JeanIsahakyan/aspectly"
+
+[project.optional-dependencies]
+# Linux only — requires system GObject-Introspection + WebKit2GTK libraries.
+webkitgtk = ["PyGObject>=3.40"]
+dev = ["pytest>=7.0"]
+
+[tool.setuptools.packages.find]
+include = ["aspectly_bridge*"]
